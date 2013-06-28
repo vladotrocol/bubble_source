@@ -7,11 +7,11 @@
 #include <stdio.h>
 #include <sys/timeb.h>
 #include <memory.h>
-//#include "sleep.h"
 #include <string>
 #include <vector>
 #include <pthread.h>
 #include "IBubbleTracker.h"
+
 class IBubbleDetector{
 	public:
 		virtual bool init(void)=0;
@@ -52,4 +52,5 @@ class BubbleDetector: public IBubbleDetector{
 		vector<Bubble> detectBubbles(Filters* filter, Mat src);
 		void updateFPS(bool newFrame);
 };
+
 #endif

@@ -5,11 +5,6 @@
 #include "windows.h"
 #endif
 
-
-#include "./DisplayKernel/OgreApplications/CompositeOgreApplication.h"
-#include "./DisplayKernel/OgreApplications/LayerSimulation.h"
-#include "./DisplayKernel/OgreApplications/VideoPlayer.h"
-#include "./WaterDisplayUSBController/XMOSControlPlugin.h"
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
@@ -19,6 +14,13 @@
 #include "BubbleGenerator.h"
 
 using namespace std;
+
+void createBubble(BubbleState* BS, BubbleGenerator* BG){
+	Bubble b;
+	if(BG->createPhysicalBubble()){
+		BS->addBubble(b);
+	}
+};
 
 int main(){
 //	Kinect K;
@@ -33,12 +35,6 @@ int main(){
 	BubbleTracker BT(&BS);
 	BT.init();
 	BT.start();
+	createBubble(&BS, &BG);
 	return 0;
-}
-
-void createBubble(BubbleState* BS, BubbleGenerator* BG){
-	Bubble b(10);
-	if(BG->createPhysicalBubble()){
-		BS->addBubble(b);
-	}
 };

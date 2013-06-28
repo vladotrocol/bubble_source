@@ -12,11 +12,6 @@ public:
 	Point2f center;
 	float radius;
 	float state;
-	Bubble(unsigned int id):ID(id),
-							center(Point2f(0,0)),
-							radius(0),
-							state(NON_TRACKED)
-	{};
 };
 
 #endif

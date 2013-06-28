@@ -12,7 +12,7 @@ void KOCVStream::display(char* s){
 	string b = "_window_";
 	generateControls();
 	generateWindows(s);
-	int j=0;
+	unsigned int j=0;
 	while(j<strlen(s)){
 		if(s[j]=='r'||s[j]=='d'){
 			readFrame(s[j]);
@@ -21,12 +21,12 @@ void KOCVStream::display(char* s){
 			cerr<<"Some flag error in display function";
 			break;
 		}
-		int i=j;
+		unsigned int i=j;
 		do{
 			imshow(s[j]+b+s[i], filter.applyFilter(s[i],*whichSource(s[j])));
 			waitKey( 20 );
 			i++;
-		}while(s[i]!='r'&&s[i]!='d'&&i<strlen(s));
+		}while((char)s[i]!='r'&&(char)s[i]!='d'&&i<strlen(s));
 		j=i;
 	}	
 	char c = waitKey( 20 );
@@ -49,7 +49,7 @@ void KOCVStream::readFrame(char s){
 void KOCVStream::displayBubbles(vector<Bubble> &bubbles){
 	RNG rng(12345);
 	Mat drawing = Mat::zeros(depth_src.size(), CV_8UC3 );
-	for( int i = 0; i< bubbles.size(); i++ ){
+	for( unsigned int i = 0; i< bubbles.size(); i++ ){
 		Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
 		if((int)bubbles[i].radius>0)
         circle( drawing, bubbles[i].center, (int)bubbles[i].radius, color, 2, 8, 0 );
@@ -153,7 +153,7 @@ Mat* KOCVStream::whichSource(char s){
 //Generates windows according to grammar
 void KOCVStream::generateWindows(char* s){
 string b = "_window_";
-	int j=0;
+	unsigned int j=0;
 	while(j<strlen(s)){
 			if(s[j]=='r'||s[j]=='d'){
 				readFrame(s[j]);
@@ -162,11 +162,11 @@ string b = "_window_";
 				cerr<<"Some flag error in display function";
 				break;
 			}
-			int i=j;
+			unsigned int i=j;
 			do{
 				namedWindow(s[j]+b+s[i],0);
 				i++;
-			}while(s[i]!='r'&&s[i]!='d'&&i<strlen(s));
+			}while((char)s[i]!='r'&&(char)s[i]!='d'&&i<strlen(s));
 			j=i;
 		}	
 };
