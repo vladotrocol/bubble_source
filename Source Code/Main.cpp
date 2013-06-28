@@ -23,14 +23,6 @@ void createBubble(BubbleState* BS, BubbleGenerator* BG){
 };
 
 int main(){
-//	Kinect K;
-//	Filters F;
-//	cout<<K.initialiseKinect()<<'\n';
-//	KOCVStream STREAM(K,F);
-//	while(1){
-//	STREAM.display("dei");
-//	}
-
 	BubbleState BS = BubbleState::instance();
 	BubbleGenerator BG;
 	BubbleTracker BT(&BS);
@@ -39,3 +31,13 @@ int main(){
 	createBubble(&BS, &BG);
 	return 0;
 };
+
+
+
+//	Kinect K;
+//	Filters F;
+//	cout<<K.initialiseKinect()<<'\n';
+//	KOCVStream STREAM(K,F);
+//	while(1){
+//	STREAM.display("dei");
+//	}
