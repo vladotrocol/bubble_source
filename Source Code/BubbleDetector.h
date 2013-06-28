@@ -1,0 +1,55 @@
+#ifndef _BUBBLE_DETECTOR
+#define _BUBBLE_DETECTOR
+
+#include <iostream>
+#include "KOCVStream.h"
+#include <assert.h>
+#include <stdio.h>
+#include <sys/timeb.h>
+#include <memory.h>
+//#include "sleep.h"
+#include <string>
+#include <vector>
+#include <pthread.h>
+#include "IBubbleTracker.h"
+class IBubbleDetector{
+	public:
+		virtual bool init(void)=0;
+		virtual bool start(void)=0;
+		virtual void run(void)=0;
+		virtual bool stop(void)=0;
+};
+
+#define minBubbleSize 10
+#define maxBubbleSize 100
+
+class BubbleDetector: public IBubbleDetector{
+	//Thread data
+	pthread_mutex_t mutex;//lock while writing to avoid conflicts.
+	pthread_mutex_t captureStarted;//Will be set to 1 when the first image is grabbed.
+	pthread_t thread;
+	float waitTime;
+
+	protected:
+		static const int ST_INIT=0;
+		static const int ST_READY=1;
+		static const int ST_PLAYING=2;
+		int status;
+		IBubbleTracker *_observer;
+
+	public:
+		vector<Bubble> Bubbles;
+		Filters filter;
+		Kinect kinect;
+
+		BubbleDetector(IBubbleTracker * observer){
+			_observer=observer;
+		}
+		bool init(void);
+		bool start(void);
+		void run(void);
+		bool stop(void);
+		vector<Bubble> detectBubbles(Filters* filter, Mat src);
+		void updateFPS(bool newFrame);
+};
+#endif
