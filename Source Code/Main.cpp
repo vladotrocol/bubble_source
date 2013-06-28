@@ -30,6 +30,7 @@ int main(){
 //	while(1){
 //	STREAM.display("dei");
 //	}
+
 	BubbleState BS = BubbleState::instance();
 	BubbleGenerator BG;
 	BubbleTracker BT(&BS);
