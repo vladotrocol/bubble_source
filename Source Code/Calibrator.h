@@ -8,7 +8,7 @@ using namespace cv;
 class Calibrator{
 	public:
 		KOCVStream* s;
-		Calibrator(KOCVStream& stream);
+		Calibrator(KOCVStream* stream);
 		void calibrateCameraProjector();
 };
 

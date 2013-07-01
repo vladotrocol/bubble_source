@@ -1,7 +1,7 @@
 #include "KOCVStream.h"
 
 //Constructor
-KOCVStream::KOCVStream(Kinect& k, Filters& f):kinect(k),filter(f)
+KOCVStream::KOCVStream(Kinect* k, Filters* f):kinect(*k),filter(*f)
 {};
 
 //----------------------------API------------------------

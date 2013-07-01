@@ -3,12 +3,13 @@
 #include "IBubbleTracker.h"
 #include "BubbleDetector.h"
 #include "BubbleState.h"
-
+#include "Calibrator.h"
 
 class BubbleTracker: public IBubbleTracker{
 	public:
 		BubbleDetector* _detector;
 		BubbleState* _state;
+		Calibrator* _calibrator;
 		bool init(void);
 		bool start(void);
 		bool stop(void);

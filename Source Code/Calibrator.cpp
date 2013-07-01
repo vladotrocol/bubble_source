@@ -10,7 +10,7 @@
 		Point2f srcPoints[4];
 		KOCVStream* STREAM;
 
-Calibrator::Calibrator(KOCVStream& stream):s(&stream){};
+Calibrator::Calibrator(KOCVStream* stream):s(stream){};
 
 void tryComputeHomography(Point2f srcPoints[],int srcCount, Point2f dstPoints[], int dstCount,Mat source, Mat distortion){
 	if(srcCount<4 || dstCount<4)
@@ -89,16 +89,19 @@ void Calibrator::calibrateCameraProjector(){
 	STREAM->readFrame('d');
 	res = STREAM->depth_src;
 
-	res.copyTo(distortion2);// = readFrameRGB(); //imread("homographyDistortion.bmp",1);
+	res.copyTo(distortion2);
+	
 	//Create windows
 	imshow("distortion",distortion2);
+	
 	//Add callbacks
 	setMouseCallback("source", on_mouse_source, NULL );
 	setMouseCallback("distortion", on_mouse_distortion, NULL );
-	// on_mouse();
-	/// Set the dst image the same type and size as src
-	while (!homographyComputed)
+	
+	// Set the dst image the same type and size as src
+	while (!homographyComputed){
 		waitKey(10);
+	}
 
 	srcCount = 0;
 	dstCount = 0;

@@ -56,10 +56,10 @@ BYTE* Kinect::getDepthData(NUI_LOCKED_RECT *LockedRect){
 //Returns the requested stream
 HANDLE Kinect::whichStream(char s){
 	if(s == 'r'){
-		return rgbStream;
+		return this->rgbStream;
 	}
 	else if(s == 'd'){
-		return depthStream;
+		return this->depthStream;
 	}
 	else{
 		cerr<<"Flag 1 is incorrect";

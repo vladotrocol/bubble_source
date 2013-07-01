@@ -30,7 +30,7 @@ class KOCVStream{
 		Filters filter;
 
 		//Constructor
-		KOCVStream(Kinect& kinect, 	Filters& filter);
+		KOCVStream(Kinect* kinect, 	Filters* filter);
 
 		//External Api
 		void display(char* s);

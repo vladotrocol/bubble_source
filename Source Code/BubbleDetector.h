@@ -41,6 +41,7 @@ class BubbleDetector: public IBubbleDetector{
 		vector<Bubble> Bubbles;
 		Filters filter;
 		Kinect kinect;
+		KOCVStream* STREAM;
 
 		BubbleDetector(IBubbleTracker * observer){
 			_observer=observer;
