@@ -5,13 +5,12 @@ BubbleTracker::BubbleTracker(BubbleState* BS):_state(BS){};
 bool BubbleTracker::init(){
 	_detector = new BubbleDetector(this);
 	_detector->init();
-	_calibrator = new Calibrator(_detector->STREAM);
+	//_calibrator = new Calibrator(_detector->_stream);
 	return true;
 };
 
 bool BubbleTracker::start(){
 	_detector->start();
-	_detector->run();
 	return true;
 };
 

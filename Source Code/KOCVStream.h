@@ -26,8 +26,8 @@ class KOCVStream{
 	public:
 		Mat rgb_src,
 			depth_src;
-		Kinect kinect;
-		Filters filter;
+		Kinect* kinect;
+		Filters* filter;
 
 		//Constructor
 		KOCVStream(Kinect* kinect, 	Filters* filter);

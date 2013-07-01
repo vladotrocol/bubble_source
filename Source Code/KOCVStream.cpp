@@ -1,7 +1,7 @@
 #include "KOCVStream.h"
 
 //Constructor
-KOCVStream::KOCVStream(Kinect* k, Filters* f):kinect(*k),filter(*f)
+KOCVStream::KOCVStream(Kinect* k, Filters* f):kinect(k), filter(f)
 {};
 
 //----------------------------API------------------------
@@ -23,7 +23,7 @@ void KOCVStream::display(char* s){
 		}
 		unsigned int i=j;
 		do{
-			imshow(s[j]+b+s[i], filter.applyFilter(s[i],*whichSource(s[j])));
+			imshow(s[j]+b+s[i], filter->applyFilter(s[i],*whichSource(s[j])));
 			waitKey( 20 );
 			i++;
 		}while((char)s[i]!='r'&&(char)s[i]!='d'&&i<strlen(s));
@@ -64,12 +64,12 @@ void KOCVStream::displayBubbles(vector<Bubble> &bubbles){
 Mat KOCVStream::tryReadFrame(char s){
 	NUI_IMAGE_FRAME imageFrame;
 
-	if (!kinect.hasNextFrame(s, &imageFrame)) {
+	if (!kinect->hasNextFrame(s, &imageFrame)) {
 		return Mat();
 	}
 
 	Mat depthFrame = kFrameToMat(s, imageFrame);
-	kinect.releaseFrame(s, &imageFrame);
+	kinect->releaseFrame(s, &imageFrame);
 
 	if(s == 'd'){
 		flip(depthFrame, depthFrame, 1);
@@ -113,7 +113,7 @@ BYTE* KOCVStream::whichImageData(char s, NUI_LOCKED_RECT *LockedRect){
 		data = (*LockedRect).pBits;
 	}
 	else if(s == 'd'){
-		data = kinect.getDepthData(LockedRect);
+		data = kinect->getDepthData(LockedRect);
 	}
 	else{
 		cerr<<"Flag 1 is incorrect";
@@ -176,15 +176,15 @@ string b = "_window_";
 void KOCVStream::generateControls(){
 	namedWindow("Controls", CV_WINDOW_AUTOSIZE);
 	cvCreateTrackbar( "ThreValue", "Controls",
-                  &filter.thresholdValue, 255,
+                  &filter->thresholdValue, 255,
                   NULL);
 	cvCreateTrackbar("ThreType","Controls",
-				  &filter.thresholdType,
+				  &filter->thresholdType,
                   4, NULL);
 	cvCreateTrackbar("EroSize","Controls",
-				  &filter.erosionSize,
+				  &filter->erosionSize,
                   200, NULL);
 	cvCreateTrackbar("DilSize","Controls",
-				  &filter.dilationSize,
+				  &filter->dilationSize,
                   200, NULL);
 };
