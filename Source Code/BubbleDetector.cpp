@@ -6,19 +6,15 @@ void* fwthreadFunction(void* a);//Helper function to create the thread
 
 void* fwthreadFunction(void* a){
 		BubbleDetector* p=((BubbleDetector*)a);
-		Kinect k;
-		Filters f;
-		p->kinect = &k;
-		p->filter = &f;
-		bool ki = p->kinect->initialiseKinect();
-		cout<<"Kinect: "<<ki<<'\n';
-		KOCVStream s(p->kinect,p->filter);
-		p->_stream = &s;
 		p->run();
 		return NULL;
 };
 
 bool BubbleDetector::init(){
+	bool ki = kinect.initialiseKinect();
+	cout<<"Kinect: "<<ki<<'\n';
+	KOCVStream* s=new KOCVStream(&kinect,&filter);
+	_stream = s;
 	status = ST_READY;
 	return true;
 };
@@ -37,7 +33,7 @@ void BubbleDetector::run(){
 	while(status==ST_PLAYING){
 		//Do your processing
 		_stream->readFrame('d');
-		Bubbles = detectBubbles(filter, _stream->depth_src);
+		Bubbles = detectBubbles(&filter, _stream->depth_src);
 		_stream->display("d");
 		//STREAM.displayBubbles(Bubbles);
 		char c = waitKey( 1 );

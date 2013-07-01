@@ -35,12 +35,12 @@ class BubbleDetector: public IBubbleDetector{
 		static const int ST_READY=1;
 		static const int ST_PLAYING=2;
 		int status;
-		IBubbleTracker *_observer;
+		IBubbleTracker* _observer;
 
 	public:
 		vector<Bubble> Bubbles;
-		Filters* filter;
-		Kinect* kinect;
+		Filters filter;
+		Kinect kinect;
 		KOCVStream* _stream;
 
 		BubbleDetector(IBubbleTracker * observer){
