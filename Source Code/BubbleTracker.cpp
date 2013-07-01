@@ -20,6 +20,8 @@ bool BubbleTracker::stop(){
 };
 
 void BubbleTracker::update(float x, float y, float radius){
-	//unsigned int untrID = _state->getUnknownBubble();
-	//_state->updateBubble(untrID, x, y, radius);
+	unsigned int untrID = _state->getUnknownBubble();
+	if(untrID){
+		_state->updateBubble(untrID, x, y, radius);
+	}
 };

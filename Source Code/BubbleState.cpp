@@ -11,10 +11,16 @@ void BubbleState::addBubble(Bubble b){
 
 //Retrieve a nontracked bubble from the queue and start tracking it
 unsigned int BubbleState::getUnknownBubble(void){
-	Bubble b = nonTrackedBubbles.front();
-	b.state = TRACKED;
-	trackedBubbles[b.ID]=b;
-	return b.ID;
+	if(nonTrackedBubbles.size()>0){
+		Bubble b = this->nonTrackedBubbles.front();
+		nonTrackedBubbles.pop();
+		b.state = TRACKED;
+		this->trackedBubbles[b.ID]=b;
+		return b.ID;
+	}
+	else{
+		return 0;
+	}
 };
 
 //Update the position of a bubble

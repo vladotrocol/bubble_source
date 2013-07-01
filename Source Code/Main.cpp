@@ -15,10 +15,14 @@
 
 using namespace std;
 
-void createBubble(BubbleState* BS, BubbleGenerator* BG){
+void createBubble(unsigned int ID, BubbleState* BS, BubbleGenerator* BG){
 	Bubble b;
+	b.ID = ID;
 	if(BG->createPhysicalBubble()){
 		BS->addBubble(b);
+	}
+	else{ 
+		cerr<<"Bubble not generated";
 	}
 };
 
@@ -26,9 +30,10 @@ int main(){
 	BubbleState BS = BubbleState::instance();
 	BubbleGenerator BG;
 	BubbleTracker BT(&BS);
+	unsigned int ID = 10;
+	createBubble(ID, &BS, &BG);
 	BT.init();
 	BT.start();
-	createBubble(&BS, &BG);
 	return 0;
 };
 

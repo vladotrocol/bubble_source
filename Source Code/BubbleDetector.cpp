@@ -27,17 +27,17 @@ bool BubbleDetector::start(){
 
 void BubbleDetector::run(){
 	KOCVStream STREAM(kinect,filter);
-	namedWindow("Contours", CV_WINDOW_AUTOSIZE );
+	//namedWindow("Contours", CV_WINDOW_AUTOSIZE );
 	//Thread's main loop
 	while(status==ST_PLAYING){
 		//Do your processing
 		STREAM.readFrame('d');
 		Bubbles = detectBubbles(&filter, STREAM.depth_src);
 		STREAM.display("d");
-		STREAM.displayBubbles(Bubbles);
+		//STREAM.displayBubbles(Bubbles);
 		char c = waitKey( 1 );
 		this->updateFPS(true);
-		_observer->update(0,0,0);
+		_observer->update(20,30,40);
 		//If escape is pressed exit
 		if( (char)c == 27 ){
 			break; 
