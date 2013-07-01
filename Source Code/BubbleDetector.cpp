@@ -13,7 +13,7 @@ void* fwthreadFunction(void* a){
 bool BubbleDetector::init(){
 	bool ki = kinect.initialiseKinect();
 	cout<<"Kinect: "<<ki<<'\n';
-	KOCVStream* s=new KOCVStream(&kinect,&filter);
+	KOCVStream* s = new KOCVStream(&kinect, &filter);
 	_stream = s;
 	status = ST_READY;
 	return true;

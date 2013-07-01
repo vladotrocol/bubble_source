@@ -6,6 +6,7 @@ bool BubbleTracker::init(){
 	_detector = new BubbleDetector(this);
 	_detector->init();
 	_calibrator = new Calibrator(_detector->_stream);
+	_calibrator->calibrateCameraProjector();
 	return true;
 };
 
