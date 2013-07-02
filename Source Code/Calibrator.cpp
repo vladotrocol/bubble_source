@@ -112,6 +112,7 @@ void Calibrator::calibrateCameraProjector(){
 
 	destroyWindow("source");
 	destroyWindow("distortion");
+	_homography = H;
 };
 
 

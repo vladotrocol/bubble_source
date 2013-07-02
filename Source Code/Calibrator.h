@@ -7,6 +7,7 @@ using namespace cv;
 
 class Calibrator{
 	public:
+		Mat _homography;
 		KOCVStream* s;
 		Calibrator(KOCVStream* stream);
 		void calibrateCameraProjector();
