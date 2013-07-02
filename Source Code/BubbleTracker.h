@@ -5,15 +5,23 @@
 #include "BubbleState.h"
 #include "Calibrator.h"
 
+#define minBubbleSize 10
+#define maxBubbleSize 100
+#define travelMax 20
+
 class BubbleTracker: public IBubbleTracker{
 	public:
 		BubbleDetector* _detector;
 		BubbleState* _state;
 		Calibrator* _calibrator;
+		vector<Bubble> bubbles;
+		vector<Bubbles> prevBubbles;
 		bool init(void);
 		bool start(void);
 		bool stop(void);
 		void update(float x, float y, float radius);
+		vector<pair<double, Point>> findNearestBubbles();
+		int guessBubblePoppedandBorn(vector<pair<double, Point>> bubbleComps);
 		BubbleTracker(BubbleState* BS);
 };
 #endif
