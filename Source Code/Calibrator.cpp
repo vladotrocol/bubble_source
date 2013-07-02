@@ -75,14 +75,17 @@ void Calibrator::calibrateCameraProjector(){
 	iHomog = false;
 	STREAM = s;
 	src = imread( "homographyCorrect.bmp", 1 );
-	namedWindow("source",0  );
-	//namedWindow("distortion",0); // was CV_WINDOW_AUTOSIZE
+	if(! src.data ) {
+		cout <<  "Could not open or find the image" << std::endl ;
+    }
+	namedWindow("source",CV_WINDOW_AUTOSIZE);
+	namedWindow("distortion",0); // was CV_WINDOW_AUTOSIZE
 	imshow("source",src);
-	//moveWindow("source", 1280, 0);
-	//setWindowProperty("source", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
-	//waitKey(10);
+	moveWindow("source", 1680, 0);
+	setWindowProperty("source", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+	waitKey(10);
 
-	/*Mat res;
+	Mat res;
 
 	int i = 0;
 
@@ -100,6 +103,7 @@ void Calibrator::calibrateCameraProjector(){
 	
 	// Set the dst image the same type and size as src
 	while (!homographyComputed){
+		//cout<<"not computed"<<'\n';
 		waitKey(10);
 	}
 
@@ -107,7 +111,7 @@ void Calibrator::calibrateCameraProjector(){
 	dstCount = 0;
 
 	destroyWindow("source");
-	destroyWindow("distortion");*/
+	destroyWindow("distortion");
 };
 
 
