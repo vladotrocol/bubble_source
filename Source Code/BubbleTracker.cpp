@@ -53,10 +53,10 @@ bool sortIndexCurr(pair<double, Point> a, pair<double, Point> b) { return a.seco
 //Obviously, this is subject to error and some double checking must be conducted.
 vector<pair<double, Point>> BubbleTracker::findNearestBubbles(){
 	vector<pair<double, Point>> nearestBubbles(bubbles.size());
-	for (int i = 0; i < bubbles.size(); i++)
+	for (unsigned int i = 0; i < bubbles.size(); i++)
 	{
 		vector<pair<double, Point>> temp;
-		for (int j = 0; j < prevBubbles.size(); j++)
+		for (unsigned int j = 0; j < prevBubbles.size(); j++)
 		{
 			temp.push_back(distanceBetweenPoints(bubbles[i].center, prevBubbles[j].center, j, i));
 		}
@@ -77,7 +77,7 @@ int BubbleTracker::guessBubblePoppedandBorn(vector<pair<double, Point>> bubbleCo
 {
 	//Distance travelled greater than treshold - assume new bubble
 	int born = 0;
-	for (int i = 0; i < bubbleComps.size() && bubbleComps[i].first > travelMax; i++)
+	for (unsigned int i = 0; i < bubbleComps.size() && bubbleComps[i].first > travelMax; i++)
 	{
 		born++;
 		bubbles[bubbleComps[i].second.x].ID = bubbles.size();
@@ -92,7 +92,7 @@ int BubbleTracker::guessBubblePoppedandBorn(vector<pair<double, Point>> bubbleCo
 	int popped = 0;
 	sort(bubbleComps.begin(), bubbleComps.end(), sortIndexPre);
 
-	for (int i = 0; i < prevBubbles.size(); i++)
+	for (unsigned int i = 0; i < prevBubbles.size(); i++)
 	{
 		if (bubbleComps[i].second.y != (i + popped))
 		{
@@ -107,4 +107,28 @@ int BubbleTracker::guessBubblePoppedandBorn(vector<pair<double, Point>> bubbleCo
 		}
 	}
 	return 0;
+}
+
+//Determine ID of bubbles
+vector<Bubble> BubbleTracker::IDBubbles()
+{
+	vector<pair<double, Point>> bubbleComps;
+	//cout << "Found bubbles - bubbles.size = " << bubbles.size() << "\n";
+	if (bubbles.size() > 0 && prevBubbles.size() > 0)
+	{
+		bubbleComps = findNearestBubbles();
+		guessBubblePoppedandBorn(bubbleComps);
+	}
+	else if (bubbles.size() > prevBubbles.size())
+	{
+		//cout << bubbles.size() << " bubbles born\n";
+		for (unsigned int i = 0; i < bubbles.size(); i++)
+			bubbles[i].ID = i;
+	}
+	else if (bubbles.size() < prevBubbles.size())
+	{
+		cout << prevBubbles.size() << " bubbles popped - No more bubbles!\n";
+	}
+
+	return bubbles;
 }
