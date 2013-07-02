@@ -23,15 +23,21 @@ unsigned int BubbleState::getUnknownBubble(void){
 	}
 };
 
+void BubbleState::printBubbles(){
+	map<unsigned int, Bubble>* bub = getCurrentState();
+	for(map<unsigned int, Bubble>::iterator it = bub->begin(); it != bub->end(); ++it) {
+		cout<<"ID: "<<it->second.ID<<"x: "<<it->second.center.x<<"y: "<<it->second.center.y<<"radius: "<<it->second.radius<<'\n';
+	}
+};
+
 //Update the position of a bubble
 void BubbleState::updateBubble(unsigned int ID, float x, float y, float radius){
 	trackedBubbles[ID].center = Point2f(x,y);
 };
 
 //Returns a copy of all tracked bubles
-map<unsigned int, Bubble> BubbleState::getCurrentState(void){
-	map<unsigned int, Bubble> trackedBubblesCopy(trackedBubbles);
-	return trackedBubblesCopy;
+map<unsigned int, Bubble>* BubbleState::getCurrentState(void){
+	return &trackedBubbles;
 };
 
 //Handles the event when a user pops a bubble

@@ -35,8 +35,7 @@ int main(){
 	createBubble(ID+1, &BS, &BG);
 	BT.init();
 	BT.start();
-	char c;
-	scanf("%c", &c);
+	cin.get();
 	return 0;
 };
 

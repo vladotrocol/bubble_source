@@ -43,6 +43,7 @@ void BubbleDetector::run(){
 		for(unsigned int i=0;i<Bubbles.size();i++){
 			_observer->update(Bubbles[i].center.x, Bubbles[i].center.y, Bubbles[i].radius);
 		}
+		_observer->printBubbles();
 
 		//If escape is pressed exit
 		if( (char)c == 27 ){

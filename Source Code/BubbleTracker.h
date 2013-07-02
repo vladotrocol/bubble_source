@@ -4,6 +4,7 @@
 #include "BubbleDetector.h"
 #include "BubbleState.h"
 #include "Calibrator.h"
+#include "ProjectionEngine.h"
 
 #define minBubbleSize 10
 #define maxBubbleSize 100
@@ -14,6 +15,7 @@ class BubbleTracker: public IBubbleTracker{
 		BubbleDetector* _detector;
 		BubbleState* _state;
 		Calibrator* _calibrator;
+		ProjectionEngine* _projector;
 		vector<Bubble> bubbles;
 		vector<Bubble> prevBubbles;
 		bool init(void);
@@ -23,7 +25,7 @@ class BubbleTracker: public IBubbleTracker{
 		vector<pair<double, Point>> findNearestBubbles();
 		int guessBubblePoppedandBorn(vector<pair<double, Point>> bubbleComps);
 		vector<Bubble> IDBubbles();
-		void Draw();
+		void printBubbles();
 		BubbleTracker(BubbleState* BS);
 };
 #endif

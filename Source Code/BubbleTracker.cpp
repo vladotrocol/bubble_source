@@ -6,7 +6,8 @@ bool BubbleTracker::init(){
 	_detector = new BubbleDetector(this);
 	_detector->init();
 	_calibrator = new Calibrator(_detector->_stream);
-	//_calibrator->calibrateCameraProjector();
+	_calibrator->calibrateCameraProjector();
+	_projector = new ProjectionEngine(_state, _calibrator);
 	return true;
 };
 
@@ -120,5 +121,6 @@ vector<Bubble> BubbleTracker::IDBubbles(){
 	return bubbles;
 };
 
-void BubbleTracker::Draw(){
+void BubbleTracker::printBubbles(){
+	_state->printBubbles();
 };

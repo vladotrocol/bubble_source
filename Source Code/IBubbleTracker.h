@@ -7,6 +7,7 @@ class IBubbleTracker{
 		virtual bool start(void)=0;
 		virtual void update(float x, float y, float radius)=0;
 		virtual bool stop(void)=0;
+		virtual void printBubbles(void)=0;
 };
 
 #endif
