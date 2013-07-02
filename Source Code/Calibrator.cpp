@@ -70,6 +70,39 @@ void on_mouse_distortion(int evt, int x, int y, int flags, void* param){
 	 tryComputeHomography(srcPoints,srcCount,dstPoints,dstCount, src, distortion2);
 };
 
+//Function can be called to manually examine how well the homography has worked / aligns
+void checkHomography()
+{
+	vector<Point2f> cam(4);
+	vector<Point2f> proj(4);
+	cam[0] = dstPoints[0];
+	cam[1] = dstPoints[1];
+	cam[2] = dstPoints[2];
+	cam[3] = dstPoints[3];
+
+	Mat drawing = Mat::zeros(768, 1024, CV_32FC3);
+	perspectiveTransform(cam, proj, H);
+	for (int i = 0; i < cam.size(); i++)
+	{
+		circle(drawing, proj[i], 20, Scalar(255,0,0), -1);
+	}
+
+	//Mat output(drawing.rows, drawing.cols, drawing.type());
+	//warpPerspective(drawing, output, H, output.size());
+
+	//cout << "height = " << height << ", width = " << width << "output.cols = " << output.cols << "output.rows = " << output.rows << "\n";
+
+	namedWindow("Bubbles", CV_WINDOW_AUTOSIZE);
+	moveWindow("Bubbles", 1680, 0);
+	//setWindowProperty("Bubbles", CV_WND_PROP_AUTOSIZE, CV_WINDOW_NORMAL);
+
+	imshow("Bubbles", drawing);
+	waitKey(10);
+
+}
+
+
+
 
 void Calibrator::calibrateCameraProjector(){
 	iHomog = false;
@@ -106,7 +139,7 @@ void Calibrator::calibrateCameraProjector(){
 		//cout<<"not computed"<<'\n';
 		waitKey(10);
 	}
-
+	//checkHomography();
 	srcCount = 0;
 	dstCount = 0;
 
@@ -114,5 +147,4 @@ void Calibrator::calibrateCameraProjector(){
 	destroyWindow("distortion");
 	_homography = H;
 };
-
 

@@ -32,6 +32,7 @@ int main(){
 	BubbleTracker BT(&BS);
 	unsigned int ID = 10;
 	createBubble(ID, &BS, &BG);
+	createBubble(ID+1, &BS, &BG);
 	BT.init();
 	BT.start();
 	char c;

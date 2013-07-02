@@ -34,12 +34,15 @@ void BubbleDetector::run(){
 		//Do your processing
 		_stream->readFrame('d');
 		Bubbles = detectBubbles(&filter, _stream->depth_src);
-		_stream->display("d");
-		//STREAM.displayBubbles(Bubbles);
+		//cout<<Bubbles.size();
+		_stream->display("di");
+		_stream->displayBubbles(Bubbles);
 		char c = waitKey( 1 );
 		this->updateFPS(true);
 
-		_observer->update(20,30,40);
+		for(unsigned int i=0;i<Bubbles.size();i++){
+			_observer->update(Bubbles[i].center.x, Bubbles[i].center.y, Bubbles[i].radius);
+		}
 
 		//If escape is pressed exit
 		if( (char)c == 27 ){

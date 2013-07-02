@@ -23,6 +23,7 @@ class BubbleTracker: public IBubbleTracker{
 		vector<pair<double, Point>> findNearestBubbles();
 		int guessBubblePoppedandBorn(vector<pair<double, Point>> bubbleComps);
 		vector<Bubble> IDBubbles();
+		void Draw();
 		BubbleTracker(BubbleState* BS);
 };
 #endif
