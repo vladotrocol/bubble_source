@@ -80,7 +80,7 @@ int BubbleTracker::guessBubblePoppedandBorn(vector<pair<double, Point>> bubbleCo
 	for (int i = 0; i < bubbleComps.size() && bubbleComps[i].first > travelMax; i++)
 	{
 		born++;
-		bubbles[bubbleComps[i].second.x].id = bubbles.size();
+		bubbles[bubbleComps[i].second.x].ID = bubbles.size();
 	}
 	cout << "Estimate " << born << " bubbles born\n";
 
@@ -103,7 +103,7 @@ int BubbleTracker::guessBubblePoppedandBorn(vector<pair<double, Point>> bubbleCo
 		if (bubbleComps[i].first < travelMax)
 		{
 			//Close bubble, assume the same id
-			bubbles[bubbleComps[i].second.x].ID = prevBubbles[bubbleComps[i].second.y].id;
+			bubbles[bubbleComps[i].second.x].ID = prevBubbles[bubbleComps[i].second.y].ID;
 		}
 	}
 	return 0;

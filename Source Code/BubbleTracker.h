@@ -15,7 +15,7 @@ class BubbleTracker: public IBubbleTracker{
 		BubbleState* _state;
 		Calibrator* _calibrator;
 		vector<Bubble> bubbles;
-		vector<Bubbles> prevBubbles;
+		vector<Bubble> prevBubbles;
 		bool init(void);
 		bool start(void);
 		bool stop(void);
