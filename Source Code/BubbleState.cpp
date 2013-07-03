@@ -26,13 +26,14 @@ unsigned int BubbleState::getUnknownBubble(void){
 void BubbleState::printBubbles(){
 	map<unsigned int, Bubble>* bub = getCurrentState();
 	for(map<unsigned int, Bubble>::iterator it = bub->begin(); it != bub->end(); ++it) {
-		cout<<"ID: "<<it->second.ID<<"x: "<<it->second.center.x<<"y: "<<it->second.center.y<<"radius: "<<it->second.radius<<'\n';
+		cout<<"ID: "<<it->second.ID<<" x: "<<it->second.center.x<<" y: "<<it->second.center.y<<" radius: "<<it->second.radius<<'\n';
 	}
 };
 
 //Update the position of a bubble
-void BubbleState::updateBubble(unsigned int ID, float x, float y, float radius){
-	trackedBubbles[ID].center = Point2f(x,y);
+void BubbleState::updateBubble(unsigned int ID, Point2f center, float radius){
+	trackedBubbles[ID].center = center;
+	cout<<ID<<" "<<center.x<<" "<<center.y<<" "<<radius<<'\n';
 };
 
 //Returns a copy of all tracked bubles
@@ -49,4 +50,8 @@ void BubbleState::notifyUserBreaks(unsigned int ID){
 //Determines a tracking cycle (used for assuming if bubble broke)
 void BubbleState::notifyTrackingFrame(void){
 
+};
+
+bool BubbleState::hasUnknownBubble(){
+	return !nonTrackedBubbles.empty();
 };

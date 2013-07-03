@@ -28,23 +28,19 @@ bool BubbleDetector::start(){
 };
 
 void BubbleDetector::run(){
-	//namedWindow("Contours", CV_WINDOW_AUTOSIZE );
 	//Thread's main loop
 	while(status==ST_PLAYING){
 		//Do your processing
 		_stream->readFrame('d');
-		Bubbles = detectBubbles(&filter, _stream->depth_src);
-		//cout<<Bubbles.size();
+		bubbles = detectBubbles(&filter, _stream->depth_src);
 		_stream->display("di");
-		_stream->displayBubbles(Bubbles);
+		_stream->displayBubbles(bubbles);
 		char c = waitKey( 1 );
 		this->updateFPS(true);
 
-		for(unsigned int i=0;i<Bubbles.size();i++){
-			_observer->update(Bubbles[i].center.x, Bubbles[i].center.y, Bubbles[i].radius);
-		}
-		_observer->printBubbles();
-
+		_observer->update();
+		//cout<<bubbles[0].center.x;
+		
 		//If escape is pressed exit
 		if( (char)c == 27 ){
 			break; 
@@ -71,7 +67,7 @@ bool BubbleDetector::stop(){
 vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat src){
 	vector<vector<Point>> contours;
 	vector<Vec4i> hier;
-	findContours(filter->applyFilter('t',src), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	findContours(filter->applyFilter('i',src), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
 	vector<Bubble> bubbles (contours.size());
 	vector<vector<Point>> contours_poly(contours.size());

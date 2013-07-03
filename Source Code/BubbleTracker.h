@@ -16,16 +16,12 @@ class BubbleTracker: public IBubbleTracker{
 		BubbleState* _state;
 		Calibrator* _calibrator;
 		ProjectionEngine* _projector;
-		vector<Bubble> bubbles;
-		vector<Bubble> prevBubbles;
 		bool init(void);
 		bool start(void);
 		bool stop(void);
-		void update(float x, float y, float radius);
-		vector<pair<double, Point>> findNearestBubbles();
-		int guessBubblePoppedandBorn(vector<pair<double, Point>> bubbleComps);
-		vector<Bubble> IDBubbles();
+		void update();
 		void printBubbles();
 		BubbleTracker(BubbleState* BS);
 };
+
 #endif

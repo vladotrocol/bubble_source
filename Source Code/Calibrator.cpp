@@ -36,12 +36,12 @@ void tryComputeHomography(Point2f srcPoints[],int srcCount, Point2f dstPoints[],
  }
 
 void on_mouse_source(int evt, int x, int y, int flags, void* param){
-	static int offset=0;
+	static float offset=0;
 	if( evt != CV_EVENT_LBUTTONDOWN )
         return;
 	if(srcCount>=4)
 		return;
-	srcPoints[srcCount]=Point2f(x,y-offset);
+	srcPoints[srcCount]=Point2f((float)x,(float)y-offset);
 	// circle(img, center, radius, color, thickness, lineType, shift)
 	circle(src, srcPoints[srcCount], 5, Scalar(1.0, 1.0, 0),5);
 	imshow("source",src);
@@ -62,7 +62,7 @@ void on_mouse_distortion(int evt, int x, int y, int flags, void* param){
         return;
 	 if(dstCount>=4)
 		return;
-	 dstPoints[dstCount]=Point2f(x,y);
+	 dstPoints[dstCount]=Point2f((float)x,(float)y);
 	 distortion2 = STREAM->depth_src;
 	 circle(distortion2, dstPoints[dstCount], 5, Scalar(0.0, 1.0, 1.0),5);
 	 imshow("distortion",distortion2);
@@ -82,7 +82,7 @@ void checkHomography()
 
 	Mat drawing = Mat::zeros(768, 1024, CV_32FC3);
 	perspectiveTransform(cam, proj, H);
-	for (int i = 0; i < cam.size(); i++)
+	for (unsigned int i = 0; i < cam.size(); i++)
 	{
 		circle(drawing, proj[i], 20, Scalar(255,0,0), -1);
 	}

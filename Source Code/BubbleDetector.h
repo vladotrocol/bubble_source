@@ -38,7 +38,7 @@ class BubbleDetector: public IBubbleDetector{
 		IBubbleTracker* _observer;
 
 	public:
-		vector<Bubble> Bubbles;
+		vector<Bubble> bubbles;
 		Filters filter;
 		Kinect kinect;
 		KOCVStream* _stream;
@@ -53,5 +53,4 @@ class BubbleDetector: public IBubbleDetector{
 		vector<Bubble> detectBubbles(Filters* filter, Mat src);
 		void updateFPS(bool newFrame);
 };
-
 #endif

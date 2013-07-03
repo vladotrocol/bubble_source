@@ -11,7 +11,9 @@ public:
 	unsigned int ID;
 	Point2f center;
 	float radius;
-	float state;
+	int state;
+	unsigned int closeID;
+	double minD;
 };
 
 #endif
