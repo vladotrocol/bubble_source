@@ -1,0 +1,58 @@
+#ifndef _FILE_INPUT_STREAM
+#define _FILE_INPUT_STREAM
+
+#include "./FileReaders/InputStream.h"
+#include <stdio.h>
+#include <iostream>
+#include <string>
+
+#define BUFFER_SIZE 256
+
+class FileInputStream: public InputStream{
+	FILE* file;
+	std::string fileName;
+	bool ready;
+
+	char buffer[BUFFER_SIZE];
+	int curBufferSize;//tama�o del buffer ocupado actualmente (nrmalmente BUFFER_SIZE, pero puede ser menor al alcanzar el final de fichero.)
+	int curChar;//posici�n del pr�ximo caracter a devolver.
+public:
+	FileInputStream(std::string fileName){
+		ready=false;
+		this->fileName=fileName;
+		reset();		
+	}
+
+	void reset(){
+		if(ready){
+			fclose(file);
+		}
+		const char* s=fileName.c_str();
+		file=fopen(s,"r");
+		ready=(file!=NULL);			
+		curBufferSize=0;//No hay nada leido
+		curChar=0;	
+		next();//Lee y se posiciona sobre el primer char.
+	}
+
+	bool next(){
+		curChar++;
+		
+		if(curChar>=curBufferSize){
+			if(eof())return false;
+			curBufferSize=fread(buffer,sizeof(char),BUFFER_SIZE,file);
+			curChar=0;			
+		}
+		return true;
+	}
+
+	char read(){
+		return buffer[curChar];
+	}
+
+	bool eof(){
+		return !file || feof(file);
+	}
+};
+
+#endif

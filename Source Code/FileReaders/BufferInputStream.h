@@ -1,0 +1,39 @@
+#ifndef _BUFFER_INPUT_STREAM
+#define _BUFFER_INPUT_STREAM
+
+#include "./FileReaders/InputStream.h"
+
+
+
+class BufferInputStream: public InputStream{
+	bool ready;
+
+	char* buffer;
+	int curChar;//posici�n del pr�ximo caracter a devolver.
+public:
+	BufferInputStream(char* buffer){
+		this->buffer=buffer;	
+		reset();		
+	}
+
+	~BufferInputStream(){
+		if(buffer!=NULL)delete buffer;
+	}
+
+	void reset(){
+		curChar=0;	
+	}
+
+	bool next(){
+		curChar++;
+		
+		return(buffer[curChar]!='\0');
+	}
+
+	char read(){
+		return buffer[curChar];
+	}
+
+};
+
+#endif

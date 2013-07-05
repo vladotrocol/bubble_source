@@ -33,8 +33,11 @@ void BubbleDetector::run(){
 		//Do your processing
 		_stream->readFrame('d');
 		bubbles = detectBubbles(&filter, _stream->depth_src);
-		_stream->display("di");
-		_stream->displayBubbles(bubbles);
+		if(bubbles.size()<1){
+			cout<<"no bubbles detected"<<'\n';
+		}
+		//_stream->display("di");
+		//_stream->displayBubbles(bubbles);
 		char c = waitKey( 1 );
 		this->updateFPS(true);
 
@@ -67,28 +70,42 @@ bool BubbleDetector::stop(){
 vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat src){
 	vector<vector<Point>> contours;
 	vector<Vec4i> hier;
+	//Apply the whole processing pipeline (threshold, erode, dilate)
 	findContours(filter->applyFilter('i',src), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-
+	
+	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());
 	vector<vector<Point>> contours_poly(contours.size());
-
 	if(contours.size() < 1){
 		cout << "No Bubbles in frame\n";
 	}
 	else{
 		for (unsigned int i = 0; i < contours.size(); i++){
 			if (contourArea(contours[i]) > 10){
+				//Find minimum circle
 				approxPolyDP(Mat(contours[i]), contours_poly[i], 3, true);
+				//Compute its radius and position
 				minEnclosingCircle( (Mat)contours_poly[i], bubbles[i].center, bubbles[i].radius);
 			}
 		}
 	}
-
+	//Remove bubbles that do not fit min and max sizes
 	for (unsigned int i = 0; i < bubbles.size(); i++){
 		if (bubbles[i].radius < minBubbleSize || bubbles[i].radius > maxBubbleSize || bubbles[i].center.x < 50){
 			bubbles.erase(bubbles.begin() + i);
 			i--;
 		}
+	}
+	if(bubbles.size()){
+	vector<Point2f> proj(bubbles.size());
+	vector<Point2f> init(bubbles.size());
+	for(unsigned int i=0;i<proj.size();i++){
+		init[i] = bubbles[i].center;
+	}
+	perspectiveTransform(init, proj, _homography);
+	for(unsigned int i=0;i<proj.size();i++){
+		bubbles[i].center = proj[i];
+	}
 	}
 	return bubbles;
 };
@@ -119,4 +136,8 @@ void BubbleDetector::updateFPS(bool newFrame){
 		imagesSinceLastSecond=cyclesSinceLastSecond=0;lastSecond=curSecond;
 	}	
 			
+};
+
+void BubbleDetector::getHomography(Mat H){
+	_homography = H;
 };

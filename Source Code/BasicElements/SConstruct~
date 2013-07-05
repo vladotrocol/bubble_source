@@ -1,0 +1,24 @@
+# -march=pentium4 -mcpu=pentium'/usr/include/OGRE',4 -O3 -pipe -fforce-addr -falign-functions=4 -fprefetch-loop-arrays -fomit-frame-pointer
+
+################################################################
+
+import glob
+
+cpppath = ['/usr/include', '/usr/local/include','/usr/local/include/OGRE', '/usr/local/include/CEGUI','/usr/local/include/OIS', './include', '..']
+
+cppflags = '-DGCC_3_1 -DEXT_HASH -O2 -DSMP_ENABLED' #-m32 -march=opteron 
+ 
+# librerias del programa principal'/usr/include/OGRE',
+libs = [ 'OgreMain', 'CEGUIBase','CEGUITaharezLook','CEGUIWindowsLook','OIS']
+libpath = [  '/usr/lib','/usr/local/lib','/usr/local/lib/OGRE','/usr/local/lib/OIS','./lib']#,'/home/diego/Desktop/PROYECT_ROOT/entornodesarrollo/prueba1/ogrenew'  ,'./',
+
+backup_files = glob.glob("*~")
+
+filelist = Split("testOID.cpp ") #input.cpp MyApplication.cpp main.cpp
+
+env = Environment(CPPPATH=cpppath, CPPFLAGS=cppflags)
+
+print filelist
+env.Program('tutorial0', filelist, LIBS=libs, LIBPATH=libpath)
+
+env.Clean('tutorial0' , backup_files)

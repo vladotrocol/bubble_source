@@ -4,6 +4,18 @@
 BubbleState::BubbleState()
 {;};
 
+BubbleState::BubbleState(BubbleState& bs){
+	trackedBubbles=bs.trackedBubbles;
+	nonTrackedBubbles=bs.nonTrackedBubbles;
+}
+
+BubbleState& BubbleState::operator=(BubbleState& bs){
+	BubbleState r;
+	r.trackedBubbles=bs.trackedBubbles;
+	r.nonTrackedBubbles=bs.nonTrackedBubbles;
+	return r;
+}
+
 //Add a new bubble to the nonTracked queue
 void BubbleState::addBubble(Bubble b){
 	nonTrackedBubbles.push(b);
@@ -33,7 +45,8 @@ void BubbleState::printBubbles(){
 //Update the position of a bubble
 void BubbleState::updateBubble(unsigned int ID, Point2f center, float radius){
 	trackedBubbles[ID].center = center;
-	cout<<ID<<" "<<center.x<<" "<<center.y<<" "<<radius<<'\n';
+	trackedBubbles[ID].radius=radius;
+	//cout<<ID<<" "<<center.x<<" "<<center.y<<" "<<radius<<'\n';
 };
 
 //Returns a copy of all tracked bubles

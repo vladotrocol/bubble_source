@@ -1,0 +1,86 @@
+#ifndef _OBJECT_REGISTER
+#define _OBJECT_REGISTER
+
+#include "./IObject.h"
+#include "./BasicTypes.h"
+#include <map>
+
+struct compareOIDS{
+	bool operator()( OID o1,  OID o2) const
+	{
+		return o1<o2;
+	}
+
+};
+
+class ObjectRegister{
+protected:
+std::map<OID,IObject*,compareOIDS> objects;
+pthread_mutex_t mutex;
+OID seed;
+OrganizationalContext validOIDS;
+
+public:
+
+	ObjectRegister(){
+		pthread_mutex_init(&mutex,NULL);	
+		//seed[0]=seed[1]=seed[2]=seed[3]=(char)0;
+	}
+
+	ObjectRegister(OrganizationalContext validOIDS){
+		pthread_mutex_init(&mutex,NULL);	
+		this->validOIDS=validOIDS;
+		this->seed=validOIDS.rootOID;
+	}
+
+	OID getNextValidOID(){
+		OID initOID=seed;		
+		pthread_mutex_lock(&mutex);		
+		do{
+			++seed;
+			
+		}while((seed!=initOID)&&(!OrganizationalContext::belongs(seed,validOIDS)||objects.find(seed)==objects.end()));		
+		if(seed==initOID);//	ERROR do something about it (No more OIDS available!)
+		pthread_mutex_unlock(&mutex);		
+		return seed;
+		
+	}	
+		
+	IObject* getObjectByOID(OID oid){
+		IObject* result;		
+		pthread_mutex_lock(&mutex);
+		result=objects[oid];
+		pthread_mutex_unlock(&mutex);
+		return result;
+	}
+
+	IObject* addObject(IObject* o){
+		pthread_mutex_lock(&mutex);
+		IObject* copy=o->copy();
+		objects[o->oid]=copy;
+		pthread_mutex_unlock(&mutex);
+		return copy;		
+	}
+
+	bool removeObject(OID oid){
+		pthread_mutex_lock(&mutex);
+		std::map<OID,IObject*>::iterator p=objects.find(oid);
+		IObject* target;		
+		if(p!=objects.end()){
+			target=objects[oid];
+			objects.erase(oid);
+			delete target;
+			pthread_mutex_unlock(&mutex);
+			return true;
+		}
+		pthread_mutex_lock(&mutex);
+		return false;
+
+	}	
+
+	
+
+	
+};
+
+#endif

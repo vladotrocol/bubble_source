@@ -1,0 +1,254 @@
+/*******************************************************************************************************
+*			ACTION
+********************************************************************************************************
+*  	Diego Martinez Plasencia, LoUISE	
+********************************************************************************************************
+*	REVISIONES:
+*	  21/09/07--> Versión inicial	
+********************************************************************************************************
+*
+*	This file contains the definition of the Operation applied to the render system used in the system.
+*
+********************************************************************************************************
+
+*####################### REQUIRED BIG UPDATE--> CHECK OperationListener ###################################
+
+*	-NOTES: These are the kinds of operations and the operands they use:
+*		0. SET_STATUS(targetOID,status)-> Sets the object 'targetOID' to status 'status'
+*		1. SET_POS(targetOID,pos)-> Sets the object 'targetOID' to position 'pos'
+*		2. SET_APPEARANCE(targetOID,ap)->??
+*		3. ATTACH_TO(targetOID,pOID)-> Attaches the object 'targetOID' to the object 'OID'
+*		// NOT VALID!!4. ADD_OBJECT(targetOID, pOID)-> Inserts the object as a child of pOID. If pOID==INVALID_OID it is added as a root object.
+*		5. REMOVE_OBJECT(target_OID)-> Removes the object and his children from the render SceneGraph
+*		6. ADD_REPRESENTATION: There are two posible representations, a representation based on basical 
+*		geometries(6.1) or based on a predefined mesh (6.2)
+*		   6.1. ADD_REPRESENTATION(targetOID,numGeometries,geometry1,...,geometryN,representationName)
+*
+*		   6.2. ADD_REPRESENTATION(targetOID, meshName,representationName)
+
+*		7. REMOVE_REPRESENTATION(targetOIT,representationName): Removes the representation 'meshName' of the object 'targetOID'
+*		8. ADD_OBJECT_BY_PROTOTYPE(targetOID,protoId);
+*		9. SPECIFIC_OPERATION(??): These operations only have meaning for certain outputsubsystems. 
+*		The ones used by now are:
+*			9.1. SPECIFIC_OPERATION(specificOperation="setVisible"; targetOID,targetIV,representationName,visible="true"|"false")
+*
+********************************************************************************************************/
+
+#ifndef _OPERATION
+
+#define _OPERATION
+
+#include "./BasicTypes.h"
+
+
+
+class Operation{
+public:
+	//TYPES OF OPERATION:
+	static const int SET_STATUS=0;
+	static const int SET_POS=1;
+	//static const int SET_APPERARANCE=2;
+	static const int ATTACH_TO=3;
+	static const int ADD_OBJECT=4;
+	static const int REMOVE_OBJECT=5;
+	static const int ADD_REPRESENTATION=6;	
+	static const int REMOVE_REPRESENTATION=7;
+	static const int MOVE_REPRESENTATION=8;
+	static const int ADD_OBJECT_BY_PROTOTYPE=9;
+	static const int SPECIFIC_OPERATION=99;
+	static const int STOP_SYSTEM=100;
+	//TYPE OF THE OPERATION 
+	int opType;
+	//ATTRIBUTES
+	std::map<std::string,std::string> additionalData; 
+
+	Operation(){
+		int opType=0;
+	}
+
+	~Operation(){
+		//Remove additionalData
+		std::map<std::string,std::string>::iterator it2=additionalData.begin();
+		while(it2!=additionalData.end()){
+			additionalData.erase(it2);
+			it2=additionalData.begin();
+		}
+	}
+
+	Operation& operator=(Operation& a){
+		opType=a.opType;
+		std::map<std::string,std::string>::iterator it2;
+		for(it2=a.additionalData.begin();it2!=a.additionalData.end();it2++){
+			additionalData[it2->first]=it2->second;
+		}
+		return *this;
+	}
+
+	static int fromStrToInt(std::string str){
+		char* c= new char[str.length()];
+		for(unsigned int i=0;i<str.length();i++)
+			c[i]=str[i];
+		int result= atoi(c);
+		delete c;
+		return result;
+	
+	}
+
+	static float fromStrToFloat(std::string str){
+		char* c= new char[str.length()];
+		for(unsigned int i=0;i<str.length();i++)
+			c[i]=str[i];
+		float result= (float)atof(c);
+		delete c;
+		return result;
+	}
+
+	static OID fromStrToOID(std::string str){
+		OID result;
+		int curIndex=0;
+		for(int i=0;i<4;i++){
+			result[i]=(str[curIndex]-'0')*100;
+			curIndex++;
+			result[i]+=(str[curIndex]-'0')*10;
+			curIndex++;
+			result[i]+=(str[curIndex]-'0');
+			curIndex++;
+			//skip the '_'
+			curIndex++;
+		}
+		return result;
+	}
+
+	//The format of the geometries is: '<radius> {<value1>,...,<value16>}'
+	static BasicGeometry fromStrToGeometry(std::string str){
+		BasicGeometry result;
+		char buffer[256];
+		int curIndex=0;
+		//1. parse radius:
+		//1.1. read it...
+		while (str[curIndex]!='{'){
+			buffer[curIndex]=str[curIndex];
+			curIndex++;
+		}
+		buffer[curIndex]='\0';
+		//1.2. copy it to the result geometry
+		result.radius=(float)atof(buffer);
+		//2. Skip the '{'
+		curIndex++;
+		
+		//2. Parse the 16 values ot the matrix:
+		for(int i=0;i<4;i++)
+			for(int j=0;j<4;j++){
+			//2.i. Parse value 'ij'
+				//2.i.1. Read the value
+				int baseIndex=curIndex;
+				while(str[curIndex]!=','&&str[curIndex]!='}'){
+					buffer[curIndex-baseIndex]=str[curIndex];
+					curIndex++;
+				}
+				buffer[curIndex-baseIndex]='\0';
+				//3.i.2. and copy it to the result geometry
+				result.pos[i][j]=(float)atof(buffer);
+				//3.i.3. Skip the ',' or the '}'
+				curIndex++;		
+			}
+
+		return result;
+	}
+
+	//The format of the matrix is: '{<value1>,...,<value16>}'
+	static Ogre::Matrix4 fromStrToMatrix(std::string str){
+		Ogre::Matrix4 result;
+		int curIndex=0;
+		char buffer[256];
+		//1. Skip the '{'
+		curIndex++;
+		
+		//2. Parse the 16 values ot the matrix:
+		for(int i=0;i<4;i++)
+			for(int j=0;j<4;j++){
+			//2.i. Parse value 'ij'
+				//2.i.1. Read the value
+				int baseIndex=curIndex;
+				while(str[curIndex]!=','&&str[curIndex]!='}'){
+					buffer[curIndex-baseIndex]=str[curIndex];
+					curIndex++;
+				}
+				buffer[curIndex-baseIndex]='\0';
+				//3.i.2. and copy it to the result geometry
+				result[i][j]=(float)atof(buffer);
+				//3.i.3. Skip the ',' or the '}'
+				curIndex++;		
+			}
+
+		return result;
+	}
+
+	static std::string fromIntToStr(int i){
+		
+		char buffer[256];
+
+		sprintf(buffer,"%d",i);
+		return std::string(buffer);		
+	}
+
+	static std::string fromFloatToStr(float f){
+		char buffer[256];
+
+		sprintf(buffer,"%f",f);
+		return std::string(buffer);		
+	}
+	static std::string fromOIDToStr(OID oid){
+		std::string result;
+		char* c=oid.toString();
+		result=c;
+		delete c;
+		return result;
+	}
+
+	static std::string fromGeometryToStr(BasicGeometry bg){
+		std::string result;
+		result="";
+		//1.Write radius
+		result=result+fromFloatToStr(bg.radius);
+		//2. write '{'
+		result=result+"{";
+		//2. Write possition data:
+		//2.2. Write ',datai'
+		for(int i=0;i<4;i++){
+			for(int j=0;j<4;j++){
+				if(i!=0||j!=0)result= result+",";
+				result= result+fromFloatToStr(bg.pos[i][j]);
+			}
+		}
+		//3. Write '}'
+		result=result+"}";
+	
+		return result;
+	}
+
+	static std::string fromMatrixToStr(Ogre::Matrix4 m){
+		std::string result;
+		result="";
+		//1. write '{'
+		result=result+"{";
+		//2. Write possition data:
+		//2.2. Write ',datai'
+		for(int i=0;i<4;i++){
+			for(int j=0;j<4;j++){
+				if(i!=0||j!=0)result= result+",";
+				result= result+fromFloatToStr(m[i][j]);
+			}
+		}
+		//3. Write '}'
+		result=result+"}";
+
+		return result;
+	
+	}
+
+};
+
+
+#endif
+

@@ -1,0 +1,232 @@
+#ifndef _OPERATION_LIST_PARSER
+#define _OPERATION_LIST_PARSER
+
+#include "./FileReaders/SemanticalParser.h"
+#include "./FileReaders/GenericLexicalParser.h"
+#include "./CommunicationElements/CommunicationLayer.h"
+#include "./FileReaders/GenericLexicalCathegories.h"
+
+
+using namespace GenericLexicalCathegories;
+
+class OperationListParser: public SemanticalParser{
+Token curToken;
+std::list<Operation*> *data;
+
+public:
+	OperationListParser(InputStream* input):curToken(-1){
+		this->input=new GenericLexicalParser(input);
+	}
+
+	~OperationListParser(){
+		if(input)delete input;
+	}
+
+	virtual bool parse(){		
+		return S();
+	}
+	
+	//Gets the interaction parsed from the inputStream.
+	std::list<Operation*>* getData(){
+		return data;
+	}
+
+	//Writes the Interaction into a string.
+	static char* putData(std::list<Operation*>* ol){
+
+		std::string result="";
+
+		char buffer[10024];
+		
+		//Interation ( priority <Number>; producerOID OID; producerIVID STRING;...
+		sprintf(buffer,"OperationList [ \n");
+		result.append(buffer);
+
+		std::list<Operation*>::iterator it;
+		for(it=ol->begin();it!=ol->end();it++){
+			sprintf(buffer,"Operation (\n\topType %d; \n\tAdditionalData[",(*it)->opType);
+			result.append(buffer);
+			std::map<std::string,std::string>::iterator itAddData;
+			for(itAddData=(*it)->additionalData.begin();itAddData!=(*it)->additionalData.end();itAddData++){
+				sprintf(buffer," [  \"%s\" / \"%s\" ];",itAddData->first.c_str(),itAddData->second.c_str());
+				result.append(buffer);			
+			}
+			sprintf(buffer,"\n\t];\n);\n");//Fin de la operaci�n
+			result.append(buffer);
+
+		}
+
+		sprintf(buffer,"];\n\n ");//Fin de la lista
+		result.append(buffer);
+
+		char* resultChar=new char[result.length()+1];
+		strcpy(resultChar,result.c_str());
+
+		return resultChar;
+	}
+private:
+
+	//<S> --> OperationList[<OL>];
+	bool S(){
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_RESERVED_WORD||std::string((char*)curToken.values["string"])!="OperationList")return false;
+		delete (char*)curToken.values["string"];
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_ABRE_COR)return false;
+		input->nextToken();
+
+		this->data=new std::list<Operation*>;
+
+		if(!OperationList())
+			return false;
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_CIERRA_COR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_PYC)return false;
+		input->nextToken();
+
+		return true;
+	}
+
+	//<OperationList>-> lambda
+	//						| <Operation><OperationList>
+	bool OperationList(){
+
+		//<OperationList> -> lambda
+		curToken=input->getToken();
+		if(curToken.tokenId==T_CIERRA_COR)
+			return true;
+		
+		//<OperationList> -> <Operation><OperationList>
+        
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_RESERVED_WORD||std::string((char*)curToken.values["string"])!="Operation")return false;
+			
+		Operation* o=new Operation();
+		if(!ParseOperation(o)) return false;
+		this->data->push_back(o);
+
+        return OperationList();
+	}
+
+	//<ParseOperation> --> Operation (opType ENTERO; <AdditionalData>);
+	bool ParseOperation(Operation* o){
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_RESERVED_WORD||std::string((char*)curToken.values["string"])!="Operation")return false;
+		delete (char*)curToken.values["string"];
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_ABRE_PAR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_RESERVED_WORD||std::string((char*)curToken.values["string"])!="opType")return false;
+		delete (char*)curToken.values["string"];
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_ENTERO)return false;
+		o->opType=*(int*)curToken.values["value"];
+		delete (int*)curToken.values["value"];
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_PYC)return false;
+		input->nextToken();
+
+		if(!AdditionalData(&(o->additionalData)) )
+			return false;
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_CIERRA_PAR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_PYC)return false;
+		input->nextToken();
+
+		return true;
+	}
+
+//<AdditionalData>-> AdditionalData (<DataList>);
+	bool AdditionalData(std::map<std::string,std::string> *a){
+		Context* ctx=new Context();
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_RESERVED_WORD||std::string((char*)curToken.values["string"])!="AdditionalData")return false;
+		delete (char*)curToken.values["string"];
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_ABRE_COR)return false;
+		input->nextToken();
+
+		if(!DataList(a))return false;
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_CIERRA_COR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_PYC)return false;
+		input->nextToken();
+
+		return true;
+	}
+
+	//<DataList>-> lambda | [string / string]; <DataList>
+	bool DataList(std::map<std::string,std::string> *a){
+		//<DataList>--> lambda
+		curToken=input->getToken();
+		if(curToken.tokenId==T_CIERRA_COR)return true;
+
+		//<DataList>-->[string / string]; <DataList>
+		std::string first,second;
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_ABRE_COR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_STRING)return false;
+		first=std::string((char*)curToken.values["string"]);
+		delete (char*)curToken.values["string"];
+		input->nextToken();
+
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_DIVISION)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_STRING)return false;
+		second=std::string((char*)curToken.values["string"]);
+		delete (char*)curToken.values["string"];
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_CIERRA_COR)return false;
+		input->nextToken();
+
+		
+		curToken=input->getToken();
+		if(curToken.tokenId!=T_PYC)return false;
+		input->nextToken();
+
+		//Attribute-value pair parsed--> add it!
+		(*a)[first]=second;
+
+		return DataList(a);
+
+
+
+    }
+
+
+};
+#endif
+

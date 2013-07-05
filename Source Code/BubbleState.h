@@ -28,6 +28,8 @@ class BubbleState: public IBubbleState{
 
 		//--------------------Constructor----------------------
 		BubbleState(void);
+		BubbleState(BubbleState& b);
+		BubbleState& operator=(BubbleState& b);
 
 	public:
 

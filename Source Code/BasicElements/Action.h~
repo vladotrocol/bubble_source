@@ -1,0 +1,166 @@
+/*******************************************************************************************************
+*			ACTION
+********************************************************************************************************
+*  	Diego Martinez Plasencia, LoUISE	
+********************************************************************************************************
+*	REVISIONES:
+*	  21/09/07--> Versión inicial			
+********************************************************************************************************
+*
+*	This file contains the definition of the actions used in the system.
+*
+********************************************************************************************************
+*	-NOTES:
+********************************************************************************************************/
+
+#ifndef _ACTION
+#define _ACTION
+
+#include "./BasicTypes.h"
+//#include "./developerMessages.h" //Aqui se definen las posibles acciones (msg's)
+static int numActions=0;
+class Action{
+public:
+	AID aid;
+
+	float weight;
+	std::list<Context*> context;
+	std::list<Context*>::iterator itContext;
+	std::map<std::string,std::string> additionalData;
+
+
+	Action(){		
+		weight=0;
+		numActions++;
+		//the list does not need to be initialized.	
+		itContext=context.begin();
+	}
+	
+	~Action(){
+		numActions--;
+//		printf("\nActions: %d",numActions);
+		//Remove representations
+		std::list<Context*>::iterator it=context.begin();
+		while(it!=context.end()){
+			delete *it;
+			it=context.erase(it);
+		}
+
+	}
+
+	Action& operator=(Action& a){
+		//0. Copiar atributos simples
+		aid=a.aid;
+		weight=a.weight;
+		//1. Copiar representaciones
+		//1.1. borrar representaciones actuales:
+		std::list<Context*>::iterator itC=context.begin();
+		while(itC!=context.end()){
+			delete *itC;
+			itC=context.erase(itC);
+		}
+		//1.2 Copiar nuevas representaciones
+		itC=a.context.begin();
+		while(itC!=a.context.end()){
+			Context* copy=new Context();
+			*copy=**itC;
+			this->context.push_back(copy);		
+			itC++;
+		}
+		
+		//2. Copiar additionalData
+		//2.1. Borrar this->additionalData
+		std::map<std::string,std::string>::iterator it;
+		it=this->additionalData.begin();
+		while(it!=this->additionalData.end()){
+			this->additionalData.erase(it);
+			it=this->additionalData.begin();
+		}
+		//2.2. Copiar nuevos additionalData
+		it=a.additionalData.begin();
+		while(it!= a.additionalData.end()){
+			this->additionalData[it->first]=it->second;
+			it++;
+		}		
+		//3. DONE!
+		return *this;
+	}
+
+
+	//Version 0.2.3. Adding accesibility to the data
+
+	
+	Context* getRepresentation(ID name){
+		std::list<Context*>::iterator it;
+		for(it=context.begin();it!=context.end();it++)
+			if((*it)->id==name)return *it;
+		return NULL;
+	}
+
+	void resetRepresentations(){
+		itContext=context.begin();
+	}
+
+	bool hasNextRepresentation(){
+		return itContext!=context.end();
+	}
+
+	Context* nextRepresentation(){
+		Context* result;
+		if(hasNextRepresentation()){
+			result= *itContext;
+			itContext++;
+			return result;
+		}
+		return NULL;		
+	}
+
+	/*
+		Adds the representation passed as an argument as long as there is not another representation with the same name
+	*/
+	bool addRepresentation(Context* ctx){
+		if(getRepresentation(ctx->id)!=NULL)return false;
+		context.push_back(ctx);
+		this->resetRepresentations();
+		return true;
+	}
+
+	/*
+		Removes a Context from the action and erases it (delete)
+	*/
+	bool removeRepresentation(ID id){
+		std::list<Context*>::iterator it;
+		for(it=context.begin();it!=context.end();it++)
+			if((*it)->id==id){
+				delete *it;
+				it=context.erase(it);
+				itContext=context.begin();
+				return true;
+			}
+		return false;
+	}
+
+	/*
+		Removes the last representation accesed using nextRepresentation. The iterator does not move.
+		PATTERN: hasNextRepresentation()- nextRepresentation()- removeRepresentation()-hasNextRepresentation()- nextRepresentation()- removeRepresentation()-
+		DO NOT CALL: hasNextRepresentation()-removeRepresentation()-hasNextRepresentation()-removeRepresentation()
+	*/
+	void removeRepresentation(){
+		itContext--;
+		delete *itContext;
+		itContext=context.erase(itContext);
+	}
+
+	std::string getData(ID name){
+		std::map<std::string,std::string>::iterator it;
+		for(it=additionalData.begin();it!=additionalData.end();it++)
+			if(it->first==name)return it->second;
+		return NULL;
+	
+	}
+
+};
+
+#endif
+
+

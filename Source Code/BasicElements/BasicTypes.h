@@ -1,0 +1,506 @@
+/*******************************************************************************************************
+*			BASIC TYPES
+********************************************************************************************************
+*  	Diego Martinez Plasencia, LoUISE	
+********************************************************************************************************
+*	REVISIONES:
+*	  18/09/07--> Versión inicial			
+********************************************************************************************************
+*	This file contains the basic elements the objects in the architecture use for their operations:
+*
+*		-OID-> Identifies an object and its role in the organization
+*		-ID-> Identifies a resource of an object (IV name, action type,...)
+*		-AID-> Identifies an action and its producer in the system.
+*		-float time-> time is measured by floats.
+*		-Period-> Specifies an interval of time
+*		-BasicGeometry
+*		-OrganizationalContext
+*
+********************************************************************************************************
+*	-NOTES:
+********************************************************************************************************/
+#ifndef _BASIC_TYPES
+#define _BASIC_TYPES
+
+#include <iostream>
+#include <string>
+#include <map>
+#include "Ogre.h"
+#include "./BasicElements/OID.h"
+#include "pthread.h"
+#include "./BasicElements/InputChannels.h"
+#include "./BasicElements/GenericType.h"
+
+
+
+typedef std::string ID;
+
+static void toID(char* msg,ID* dst){
+	*dst=msg;
+	
+	/*
+	int i;
+	for(i=0;i<ID_LENGTH-1&&*msg!='\0';i++)//copies the message
+		(*dst)[i]=msg[i];
+	for(;i<ID_LENGTH;i++)(*dst)[i]='\0';//fills the rest of the ID with '\0'*/
+
+}
+
+static bool IDequals(ID a,ID b){
+	return a==b;
+}
+
+class AID{
+	public:
+
+	OID oid;
+	unsigned int code;
+	AID():code(0){oid=(OID&)INVALID_OID;}
+	AID(OID oid, unsigned int code=0){
+		this->code=code;
+		for(int i=0;i<4;i++)this->oid[i]=oid[i];
+	}
+	
+	AID& operator++(){
+		code++;
+		return *this;
+	}
+
+	AID& operator--(){
+		code--;
+		return *this;
+	}
+
+	bool operator==(AID& a){
+		
+		return a.code==code&&a.oid==oid;
+	}
+	bool operator!=(AID& a){
+		return !(*this==a);
+	}
+
+	AID& operator=(AID& a){
+		oid=a.oid;
+		code=a.code;		
+		return *this;
+			
+	}
+
+
+
+
+	
+};
+
+class Period{
+	public:
+	float startTime, endTime, dumpTime;
+	
+	Period():startTime(0),endTime(0),dumpTime(0){
+	}
+	
+	Period(float sT, float eT,float dT){
+		this->startTime=sT;
+		this->endTime=eT;
+		this->dumpTime=dT;				
+	}
+	inline bool isCorrect(){
+		return Period::isCorrect(*this);
+	}
+	static bool isCorrect(Period a){
+		return a.startTime<=a.endTime && a.dumpTime >=0;	
+	}
+
+	inline bool isSubsetOf(Period big){
+		return Period::subset(*this,big);
+	}
+	static bool subset(Period s,Period big){
+		return (isCorrect(s)&& isCorrect(big)&&s.startTime>=big.startTime && s.endTime<=big.endTime);	
+	}
+	inline bool overlaps(Period b){
+		return Period::overlap(*this,b);
+	}	
+	static bool overlap(Period a, Period b){
+		if(!(isCorrect(a) && isCorrect(b)))return false;		
+		return (a.endTime>=b.startTime&&a.endTime<=b.endTime)||(b.endTime>=a.startTime&&b.endTime<=a.endTime);	
+	}
+
+	inline bool isDisjoint(Period b){
+		return Period::disjoint(*this,b);
+	}
+	
+	static bool disjoint(Period a, Period b){
+		if(!(isCorrect(a) && isCorrect(b)))return false;		
+		return (a.endTime<=b.startTime)||( b.endTime<=a.startTime);
+	}
+
+	inline bool isAdjacent(Period b){
+		return Period::adjacent(*this,b);
+	}
+	static bool adjacent(Period a, Period b){
+		if(!(isCorrect(a) && isCorrect(b)))return false;
+		return (a.endTime<=b.startTime&&a.endTime+a.dumpTime>=b.startTime)||((b.endTime<=a.startTime&&b.endTime+b.dumpTime>=a.startTime));			
+	}	
+
+	inline bool isPreviousTo(Period b){
+		return Period::previous(*this,b);
+	}
+	static bool previous(Period a, Period b){
+		return isCorrect(a)&& isCorrect(b)&& a.endTime+a.dumpTime<= b.startTime;	
+	}
+	
+	inline bool isLaterThan(Period b){
+		return Period::later(*this,b);
+	}
+	static bool later(Period a,Period b){
+		return isCorrect(a)&& isCorrect(b)&& b.endTime-a.dumpTime<= a.startTime;	
+	}
+
+	inline bool isActive(float t){
+		return Period::active(*this,t);
+	}
+	static bool active(Period a, float t){
+		return t>=a.startTime&& t<=a.endTime;	
+	}
+
+};
+
+
+
+
+
+static const float ADYACENCY_THRESHOLD=5;
+static const float ALIGNED_THRESHOLD=0.2f;//cos(A), donde A es el ángulo dejado como margen.
+static const float ORIENTED_THRESHOLD=0.2f;//cos (B)
+
+class BasicGeometry{
+
+
+public:
+	Ogre::Matrix4 pos;
+	float radius;
+
+	BasicGeometry(){
+		pos=Ogre::Matrix4::IDENTITY;
+		radius=0;
+	}
+
+	BasicGeometry& operator=(BasicGeometry& bg){
+		pos=bg.pos;
+		radius=bg.radius;
+		return *this;
+	}
+	//Condiciones absolutas	
+	inline bool isAdjacentTo(BasicGeometry b, Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ADYACENCY_THRESHOLD){
+		return BasicGeometry::adjacent(*this,b, fromAtoB,threshold);
+	}
+	static bool adjacent(BasicGeometry a,BasicGeometry b, Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ADYACENCY_THRESHOLD){
+		//1. Put a in b's system of coordinates.
+		BasicGeometry AinB=a;
+		AinB.pos=fromAtoB*a.pos;	
+		//2. Find out the distance between their centers
+		Ogre::Vector3 posA=AinB.pos.getTrans();
+		Ogre::Vector3 posB=b.pos.getTrans();
+		Ogre::Vector3 ab=posA-posB;
+		float d=ab.squaredLength();
+		float max=(a.radius+b.radius+threshold);
+		float min=a.radius+b.radius;
+		//3. Check the condition
+		return d<=max*max && d>=min*min;
+	}
+	inline bool collides(BasicGeometry b, Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY){
+		return BasicGeometry::collision(*this,b,fromAtoB);
+	}
+	static bool collision(BasicGeometry a,BasicGeometry b, Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY){
+		//1. Put a in b's system of coordinates.
+		BasicGeometry AinB=a;
+		AinB.pos=fromAtoB*a.pos;	
+		//2. Find out the distance between their centers
+		Ogre::Vector3 posA=AinB.pos.getTrans();
+		Ogre::Vector3 posB=b.pos.getTrans();
+		Ogre::Vector3 ab=posA-posB;
+		
+		//3. Check the condition
+		float d=ab.squaredLength();
+		return d<=(a.radius+b.radius)*(a.radius+b.radius);
+		//float d=1.0*ab.length();
+		//return d<a.radius+b.radius;
+		
+	}
+
+	inline bool isFarAwayFrom(BasicGeometry b, Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ADYACENCY_THRESHOLD){
+		return BasicGeometry::farAway(*this,b,fromAtoB,threshold);
+	}
+	static bool farAway(BasicGeometry a,BasicGeometry b, Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ADYACENCY_THRESHOLD){
+		//1. Put a in b's system of coordinates.
+		BasicGeometry AinB=a;
+		AinB.pos=fromAtoB*a.pos;	
+		//2. Find out the distance between their centers
+		Ogre::Vector3 posA=AinB.pos.getTrans();
+		Ogre::Vector3 posB=b.pos.getTrans();
+		Ogre::Vector3 ab=posA-posB;
+		float d=ab.squaredLength();
+		float max=(a.radius+b.radius+threshold);
+		float min=a.radius+b.radius;
+		//3. Check the condition
+		return d>max*max;
+	}
+
+	//Posición relativa:
+	static bool aligned(BasicGeometry a,BasicGeometry b, Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ALIGNED_THRESHOLD){
+		//1. Position b using a as his system of coordinates.
+		BasicGeometry BfromA=b;
+		Ogre::Matrix4 posBfromA=fromAtoB*a.pos;
+		//BfromA.pos=(b.pos.inverse())*posBfromA;
+		BfromA.pos=(posBfromA.inverse())*b.pos;
+	
+		//2. Find out the unit vector from the origin (a) to b:
+		Ogre::Vector3 directionFromAtoB=BfromA.pos.getTrans();
+		directionFromAtoB.normalise();
+		
+
+		//3. Check the condition
+		float threshold2=threshold*threshold;
+		directionFromAtoB[0]=directionFromAtoB[0]*directionFromAtoB[0];
+		directionFromAtoB[1]=directionFromAtoB[1]*directionFromAtoB[1];
+		directionFromAtoB[2]=directionFromAtoB[2]*directionFromAtoB[2];
+		return    (directionFromAtoB[0]<threshold2 &&  directionFromAtoB[1]<threshold2 )
+			||(directionFromAtoB[1]<threshold2 &&  directionFromAtoB[2]<threshold2 )
+			||(directionFromAtoB[0]<threshold2 &&  directionFromAtoB[2]<threshold2 );
+	}	
+	static bool aligned(BasicGeometry a,BasicGeometry b,Ogre::Vector3 directionVector,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ALIGNED_THRESHOLD){
+		//1. Position b using a as his system of coordinates.
+		BasicGeometry BfromA=b;
+		Ogre::Matrix4 posBfromA=fromAtoB*a.pos;
+		//BfromA.pos=(b.pos.inverse())*posBfromA;
+		BfromA.pos=(posBfromA.inverse())*b.pos;
+	
+		//2. Find out the unit vector from the origin (a) to b:
+		Ogre::Vector3 directionFromAtoB=BfromA.pos.getTrans();
+		directionFromAtoB.normalise();
+		
+
+		//3. Check the condition
+		float threshold2=threshold*threshold;
+		directionFromAtoB[0]=(directionFromAtoB[0]-directionVector[0])*(directionFromAtoB[0]-directionVector[0]);
+		directionFromAtoB[1]=(directionFromAtoB[1]-directionVector[1])*(directionFromAtoB[1]-directionVector[1]);
+		directionFromAtoB[2]=(directionFromAtoB[2]-directionVector[2])*(directionFromAtoB[2]-directionVector[2]);
+		return    (directionFromAtoB[0]<threshold2 &&  directionFromAtoB[1]<threshold2 && directionFromAtoB[2]<threshold2 );
+			
+
+	}	
+
+
+	//CONSTANTS USED FOR THE ORIENTATION MASK
+	static const int ORIENTED_ALL=128;// valor 56=32+16+8?	
+	static const int ORIENTED_ANY=64;
+	static const int ORIENTED_X_X=32;
+	static const int ORIENTED_Y_Y=16;
+	static const int ORIENTED_Z_Z=8;
+	static const int ORIENTED_ANY_X=4;
+	static const int ORIENTED_ANY_Y=2;
+	static const int ORIENTED_ANY_Z=1;
+
+	static int oriented(BasicGeometry a,BasicGeometry b, bool sameDirection=false,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ORIENTED_THRESHOLD){
+		//1. Position b using a as his system of coordinates.
+		BasicGeometry BfromA=b;
+		Ogre::Matrix4 posBfromA=(fromAtoB*a.pos).inverse();
+		BfromA.pos=posBfromA*b.pos;
+
+		//2. Find out the direction of B's axis:
+		Ogre::Vector3 X(1,0,0), Y(0,1,0), Z(0,0,1), origin(0,0,0);
+		origin=BfromA.pos*origin;
+		X=(BfromA.pos*X)-origin;
+		Y=(BfromA.pos*Y)-origin;
+		Z=(BfromA.pos*Z)-origin;
+
+		X.normalise();
+		Y.normalise();
+		Z.normalise();
+		
+		//3. Check Conditions:
+		int resultMask=0;
+		//3.1. Same axis
+		if(-1*threshold<X[1]&& threshold>X[1] &&-1*threshold<X[2]&& threshold>X[2]&&(!sameDirection||X[0]>0))
+			resultMask|=ORIENTED_X_X|ORIENTED_ANY_X;
+
+		if(-1*threshold<Y[0]&& threshold>Y[0] &&-1*threshold<Y[2]&& threshold>Y[2]&&(!sameDirection||Y[1]>0))
+			resultMask|=ORIENTED_Y_Y|ORIENTED_ANY_Y;
+
+		if(-1*threshold<Z[0]&& threshold>Z[0] &&-1*threshold<Z[1]&& threshold>Z[1]&&(!sameDirection||Z[2]>0))
+			resultMask|=ORIENTED_Z_Z|ORIENTED_ANY_Z;
+		
+		//3.2. Different axis
+
+		if((-1*threshold<X[0]&& threshold>X[0] &&-1*threshold<X[1]&& threshold>X[1]&&(!sameDirection||X[2]>0))
+		 ||(-1*threshold<X[0]&& threshold>X[0] &&-1*threshold<X[2]&& threshold>X[2]&&(!sameDirection||X[1]>0)))
+			resultMask|=ORIENTED_ANY_X;
+		
+		if((-1*threshold<Y[0]&& threshold>Y[0] &&-1*threshold<Y[1]&& threshold>Y[1]&&(!sameDirection||Y[2]>0))
+		 ||(-1*threshold<Y[1]&& threshold>Y[1] &&-1*threshold<Y[2]&& threshold>Y[2]&&(!sameDirection||Y[0]>0)))
+			resultMask|=ORIENTED_ANY_Y;
+
+		if((-1*threshold<Z[0]&& threshold>Z[0] &&-1*threshold<Z[2]&& threshold>Z[2]&&(!sameDirection||Z[1]>0))
+		 ||(-1*threshold<Z[1]&& threshold>Z[1] &&-1*threshold<Z[2]&& threshold>Z[2]&&(!sameDirection||Z[0]>0)))
+			resultMask|=ORIENTED_ANY_Z;
+
+		//3.3. All axis
+		int all=ORIENTED_X_X|ORIENTED_Y_Y|ORIENTED_Z_Z;
+		if((resultMask&all)==all)resultMask|=ORIENTED_ALL;
+		if(resultMask)resultMask|=ORIENTED_ANY;
+
+		return resultMask;
+	}
+
+	static bool orientedAll(BasicGeometry a,BasicGeometry b, bool sameDirection=false,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ORIENTED_THRESHOLD){
+		return (BasicGeometry::oriented(a,b,sameDirection,fromAtoB,threshold)&ORIENTED_ALL)!=0;	
+	}
+
+	static bool orientedAny(BasicGeometry a,BasicGeometry b, bool sameDirection=false,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ORIENTED_THRESHOLD){
+		return (BasicGeometry::oriented(a,b,sameDirection,fromAtoB,threshold)&ORIENTED_ANY)!=0;	
+	}
+
+	static bool oriented_X_X(BasicGeometry a,BasicGeometry b, bool sameDirection=false,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ORIENTED_THRESHOLD){
+		return (BasicGeometry::oriented(a,b,sameDirection,fromAtoB,threshold)&ORIENTED_X_X)!=0;	
+	}
+
+	static bool oriented_Y_Y(BasicGeometry a,BasicGeometry b, bool sameDirection=false,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ORIENTED_THRESHOLD){
+		return (BasicGeometry::oriented(a,b,sameDirection,fromAtoB,threshold)&ORIENTED_Y_Y)!=0;	
+	}
+
+	static bool oriented_Z_Z(BasicGeometry a,BasicGeometry b, bool sameDirection=false,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ORIENTED_THRESHOLD){
+		return (BasicGeometry::oriented(a,b,sameDirection,fromAtoB,threshold)&ORIENTED_Z_Z)!=0;	
+	}
+
+	static bool oriented_Any_X(BasicGeometry a,BasicGeometry b, bool sameDirection=false,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ORIENTED_THRESHOLD){
+		return (BasicGeometry::oriented(a,b,sameDirection,fromAtoB,threshold)&ORIENTED_ANY_X)!=0;	
+	}
+
+	static bool oriented_Any_Y(BasicGeometry a,BasicGeometry b, bool sameDirection=false,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ORIENTED_THRESHOLD){
+		return (BasicGeometry::oriented(a,b,sameDirection,fromAtoB,threshold)&ORIENTED_ANY_Y)!=0;	
+	}
+
+	static bool oriented_Any_Z(BasicGeometry a,BasicGeometry b, bool sameDirection=false,Ogre::Matrix4 fromAtoB=Ogre::Matrix4::IDENTITY,float threshold=ORIENTED_THRESHOLD){
+		return (BasicGeometry::oriented(a,b,sameDirection,fromAtoB,threshold)&ORIENTED_ANY_Z)!=0;	
+	}
+
+	static float distance(BasicGeometry a,BasicGeometry b){
+		Ogre::Vector3 p1=a.pos*Ogre::Vector3(0,0,0);
+		Ogre::Vector3 p2=b.pos*Ogre::Vector3(0,0,0);
+		return (p2-p1).length();
+	}
+};
+
+
+class OrganizationalContext{
+public:
+	OID rootOID;
+	OID mask;
+
+	OrganizationalContext(){
+	}
+	
+	OrganizationalContext(OID rootOID,OID mask){
+		for(int i=0;i<4;i++){
+			this->rootOID[i]=rootOID[i];
+			this->mask[i]=mask[i];
+		}
+	}
+
+	OrganizationalContext& operator=(OrganizationalContext& oc){
+		this->rootOID=oc.rootOID;
+		this->mask=oc.mask;
+		return *this;		
+	}
+
+	inline bool contains(OID oid){
+		return OrganizationalContext::belongs(oid,*this);
+	}
+	static bool belongs(OID oid, OrganizationalContext oc){
+		for(int i=0;i<4;i++){
+			int mask=1;
+			for(;mask<=128;mask*=2){
+				if(  oc.mask[i]&mask || ((oc.rootOID[i]&mask) == (oid[i]&mask))  );
+				else return false;
+			}
+			//if(((oc.rootOID[i]|oc.mask[i])&oid[i])!=oid[i])return false;
+		}
+		return true;	
+	}
+
+	inline bool overlaps(OrganizationalContext  b){
+		return OrganizationalContext::overlap(*this,b);
+	}
+	static bool overlap(OrganizationalContext a,OrganizationalContext b){
+		for(int i=0;i<4;i++)	
+			for(int aux=1;aux<256;aux*=2)
+				if ( ((a.mask[i]&aux)==0) && ((b.mask[i]&aux)==0) && ((a.mask[i]&aux)!=(b.mask[i]&aux)) )
+					return false;
+		return true;
+	}
+	
+	static bool subset(OrganizationalContext s,OrganizationalContext big){//CHECK IN DEPTH
+		for(int i=0;i<4;i++)	
+			for(int aux=1;aux<256;aux*=2)
+				if ( ((big.mask[i]&aux)==0) && 
+				   ( ((s.mask[i]&aux)!=0) || ((s.rootOID[i]&aux)!=(big.rootOID[i]&aux)) ) 
+				   )//end if condition
+				   return false;
+		return true;
+			
+	}
+
+};
+
+static int numContext=0;
+class Context: public Period, public OrganizationalContext,public BasicGeometry{
+public:	
+	
+	int inputChannel;
+	ID id;
+	ID parentContextID;
+
+	Context():Period(),OrganizationalContext(),BasicGeometry()
+	{
+		numContext++;
+		//printf("\nContext's: %d",numContext);
+		inputChannel=-1;
+		id="NONE";
+		parentContextID="";
+	}
+
+	~Context(){
+		numContext--;
+	}
+
+	Context& operator=(Context& c){
+		*((Period*)this) =((Period)c);
+		
+		//*((OrganizationalContext*)this)=((OrganizationalContext)c);
+		//*((BasicGeometry*)this)=((BasicGeometry)c);		
+		
+		OrganizationalContext oc=(OrganizationalContext)c;
+		BasicGeometry bg=(BasicGeometry)c;
+
+		*((OrganizationalContext*)this)=oc;
+		*((BasicGeometry*)this)=bg;
+
+		
+		this->id=c.id;
+		this->parentContextID=c.parentContextID;
+		this->inputChannel=c.inputChannel;
+		return *this;
+	}
+
+};
+
+
+
+
+#endif
+
+
+
+
+
+

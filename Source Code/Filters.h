@@ -18,10 +18,10 @@ using namespace cv;
 
 class IFilters{
 	public:
-		virtual Mat applyFilter(char s, Mat src)=0;
-		virtual Mat thresholdFilter(Mat src)=0;
-		virtual Mat erosionFilter(Mat src)=0;
-		virtual Mat dilationFilter(Mat src)=0;
+		virtual Mat& applyFilter(char s, Mat& src)=0;
+		virtual Mat& thresholdFilter(Mat& src)=0;
+		virtual Mat& erosionFilter(Mat& src)=0;
+		virtual Mat& dilationFilter(Mat& src)=0;
 };
 
 
@@ -33,10 +33,10 @@ class Filters: public IFilters {
 		int dilationSize;
 
 		Filters(void);
-		Mat applyFilter(char s, Mat src);
-		Mat thresholdFilter(Mat src);
-		Mat erosionFilter(Mat src);
-		Mat dilationFilter(Mat src);
+		Mat& applyFilter(char s, Mat& src);
+		Mat& thresholdFilter(Mat& src);
+		Mat& erosionFilter(Mat& src);
+		Mat& dilationFilter(Mat& src);
 };
 
 #endif

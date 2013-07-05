@@ -11,6 +11,8 @@
 #include <vector>
 #include <pthread.h>
 #include "IBubbleTracker.h"
+#include "Calibrator.h"
+#include "ProjectionEngine.h"
 
 class IBubbleDetector{
 	public:
@@ -20,6 +22,8 @@ class IBubbleDetector{
 		virtual bool stop(void)=0;
 };
 
+
+//DIEGO: Set these as config parameters in your dialog. Declare them as static int minBubbleSize, rather than #define
 #define minBubbleSize 10
 #define maxBubbleSize 100
 
@@ -42,6 +46,7 @@ class BubbleDetector: public IBubbleDetector{
 		Filters filter;
 		Kinect kinect;
 		KOCVStream* _stream;
+		Mat _homography;
 
 		BubbleDetector(IBubbleTracker * observer){
 			_observer=observer;
@@ -52,5 +57,7 @@ class BubbleDetector: public IBubbleDetector{
 		bool stop(void);
 		vector<Bubble> detectBubbles(Filters* filter, Mat src);
 		void updateFPS(bool newFrame);
+		void getHomography(Mat H);
 };
+
 #endif

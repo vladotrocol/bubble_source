@@ -1,15 +1,18 @@
 #include "Filters.h"
 
+
+//DIEGO:We do not want these to be created every time, as it is very expensive. This way they are created the first time they are used and not every time.
+static Mat src_grey, resultThres, resultErosion, resultDilate;
 //Constructor
 Filters::Filters():
 	thresholdValue(1),
 	thresholdType(1),
 	erosionSize(32),
-	dilationSize(36)
+	dilationSize(41)
 {};
 
 //Applies the requested filter to the corresponding source stream
-Mat Filters::applyFilter(char s, Mat src){
+Mat& Filters::applyFilter(char s, Mat& src){
 	if(s == 't'){
 		return thresholdFilter(src);
 	}else if(s == 'e'){
@@ -22,36 +25,34 @@ Mat Filters::applyFilter(char s, Mat src){
 };
 
 //Apply Threshold Filer
-Mat Filters::thresholdFilter(Mat src){
-	Mat src_grey, result;
+Mat& Filters::thresholdFilter(Mat& src){
+
 	if(src.type() == CV_8U){
-		threshold(src, result, thresholdValue, 255, thresholdType);
+		threshold(src, resultThres, thresholdValue, 255, thresholdType);
 	}
 	else{
 		cvtColor(src, src_grey, CV_BGR2GRAY);
-		threshold(src_grey, result, thresholdValue, 255, thresholdType);
+		threshold(src_grey, resultThres, thresholdValue, 255, thresholdType);
 	}
-	return result;
+	return resultThres;
 };
 
 //Apply Erosion Filter
-Mat Filters::erosionFilter(Mat src){
-	Mat result;
+Mat& Filters::erosionFilter(Mat& src){
 	if(erosionSize<=2){
 		erosionSize=3;
 	}
-	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(erosionSize, erosionSize), Point(2,2));
-	erode( src, result, element );
-	return result;
+	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(erosionSize, erosionSize), Point(2,2));//DIEGO:Try cv::MORPH_ELLIPSE 
+	erode( src, resultErosion, element );
+	return resultErosion;
 };
 
 //Apply Dilation Filter
-Mat Filters::dilationFilter(Mat src){
-	Mat result;
+Mat& Filters::dilationFilter(Mat& src){
 	if(dilationSize<=2){
 		dilationSize=3;
 	}
-	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize), Point(2,2));
-	dilate( src, result, element );
-	return result;
+	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize), Point(2,2));//DIEGO:Use cv::MORPH_ELLIPSE 
+	dilate( src, resultDilate, element );
+	return resultDilate;
 };

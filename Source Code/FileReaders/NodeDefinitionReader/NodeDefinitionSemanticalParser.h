@@ -1,0 +1,312 @@
+#ifndef _NODE_DEFINITION_SEMANTICAL_PARSER
+#define _NODE_DEFINITION_SEMANTICAL_PARSER
+
+#include "./FileReaders/SemanticalParser.h"
+#include "./FileReaders/NodeDefinitionReader/NodeDefinitionLexicalParser.h"
+#include "./CommunicationElements/CommunicationLayer.h"
+
+
+
+using namespace NodeDefinitionLexicalCathegories;
+
+class NodeDefinitionSemanticalParser: public SemanticalParser{
+Token curToken;
+
+public:
+	
+	std::string nodeName;
+	OrganizationalContext localNodeContext;
+	int localInputPort;
+	std::string upperNodeName;
+	OID upperlNodeIP;
+	int upperNodePort;
+	std::map<std::string,OrganizationalContext> children;
+	bool isRootNode;
+	bool isLeafNode;
+
+	NodeDefinitionSemanticalParser(std::string file):curToken(-1){
+		this->input=new NodeDefinitionLexicalParser(file);
+		this->upperNodeName="";
+	}
+
+	virtual bool parse(){
+		bool result=S();
+		this->isRootNode=(upperNodeName=="");
+		this->isLeafNode=(children.size()==0);
+		return result;
+	}
+private:
+	
+	//<S>--><Node> eof
+	bool S(){
+		if(!Node())
+			return false;
+		//if(input->getToken())
+		return true;
+	}
+
+	//<Node> --> Node ( <ParamList>)
+	bool Node(){
+		curToken=input->getToken();
+		if(curToken.tokenId!=NODE)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=ABRE_PAR)return false;
+		input->nextToken();
+		
+		//printf("<BEGIN PARAM_LIST>");
+
+		if(!ParamList())return false;
+
+		//printf("<END PARAM_LIST>");
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=CIERRA_PAR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=PYC)return false;
+		input->nextToken();
+
+		return true;
+	}
+
+	/*
+		<ParamList>-->	<NodeData><ParamList>
+						|<UpperNode><ParamList>
+						|<InputPort><ParamList>
+						|<Children><ParamList>
+						|lambda
+	*/
+
+	bool ParamList(){
+		curToken=input->getToken();
+		switch(curToken.tokenId){
+			case NODE_DATA:
+				//printf("<BEGIN NODE_DATA>");
+				if(!NodeData(&nodeName,&(localNodeContext.rootOID),&(localNodeContext.mask)))return false;
+				//printf("<END NODE_DATA>");
+				if(!ParamList())return false;
+				return true;
+				break;
+			case UPPER_NODE:
+				//printf("<BEGIN UPPER_NODE>");
+				if(!UpperNode())return false;
+				//printf("<END UPPER_NODE>");
+				if(!ParamList())return false;
+				return true;
+			case INPUT_PORT:
+				//printf("<BEGIN INPUT_PORT>");
+				if(!InputPort())return false;
+				//printf("<END INPUT_PORT>");
+				if(!ParamList())return false;
+				return true;
+			case CHILDREN:
+				//printf("<BEGIN CHILDREN>");
+				if(!Children())return false;
+				//printf("<END CHILDREN>");
+				if(!ParamList())return false;
+				return true;
+			case CIERRA_PAR:
+				return true;
+			default: 
+				printf("%WRONG PARAM_LIST%: %d",curToken.tokenId);
+				return false;
+
+		}
+	}
+
+
+	/*
+		<NodeData>-->	NodeData ( string ; OID/OID); 	
+	*/
+	bool NodeData(std::string* str, OID* rootOID,OID* mask){
+		curToken=input->getToken();
+		if(curToken.tokenId!=NODE_DATA)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=ABRE_PAR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=STRING)return false;
+		//Save NodeData
+		*str=std::string((char*)curToken.values["string"]);
+		delete (char*)curToken.values["string"];
+		//
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=PYC)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=TOKEN_OID)return false;
+		//Save OID 1
+		*rootOID=*(OID*)curToken.values["OID"];
+		delete (OID*)curToken.values["OID"];
+		//
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=BARRA)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=TOKEN_OID)return false;
+		//Save OID2
+		*mask=*(OID*)curToken.values["OID"];
+		delete (OID*)curToken.values["OID"];
+		input->nextToken();
+		//
+		curToken=input->getToken();
+		if(curToken.tokenId!=CIERRA_PAR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=PYC)return false;
+		input->nextToken();
+
+
+		return true;
+	
+	}
+
+
+	/*
+		<UpperNode>-->	UpperNode ( string ; OID / ENTERO);
+	*/
+	bool UpperNode(){
+		curToken=input->getToken();
+		if(curToken.tokenId!=UPPER_NODE)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=ABRE_PAR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=STRING)return false;
+		//Save upperNodeName
+		this->upperNodeName=std::string((char*)curToken.values["string"]);
+		delete (char*)curToken.values["string"];
+		//
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=PYC)return false;
+		input->nextToken();
+		
+		curToken=input->getToken();
+		if(curToken.tokenId!=TOKEN_OID)return false;
+		//Save upprNodeIP
+		this->upperlNodeIP=*(OID*)curToken.values["OID"];
+		delete (OID*)curToken.values["OID"];
+		//
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=BARRA)return false;
+		input->nextToken();
+		
+		curToken=input->getToken();
+		if(curToken.tokenId!=ENTERO)return false;
+		//Save upperNodePort
+		this->upperNodePort=*(int*)curToken.values["value"];
+		delete (int*)curToken.values["value"];
+		//
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=CIERRA_PAR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=PYC)return false;
+		input->nextToken();
+
+		return true;
+	
+	}
+
+	/*
+		<InputPort>--> InputPort ( ENTERO );
+	*/
+
+	bool InputPort(){
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=INPUT_PORT)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=ABRE_PAR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=ENTERO)return false;
+		this->localInputPort=*(int*)curToken.values["value"];
+		delete (int*)curToken.values["value"];
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=CIERRA_PAR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=PYC)return false;
+		input->nextToken();
+		return true;
+	}
+
+	/*
+		<Children>--> Children [ <NodeList> ];
+	*/
+	bool Children(){
+		curToken=input->getToken();
+		if(curToken.tokenId!=CHILDREN)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=ABRE_COR)return false;
+		input->nextToken();
+
+		if(!NodeList())return false;
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=CIERRA_COR)return false;
+		input->nextToken();
+
+		curToken=input->getToken();
+		if(curToken.tokenId!=PYC)return false;
+		input->nextToken();
+
+		return true;
+	}
+
+	/*
+		<NodeList>--> <NodeData><NodeList> | lambda
+	*/
+	bool NodeList(){
+		OrganizationalContext ctxt;
+		std::string subnode;
+
+		curToken=input->getToken();
+		switch(curToken.tokenId){
+			case NODE_DATA:
+				if(!NodeData(&subnode,&ctxt.rootOID,&ctxt.mask))return false;
+				this->children[subnode]=ctxt;
+				if(!NodeList())return false;
+				return true;
+			case CIERRA_COR:
+				return true;
+			default:
+				return false;
+		}
+	}
+};
+
+#endif
+

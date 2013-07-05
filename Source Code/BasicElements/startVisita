@@ -1,0 +1,9 @@
+#!/bin/sh
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/nacheitor/Proyectos/Visita/
+
+export __GL_SYNC_TO_VBLANK=1
+
+cd /home/nacheitor/Proyectos/Visita/
+./tutorial0

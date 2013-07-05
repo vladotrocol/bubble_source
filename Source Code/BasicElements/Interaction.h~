@@ -1,0 +1,166 @@
+/*******************************************************************************************************
+*			ACTION
+********************************************************************************************************
+*  	Diego Martinez Plasencia, LoUISE	
+********************************************************************************************************
+*	REVISIONES:
+*	  21/09/07--> Versión inicial			
+********************************************************************************************************
+*
+*	This file contains the definition of the interactions used in the system.
+*
+********************************************************************************************************
+*	-NOTES:
+********************************************************************************************************/
+
+#ifndef _INTERACTION
+#define _INTERACTION
+#include "./Action.h"
+static int numInteractions=0;
+class Interaction{
+public:
+	int priority;
+	OID producerOID;//Object through which the interaction was risen.
+	ID producerIVID;//Identifier of the Interaction View which produced the interaction
+	std::list<Action*> trigger;// Actions which triggered the interaction view. These copies are local and private
+	std::list<Action*>::iterator itTrigger;
+
+	std::map<std::string,std::string> additionalData;//Optional data necessary for the processing of the interaction.
+
+	Interaction(){
+		priority=0;
+		producerIVID="";
+		numInteractions++;
+		itTrigger=trigger.begin();
+	}
+
+	~Interaction(){
+		numInteractions--;
+		//printf("\nInteractions:%d",numInteractions);
+		//Remove Actions:
+		std::list<Action*>::iterator it;
+		for(it=trigger.begin();it!=trigger.end();it=trigger.erase(it))
+			delete *it;//The Actions are deleted
+
+
+	}
+	
+	Interaction& operator=(Interaction& a){
+		//0. Copy simple atttributes
+		priority=a.priority;
+		producerOID=a.producerOID;
+		producerIVID=a.producerIVID;
+		
+		//1. Copy: trigger=a.trigger;
+		std::list<Action*>::iterator it;
+		//1.1. erase previous trigger		
+		for(it=trigger.begin();it!=trigger.end();it=trigger.erase(it))
+			delete *it;//The Actions are deleted
+		//1.2. Copy new actions
+		it= a.trigger.begin();
+		while(it!=a.trigger.end()){
+			Action* copy= new Action();
+			Action* original=*it;
+			*copy=*original;
+			trigger.push_back(copy);
+			it++;
+		}
+		//2. Copy: additionalData=a.additionalData;
+		//2.1. erase  this->additionalData
+		std::map<std::string,std::string>::iterator it2;
+		it2=this->additionalData.begin();
+		while(it2!=this->additionalData.end()){
+			it2=this->additionalData.erase(it2);
+		}
+		//2.2. copy new data
+		it2=a.additionalData.begin();
+		while(it2!= a.additionalData.end()){
+			this->additionalData[it2->first]=it2->second;
+			it2++;
+		}
+		return *this;
+	}
+
+	bool operator<(Interaction& a){
+		return this->priority<a.priority;	
+	}
+
+	bool operator>(Interaction& a){
+		return this->priority>a.priority;	
+	}
+
+	Action* getAction(AID aid){
+		std::list<Action*>::iterator it;
+		for(it=trigger.begin();it!=trigger.end();it++)
+			if((*it)->aid==aid)return *it;
+		return NULL;
+	}
+
+	void resetActions(){
+		itTrigger=trigger.begin();
+	}
+	
+	bool hasNextAction(){
+		return itTrigger!=trigger.end();
+	}
+
+	Action* nextAction(){
+		Action* result;
+		if(hasNextAction()){
+			result= *itTrigger;
+			itTrigger++;
+			return result;
+		}
+		return NULL;		
+	}
+
+	/*
+		Adds the action passed as an argument as long as there is not another action with the same aid
+	*/
+	
+	bool addAction(Action* a){
+		if(getAction(a->aid)!=NULL)return false;
+		trigger.push_back(a);
+		this->resetActions();
+		return true;
+	}
+
+	/*
+		Removes an Action from the Interaction and erases it (delete). It also resets the itTrigger operator
+	*/
+	bool removeAction(AID aid){
+		std::list<Action*>::iterator it;
+		for(it=trigger.begin();it!=trigger.end();it++)
+			if((*it)->aid==aid){
+				delete *it;
+				it=trigger.erase(it);
+				itTrigger=trigger.begin();
+				return true;
+			}
+		return false;
+	}
+
+	/*
+		Removes the last action accesed using nextAction. The iterator does not move.
+		PATTERN: hasNextAction()- nextAction()- removeAction()-hasNextAction()-nextAction()- removeAction()-hasNextAction()-nextAction()- removeAction()
+		DO NOT CALL: hasNextAction()-removeAction()-hasNextAction()-removeAction()
+	*/
+
+	void removeAction(){
+		itTrigger--;
+		delete *itTrigger;
+		itTrigger=trigger.erase(itTrigger);
+	}
+
+	std::string getData(ID name){
+		std::map<std::string,std::string>::iterator it;
+		for(it=additionalData.begin();it!=additionalData.end();it++)
+			if(it->first==name)return it->second;
+		return NULL;
+	
+	}
+};
+
+#endif
+
+

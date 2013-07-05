@@ -1,0 +1,16 @@
+#include "./OID.h"
+#include <stdio.h>
+int main(){
+	OID a,b((char)157,(char)15,(char)0,(char)7);
+	printf("Probando toString:\n\t a->%s \n\t b->%s ",a.toString(),b.toString());	
+	printf("a(%d,%d,%d,%d)",a[0],a[1],a[2],a[3]);// 0 0 0 0
+	a[0]=(char)1;
+	printf("a(%d,%d,%d,%d)",a[0],a[1],a[2],a[3]);//1 0 0 0 
+	printf("b(%d,%d,%d,%d)",b[0],b[1],b[2],b[3]);//0 0 0 0 
+	b=a;
+	printf("b(%d,%d,%d,%d)",b[0],b[1],b[2],b[3]);//1 0 0 0 	
+	++b;
+	printf("b(%d,%d,%d,%d)",b[0],b[1],b[2],b[3]);//1 0 0 1 	
+	
+	return 0;
+}
