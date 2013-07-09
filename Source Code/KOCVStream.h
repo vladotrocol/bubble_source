@@ -16,9 +16,6 @@
 #include "Filters.h"
 #include "BubbleState.h"
 
-#define width 640 
-#define height 480
-
 using namespace std;
 using namespace cv;
 
@@ -29,23 +26,22 @@ class KOCVStream{
 		Kinect* kinect;
 		Filters* filter;
 
-		//Constructor
-		KOCVStream(Kinect* kinect, 	Filters* filter);
-
-		//External Api
-		void display(char* s);
-		void readFrame(char s);
-		void displayBubbles(vector<Bubble>& bubbles);
+		KOCVStream(Kinect* kinect, 	Filters* filter); //Constructor
+		void display(char* s); //Display streams in windows
+		void readFrame(char s); //Reads the current frames into the source materials
+		void displayBubbles(vector<Bubble>& bubbles); //Display detected bubbles as circles
 
 	private:
-		//Internal
-		Mat tryReadFrame(char s);
-		Mat kFrameToMat(char s,NUI_IMAGE_FRAME imageFrame);
-		BYTE* whichImageData(char s, NUI_LOCKED_RECT* LockedRect);
-		int whichDataType(char s);
-		Mat* whichSource(char s);
-		void generateWindows(char* s);
-		void generateControls(void);	
+		unsigned int static const width = 640;
+		unsigned int static const height = 480;
+
+		Mat tryReadFrame(char s); //Read the Mat data into a image frame
+		Mat kFrameToMat(char s,NUI_IMAGE_FRAME imageFrame); //Put the kinect frame data onto a Mat
+		BYTE* whichImageData(char s, NUI_LOCKED_RECT* LockedRect); //Get the image data correspondig to flag
+		int whichDataType(char s); //This function returns the correct data format for each stream type
+		Mat* whichSource(char s); //Returns the correct source
+		void generateWindows(char* s); //Generates windows according to grammar
+		void generateControls(void); //Generates the window with the filter sliders 
 };
 
 #endif

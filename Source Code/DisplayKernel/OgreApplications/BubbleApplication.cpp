@@ -80,6 +80,8 @@ void BubbleApplication::removeDirtyNodes(){
 
 
 void BubbleApplication::updateNodesPositions(){
+	static Ogre::SceneNode* aux=NULL;
+	
 	//0. Get current position of bubbles
 	static BubbleState& bubbles=BubbleState::instance();
 	std::map<unsigned int, Bubble>* curBubbles= bubbles.getCurrentState();
@@ -98,14 +100,15 @@ void BubbleApplication::updateNodesPositions(){
 		else{
 
 			//We need to set up a whole new bubble
-			Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
+			aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
+			
 			Ogre::Entity* auxEnt=mSceneMgr->createEntity("sampleBubble.mesh");
-			auxEnt->setMaterialName("Examples/Water2");//itBubbles->second.materialToShow
+			auxEnt->setMaterialName("Examples/ColourCheckerBoard");//itBubbles->second.materialToShow
 			aux->attachObject(auxEnt);
 			//Set its size and position
-			aux->scale(itBubbles->second.radius,itBubbles->second.radius,-itBubbles->second.radius);	
+			//aux->scale(itBubbles->second.radius,itBubbles->second.radius,-itBubbles->second.radius);	
+			aux->scale(itBubbles->second.radius,-itBubbles->second.radius,itBubbles->second.radius);	
 			aux->setPosition(itBubbles->second.center.x-512,itBubbles->second.center.y-384, 0); //DIEGO: BUBBLES SHOULD NOT USE 2D COORDINATES!!!! Bubble::center should not be cv::Point2f!!!!!
-			//aux->setPosition(itBubbles->second.center.x,itBubbles->second.center.y, 0);
 			//Store it
 			_GraphicalBubble gb;
 			gb.dirty=false;
@@ -114,5 +117,11 @@ void BubbleApplication::updateNodesPositions(){
 			
 		}
 	}
+	/*
+	//Let's see what happens when fliping normals
+	static int i=0;
+	i=(i+1)%20;
+	if(i==0)
+		aux->scale(1,1,-1);	*/
 
 }

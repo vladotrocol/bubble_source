@@ -1,37 +1,44 @@
 #include "Kinect.h"
 
-//Constructor
-Kinect::Kinect(void){
-};
+unsigned int static const width=640; //width of kinect stream
+unsigned int static const height=480; //height of kiect stream
 
-//-------------------------API------------------------------
+//Constructor
+Kinect::Kinect(void)
+{;};
+
+//-------------------------Public------------------------------
 
 //Initialise Kinect
-bool Kinect::initialiseKinect(void){
+void Kinect::initialiseKinect(void){
 	int numSensors;
-	if (NuiGetSensorCount(&numSensors) < 0 || numSensors < 1) return false;
-	if (NuiCreateSensorByIndex(0, &sensor) < 0) return false;
+	isInit = false;
+	if (!(NuiGetSensorCount(&numSensors) < 0 || numSensors < 1) && !(NuiCreateSensorByIndex(0, &sensor) < 0)){
+		sensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_DEPTH | NUI_INITIALIZE_FLAG_USES_COLOR);
+		sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH, NUI_IMAGE_RESOLUTION_640x480, NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE,2,NULL, &depthStream);
+		sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_COLOR, NUI_IMAGE_RESOLUTION_640x480, 0, 2, NULL, &rgbStream);
+		isInit = true;
+	}
+};
 
-	sensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_DEPTH | NUI_INITIALIZE_FLAG_USES_COLOR);
-	sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH, NUI_IMAGE_RESOLUTION_640x480, NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE,2,NULL, &depthStream);
-	sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_COLOR, NUI_IMAGE_RESOLUTION_640x480, 0, 2, NULL, &rgbStream); 
-	return sensor;
+//Check if Kinect is detected
+bool Kinect::hasInitialized(){
+	return isInit;
 };
 
 //Get the next frame
 bool Kinect::hasNextFrame(char s, NUI_IMAGE_FRAME *imageFrame){
-	HANDLE stream = whichStream(s);
-	if(stream){
+	stream = whichStream(s);
+	if(stream&&isInit){
 		if(sensor->NuiImageStreamGetNextFrame(stream, 10, imageFrame) >= 0){
 			return true;
 		}
 	}
-	//cerr << "No frame available\n";
 	return false;
 };
 
 //Releases the current frame
-bool Kinect::releaseFrame(char s, NUI_IMAGE_FRAME *imageFrame){
+HRESULT Kinect::releaseFrame(char s, NUI_IMAGE_FRAME *imageFrame){
 	return sensor->NuiImageStreamReleaseFrame(whichStream(s), imageFrame);
 };
 
@@ -51,7 +58,7 @@ BYTE* Kinect::getDepthData(NUI_LOCKED_RECT *LockedRect){
 	return data;
 };
 
-//------------------------------Internal-------------------------
+//------------------------------Private-------------------------
 
 //Returns the requested stream
 HANDLE Kinect::whichStream(char s){

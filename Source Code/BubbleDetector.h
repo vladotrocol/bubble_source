@@ -22,11 +22,6 @@ class IBubbleDetector{
 		virtual bool stop(void)=0;
 };
 
-
-//DIEGO: Set these as config parameters in your dialog. Declare them as static int minBubbleSize, rather than #define
-#define minBubbleSize 10
-#define maxBubbleSize 100
-
 class BubbleDetector: public IBubbleDetector{
 	//Thread data
 	pthread_mutex_t mutex;//lock while writing to avoid conflicts.

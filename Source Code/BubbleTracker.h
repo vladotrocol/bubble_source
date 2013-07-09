@@ -6,8 +6,6 @@
 #include "Calibrator.h"
 #include "ProjectionEngine.h"
 
-#define minBubbleSize 10
-#define maxBubbleSize 100
 #define travelMax 20
 
 class BubbleTracker: public IBubbleTracker{

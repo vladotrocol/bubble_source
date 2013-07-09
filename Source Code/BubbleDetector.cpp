@@ -1,7 +1,11 @@
 #include "Ogre.h"
 #include "BubbleDetector.h"
 
-void* fwthreadFunction(void* a);//Helper function to create the thread
+unsigned int static minBubbleSize = 5;
+unsigned int static maxBubbleSize = 100;
+
+//Helper function to create the thread
+void* fwthreadFunction(void* a);
 
 
 void* fwthreadFunction(void* a){
@@ -10,15 +14,19 @@ void* fwthreadFunction(void* a){
 		return NULL;
 };
 
+//Detection Initialisation
 bool BubbleDetector::init(){
-	bool ki = kinect.initialiseKinect();
-	cout<<"Kinect: "<<ki<<'\n';
-	KOCVStream* s = new KOCVStream(&kinect, &filter);
-	_stream = s;
-	status = ST_READY;
+	kinect.initialiseKinect();
+	if(kinect.hasInitialized()){
+		KOCVStream* s = new KOCVStream(&kinect, &filter);
+		_stream = s;
+		status = ST_READY;
+	}
 	return true;
 };
 
+
+//Detection trigger
 bool BubbleDetector::start(){
 	if(status==ST_READY){
 		status=ST_PLAYING;
@@ -27,22 +35,21 @@ bool BubbleDetector::start(){
 	return true;
 };
 
+//Detection main loop
 void BubbleDetector::run(){
 	//Thread's main loop
 	while(status==ST_PLAYING){
 		//Do your processing
 		_stream->readFrame('d');
 		bubbles = detectBubbles(&filter, _stream->depth_src);
-		if(bubbles.size()<1){
-			cout<<"no bubbles detected"<<'\n';
-		}
+
 		//_stream->display("di");
 		//_stream->displayBubbles(bubbles);
+
 		char c = waitKey( 1 );
 		this->updateFPS(true);
 
 		_observer->update();
-		//cout<<bubbles[0].center.x;
 		
 		//If escape is pressed exit
 		if( (char)c == 27 ){
@@ -56,7 +63,7 @@ void BubbleDetector::run(){
 	Sleep(1000);//Keep it	
 };
 
-
+//Detection kill
 bool BubbleDetector::stop(){
 	if(status!=ST_PLAYING)
 		return false;
@@ -67,6 +74,7 @@ bool BubbleDetector::stop(){
 	return true;
 };
 
+//Main Detection Method
 vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat src){
 	vector<vector<Point>> contours;
 	vector<Vec4i> hier;
@@ -110,6 +118,7 @@ vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat src){
 	return bubbles;
 };
 
+//A basic fps retriever
 void BubbleDetector::updateFPS(bool newFrame){
 	static Ogre::Timer timer;
 	static bool firstTime=true;
@@ -138,6 +147,7 @@ void BubbleDetector::updateFPS(bool newFrame){
 			
 };
 
+//Fetch the homography
 void BubbleDetector::getHomography(Mat H){
 	_homography = H;
 };

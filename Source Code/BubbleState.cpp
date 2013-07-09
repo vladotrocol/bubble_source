@@ -1,6 +1,6 @@
 #include "BubbleState.h"
 
-//Constructor
+//Constructors
 BubbleState::BubbleState()
 {;};
 

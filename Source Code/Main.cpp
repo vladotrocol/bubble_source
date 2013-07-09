@@ -33,21 +33,18 @@ int main(){
 	BubbleTracker BT(&BS);
 	OgreProjectionEngine ope;
 	unsigned int ID = 10;
+
 	createBubble(ID, &BS, &BG);
-	//createBubble(ID+1, &BS, &BG);
+	createBubble(ID+1, &BS, &BG);
+
 	BT.init();
-	ope.init();
-	BT.start();
-	ope.start();
+	if(BT._detector->kinect.hasInitialized()){
+		ope.init();
+		BT.start();
+		ope.start();
+	}
+
 	cin.get();
 	return 0;
 };
-
-
-/*int main(){
-	BubbleApplication bubApp;
-	bubApp.go();
-	return 0;
-
-}*/
 

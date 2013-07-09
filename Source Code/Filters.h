@@ -32,11 +32,11 @@ class Filters: public IFilters {
 		int erosionSize;
 		int dilationSize;
 
-		Filters(void);
-		Mat& applyFilter(char s, Mat& src);
-		Mat& thresholdFilter(Mat& src);
-		Mat& erosionFilter(Mat& src);
-		Mat& dilationFilter(Mat& src);
+		Filters(void); //Constructor
+		Mat& applyFilter(char s, Mat& src); //Applies the requested filter to the corresponding source stream
+		Mat& thresholdFilter(Mat& src); //Apply Threshold Filer
+		Mat& erosionFilter(Mat& src); //Apply Erosion Filter
+		Mat& dilationFilter(Mat& src); //Apply Dilation Filter
 };
 
 #endif

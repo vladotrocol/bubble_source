@@ -1,8 +1,10 @@
 #include "KOCVStream.h"
 
 //Constructor
-KOCVStream::KOCVStream(Kinect* k, Filters* f):kinect(k), filter(f)
-{};
+KOCVStream::KOCVStream(Kinect* k, Filters* f):
+	kinect(k), 
+	filter(f)
+{;};
 
 //----------------------------API------------------------
 
@@ -46,6 +48,7 @@ void KOCVStream::readFrame(char s){
 	temp.release();
 };
 
+//Display detected bubbles as circles
 void KOCVStream::displayBubbles(vector<Bubble> &bubbles){
 	RNG rng(12345);
 	Mat drawing = Mat::zeros(depth_src.size(), CV_8UC3 );
@@ -60,7 +63,7 @@ void KOCVStream::displayBubbles(vector<Bubble> &bubbles){
 
 //--------------------------Internal----------------------------
 
-//Read the kinect frame data into a image frame
+//Read the Mat data into a image frame
 Mat KOCVStream::tryReadFrame(char s){
 	NUI_IMAGE_FRAME imageFrame;
 
@@ -78,7 +81,7 @@ Mat KOCVStream::tryReadFrame(char s){
 	return depthFrame;
 };
 
-//Put the frame data onto a Mat
+//Put the kinect frame data onto a Mat
 Mat KOCVStream::kFrameToMat(char s, NUI_IMAGE_FRAME imageFrame){
 	int dataType = whichDataType(s);
 	Mat frame(height, width, dataType);

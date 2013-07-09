@@ -1,15 +1,17 @@
 #include "Filters.h"
 
+static Mat src_grey,
+		resultThres, 
+		resultErosion, 
+		resultDilate;
 
-//DIEGO:We do not want these to be created every time, as it is very expensive. This way they are created the first time they are used and not every time.
-static Mat src_grey, resultThres, resultErosion, resultDilate;
 //Constructor
 Filters::Filters():
 	thresholdValue(1),
 	thresholdType(1),
 	erosionSize(32),
-	dilationSize(41)
-{};
+	dilationSize(51)
+{;};
 
 //Applies the requested filter to the corresponding source stream
 Mat& Filters::applyFilter(char s, Mat& src){
@@ -26,7 +28,6 @@ Mat& Filters::applyFilter(char s, Mat& src){
 
 //Apply Threshold Filer
 Mat& Filters::thresholdFilter(Mat& src){
-
 	if(src.type() == CV_8U){
 		threshold(src, resultThres, thresholdValue, 255, thresholdType);
 	}
@@ -42,7 +43,7 @@ Mat& Filters::erosionFilter(Mat& src){
 	if(erosionSize<=2){
 		erosionSize=3;
 	}
-	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(erosionSize, erosionSize), Point(2,2));//DIEGO:Try cv::MORPH_ELLIPSE 
+	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(erosionSize, erosionSize), Point(2,2)); 
 	erode( src, resultErosion, element );
 	return resultErosion;
 };
@@ -52,7 +53,7 @@ Mat& Filters::dilationFilter(Mat& src){
 	if(dilationSize<=2){
 		dilationSize=3;
 	}
-	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize), Point(2,2));//DIEGO:Use cv::MORPH_ELLIPSE 
+	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize), Point(2,2));
 	dilate( src, resultDilate, element );
 	return resultDilate;
 };
