@@ -12,7 +12,7 @@ bool BubbleTracker::init(){
 	if(_detector->kinect.hasInitialized()){
 		_calibrator = new Calibrator(_detector->_stream);
 		_calibrator->calibrateCameraProjector();
-		_detector->getHomography(_calibrator->_homography);
+		_detector->getHomography(&_calibrator->_homography);
 		_projector = new ProjectionEngine(_state, _calibrator);
 	}
 	else{
@@ -41,20 +41,20 @@ void BubbleTracker::update(){
 	unsigned int untrID, detected;
 	double min,d;
 	unsigned int tempID=0, tempI=0;
-	if(trackedBubbles->size() > 0&&_detector->bubbles.size()>0){
+	if(_detector->bubbles.size()>0){
 		//Get the minimum distances and the IDs of the closest bubbles
 		for(unsigned int i=0; i<_detector->bubbles.size(); i++){
 			min = 100000;
 			for(map<unsigned int, Bubble>::iterator it = trackedBubbles->begin(); it != trackedBubbles->end(); ++it) {
 				d = distanceBetweenPoints(_detector->bubbles[i].center, it->second.center);
-				if(min>d){
+				if(min>d&&d!=0){
 					min = d;
 					tempID = it->second.ID;
 				}
 			}
 			_detector->bubbles[i].closeID = tempID;
-			_detector->bubbles[i].minD = d;
-			//make a decision on which bubble is closest, update and delete it
+			_detector->bubbles[i].minD = min;
+			//Make a decision on which bubble is closest, update and delete it
 			for(map<unsigned int, Bubble>::iterator it = trackedBubbles->begin(); it != trackedBubbles->end(); ++it) {
 					min = 10000;
 					detected = 0;
@@ -66,32 +66,28 @@ void BubbleTracker::update(){
 						detected =1;
 					}
 				}
-					if(detected){
+				if(detected){
 					_state->updateBubble(tempID, _detector->bubbles[tempI].center, _detector->bubbles[tempI].radius);
-					//cout<<tempID<<'\n';
-					//_detector->bubbles.erase(_detector->bubbles.begin()+tempI);
+					_detector->bubbles.erase(_detector->bubbles.begin()+tempI);
+				}
+			}
+
+			//remaining bubbles in new vector must be newly generated ones
+			while(_state->hasUnknownBubble()){
+				if(_detector->bubbles.size()>0){
+					untrID = _state->getUnknownBubble();
+					cout<<untrID<<'\n';
+					if(untrID){
+						_state->updateBubble(untrID, _detector->bubbles.back().center, _detector->bubbles.back().radius);
+						_detector->bubbles.pop_back();
 					}
+				}
+				else{
+					break;
+				}
 			}
-		}
 
-		//remaining bubbles in new vector must be newly generated ones
-		while(_state->hasUnknownBubble()){
-			untrID = _state->getUnknownBubble();
-			if(untrID&&_detector->bubbles.size()>0){
-				_state->updateBubble(untrID, _detector->bubbles.back().center, _detector->bubbles.back().radius);
-				_detector->bubbles.pop_back();
-			}
 		}
-	}
-	else{
-		while(_state->hasUnknownBubble()){
-			untrID = _state->getUnknownBubble();
-			if(untrID&&_detector->bubbles.size()>0){
-				_state->updateBubble(untrID, _detector->bubbles.back().center, _detector->bubbles.back().radius);
-				_detector->bubbles.pop_back();
-			}
-		}
-
 	}
 	//printBubbles();
 	//_projector->Draw();
@@ -102,3 +98,5 @@ void BubbleTracker::update(){
 void BubbleTracker::printBubbles(){
 	_state->printBubbles();
 };
+
+

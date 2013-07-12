@@ -62,6 +62,9 @@ class BubbleState: public IBubbleState{
 
 		//Determines a tracking cycle (used for assuming if bubble broke)
 		void notifyTrackingFrame(void);
+
+		void dontTrack(unsigned int ID);
+
 };
 
 #endif

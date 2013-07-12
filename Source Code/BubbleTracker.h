@@ -20,6 +20,7 @@ class BubbleTracker: public IBubbleTracker{
 		void update();
 		void printBubbles();
 		BubbleTracker(BubbleState* BS);
+		void updateFPS(bool newFrame);
 };
 
 #endif

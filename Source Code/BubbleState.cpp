@@ -60,6 +60,10 @@ void BubbleState::notifyUserBreaks(unsigned int ID){
 	cout<<"User popped bubble: "<<ID;
 };
 
+void BubbleState::dontTrack(unsigned int ID){
+	trackedBubbles[ID].state = NON_TRACKED;
+};
+
 //Determines a tracking cycle (used for assuming if bubble broke)
 void BubbleState::notifyTrackingFrame(void){
 

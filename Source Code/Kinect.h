@@ -24,8 +24,8 @@ class Kinect{
 
 	private:
 		INuiSensor* sensor; //Pointer to kinect sensors
-		HANDLE whichStream(char s); //Returns the requested stream
-		HANDLE stream; //Main kinect stream
+		HANDLE* whichStream(char s); //Returns the requested stream
+		HANDLE* stream; //Main kinect stream
 		bool isInit; //Kinect initialised
 };
 

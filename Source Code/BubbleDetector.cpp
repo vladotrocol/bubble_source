@@ -1,8 +1,11 @@
 #include "Ogre.h"
 #include "BubbleDetector.h"
 
-unsigned int static minBubbleSize = 5;
-unsigned int static maxBubbleSize = 100;
+unsigned int static minBubbleSize = 10;
+unsigned int static maxBubbleSize = 200;
+
+	vector<vector<Point>> contours;
+	vector<Vec4i> hier;
 
 //Helper function to create the thread
 void* fwthreadFunction(void* a);
@@ -46,15 +49,15 @@ void BubbleDetector::run(){
 		//_stream->display("di");
 		//_stream->displayBubbles(bubbles);
 
-		char c = waitKey( 1 );
-		this->updateFPS(true);
+		//char c = waitKey( 1 );
+		//this->updateFPS(true);
 
 		_observer->update();
 		
 		//If escape is pressed exit
-		if( (char)c == 27 ){
-			break; 
-		}
+		//if( (char)c == 27 ){
+		//	break; 
+		//}
 
 		//Leave the processor (do this always! You have to let other threads get the processor)
 		Sleep(1);
@@ -76,10 +79,9 @@ bool BubbleDetector::stop(){
 
 //Main Detection Method
 vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat src){
-	vector<vector<Point>> contours;
-	vector<Vec4i> hier;
+
 	//Apply the whole processing pipeline (threshold, erode, dilate)
-	findContours(filter->applyFilter('i',src), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	findContours(*filter->applyFilter('i',&src), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	
 	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());
@@ -104,16 +106,16 @@ vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat src){
 			i--;
 		}
 	}
-	if(bubbles.size()){
-	vector<Point2f> proj(bubbles.size());
-	vector<Point2f> init(bubbles.size());
-	for(unsigned int i=0;i<proj.size();i++){
-		init[i] = bubbles[i].center;
-	}
-	perspectiveTransform(init, proj, _homography);
-	for(unsigned int i=0;i<proj.size();i++){
-		bubbles[i].center = proj[i];
-	}
+	if(bubbles.size()>0){
+		vector<Point2f> proj(bubbles.size());
+		vector<Point2f> init(bubbles.size());
+		for(unsigned int i=0;i<proj.size();i++){
+			init[i] = bubbles[i].center;
+		}
+		perspectiveTransform(init, proj, *_homography);
+		for(unsigned int i=0;i<proj.size();i++){
+			bubbles[i].center = proj[i];
+		}
 	}
 	return bubbles;
 };
@@ -148,6 +150,6 @@ void BubbleDetector::updateFPS(bool newFrame){
 };
 
 //Fetch the homography
-void BubbleDetector::getHomography(Mat H){
+void BubbleDetector::getHomography(Mat* H){
 	_homography = H;
 };

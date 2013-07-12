@@ -59,8 +59,6 @@ bool BubbleApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	//3. Remove dirty nodes (they poped or wathever. This is none of our business)
 	removeDirtyNodes();
 
-
-
 	return BaseApplication::frameRenderingQueued(evt);
 }
 
@@ -101,7 +99,6 @@ void BubbleApplication::updateNodesPositions(){
 
 			//We need to set up a whole new bubble
 			aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
-			
 			Ogre::Entity* auxEnt=mSceneMgr->createEntity("sampleBubble.mesh");
 			auxEnt->setMaterialName("Examples/ColourCheckerBoard");//itBubbles->second.materialToShow
 			aux->attachObject(auxEnt);

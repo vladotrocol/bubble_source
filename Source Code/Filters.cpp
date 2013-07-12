@@ -10,11 +10,11 @@ Filters::Filters():
 	thresholdValue(1),
 	thresholdType(1),
 	erosionSize(32),
-	dilationSize(51)
+	dilationSize(50)
 {;};
 
 //Applies the requested filter to the corresponding source stream
-Mat& Filters::applyFilter(char s, Mat& src){
+Mat* Filters::applyFilter(char s, Mat* src){
 	if(s == 't'){
 		return thresholdFilter(src);
 	}else if(s == 'e'){
@@ -27,33 +27,33 @@ Mat& Filters::applyFilter(char s, Mat& src){
 };
 
 //Apply Threshold Filer
-Mat& Filters::thresholdFilter(Mat& src){
-	if(src.type() == CV_8U){
-		threshold(src, resultThres, thresholdValue, 255, thresholdType);
+Mat* Filters::thresholdFilter(Mat* src){
+	if(src->type() == CV_8U){
+		threshold(*src, resultThres, thresholdValue, 255, thresholdType);
 	}
 	else{
-		cvtColor(src, src_grey, CV_BGR2GRAY);
+		cvtColor(*src, src_grey, CV_BGR2GRAY);
 		threshold(src_grey, resultThres, thresholdValue, 255, thresholdType);
 	}
-	return resultThres;
+	return &resultThres;
 };
 
 //Apply Erosion Filter
-Mat& Filters::erosionFilter(Mat& src){
+Mat* Filters::erosionFilter(Mat* src){
 	if(erosionSize<=2){
 		erosionSize=3;
 	}
 	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(erosionSize, erosionSize), Point(2,2)); 
-	erode( src, resultErosion, element );
-	return resultErosion;
+	erode( *src, resultErosion, element );
+	return &resultErosion;
 };
 
 //Apply Dilation Filter
-Mat& Filters::dilationFilter(Mat& src){
+Mat* Filters::dilationFilter(Mat* src){
 	if(dilationSize<=2){
 		dilationSize=3;
 	}
 	Mat element = getStructuringElement(cv::MORPH_RECT, cv::Size(dilationSize, dilationSize), Point(2,2));
-	dilate( src, resultDilate, element );
-	return resultDilate;
+	dilate( *src, resultDilate, element );
+	return &resultDilate;
 };

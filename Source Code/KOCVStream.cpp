@@ -25,7 +25,7 @@ void KOCVStream::display(char* s){
 		}
 		unsigned int i=j;
 		do{
-			imshow(s[j]+b+s[i], filter->applyFilter(s[i],*whichSource(s[j])));
+			imshow(s[j]+b+s[i], *filter->applyFilter(s[i], whichSource(s[j])));
 			waitKey( 20 );
 			i++;
 		}while((char)s[i]!='r'&&(char)s[i]!='d'&&i<strlen(s));

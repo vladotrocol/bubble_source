@@ -41,7 +41,7 @@ class BubbleDetector: public IBubbleDetector{
 		Filters filter;
 		Kinect kinect;
 		KOCVStream* _stream;
-		Mat _homography;
+		Mat* _homography;
 
 		BubbleDetector(IBubbleTracker * observer){
 			_observer=observer;
@@ -52,7 +52,7 @@ class BubbleDetector: public IBubbleDetector{
 		bool stop(void);
 		vector<Bubble> detectBubbles(Filters* filter, Mat src);
 		void updateFPS(bool newFrame);
-		void getHomography(Mat H);
+		void getHomography(Mat* H);
 };
 
 #endif
