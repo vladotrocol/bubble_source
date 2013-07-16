@@ -14,6 +14,7 @@ public:
 	int state;
 	unsigned int closeID;
 	double minD;
+	char* material;
 };
 
 #endif

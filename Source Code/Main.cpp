@@ -12,13 +12,15 @@
 #include "BubbleTracker.h"
 #include "BubbleState.h"
 #include "BubbleGenerator.h"
+#include "FruitNinja.h"
 #include "./DisplayKernel/OgreProjectionEngine.h"
 
 using namespace std;
 
-void createBubble(unsigned int ID, BubbleState* BS, BubbleGenerator* BG){
+void createBubble(unsigned int ID, char* material, BubbleState* BS, BubbleGenerator* BG){
 	Bubble b;
 	b.ID = ID;
+	b.material = material;
 	if(BG->createPhysicalBubble()){
 		BS->addBubble(b);
 	}
@@ -32,10 +34,11 @@ int main(){
 	BubbleGenerator BG;
 	BubbleTracker BT(&BS);
 	OgreProjectionEngine ope;
+	//FruitNinja app = new FruitNinja();
 	unsigned int ID = 10;
 
-	createBubble(ID, &BS, &BG);
-	createBubble(ID+1, &BS, &BG);
+	createBubble(ID, "Examples/watermelon",&BS, &BG);
+	createBubble(ID+1, "Examples/orange", &BS, &BG);
 
 	BT.init();
 	if(BT._detector->kinect.hasInitialized()){

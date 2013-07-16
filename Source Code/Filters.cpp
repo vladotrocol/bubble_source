@@ -10,7 +10,7 @@ Filters::Filters():
 	thresholdValue(1),
 	thresholdType(1),
 	erosionSize(32),
-	dilationSize(50)
+	dilationSize(32)
 {;};
 
 //Applies the requested filter to the corresponding source stream

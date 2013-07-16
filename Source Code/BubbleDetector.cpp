@@ -41,17 +41,16 @@ bool BubbleDetector::start(){
 //Detection main loop
 void BubbleDetector::run(){
 	//Thread's main loop
+		
 	while(status==ST_PLAYING){
 		//Do your processing
 		_stream->readFrame('d');
 		bubbles = detectBubbles(&filter, _stream->depth_src);
-
 		//_stream->display("di");
 		//_stream->displayBubbles(bubbles);
 
 		//char c = waitKey( 1 );
 		//this->updateFPS(true);
-
 		_observer->update();
 		
 		//If escape is pressed exit

@@ -91,8 +91,9 @@ void BubbleApplication::updateNodesPositions(){
 		//1.2. Check if it already existed...
 		if(it!=graphicBubbles.end())
 		{//This bubble already existed... we simply update its position
+			//it->second.node->setScale(itBubbles->second.radius,-itBubbles->second.radius,itBubbles->second.radius);	
 			it->second.node->setPosition(itBubbles->second.center.x-512,itBubbles->second.center.y-384, 0); //DIEGO: BUBBLES SHOULD NOT USE 2D COORDINATES!!!! Bubble::center should not be cv::Point2f!!!!!
-			//it->second.node->setPosition(itBubbles->second.center.x,itBubbles->second.center.y, 0);
+
 			it->second.dirty=false;
 		}
 		else{
@@ -100,7 +101,7 @@ void BubbleApplication::updateNodesPositions(){
 			//We need to set up a whole new bubble
 			aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
 			Ogre::Entity* auxEnt=mSceneMgr->createEntity("sampleBubble.mesh");
-			auxEnt->setMaterialName("Examples/ColourCheckerBoard");//itBubbles->second.materialToShow
+			auxEnt->setMaterialName(itBubbles->second.material);//itBubbles->second.materialToShow
 			aux->attachObject(auxEnt);
 			//Set its size and position
 			//aux->scale(itBubbles->second.radius,itBubbles->second.radius,-itBubbles->second.radius);	
