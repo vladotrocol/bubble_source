@@ -130,7 +130,6 @@ void Calibrator::calibrateCameraProjector(){
 	
 	// Set the dst image the same type and size as src
 	while (!homographyComputed){
-		//cout<<"not computed"<<'\n';
 		waitKey(10);
 	}
 	//checkHomography();

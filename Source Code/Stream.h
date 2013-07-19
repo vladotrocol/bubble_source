@@ -12,19 +12,21 @@
 #include <opencv2\calib3d\calib3d.hpp>
 #include <opencv2\imgproc\imgproc.hpp>
 #include <string>
-//#include "KOCVStream.h"
-//#include "VideoStream.h"
+#include "Filters.h"
+#include "Bubble.h"
+
 
 using namespace std;
 using namespace cv;
 class Stream{
 	public:
 		Mat* _stream;
-		//KOCVStream* ks;
-		//VideoStream* vs;
+		Filters* filter;
 		bool TestON;
-		Stream();
-		Stream* getParent();
+		Stream(){;};
 		virtual void readFrame()=0;
+		void display(char* s);
+		void displayBubbles(vector<Bubble> &bubbles);
+		void generateControls();
 };
 #endif

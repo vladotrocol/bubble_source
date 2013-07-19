@@ -13,7 +13,7 @@ void ProjectionEngine::Draw(){
 		for(map<unsigned int, Bubble>::iterator it = _curState->begin(); it != _curState->end(); ++it) {
 			radius = it->second.radius;
 			if(radius>0){
-				circle(drawing, it->second.center, radius, Scalar(0,255,0), -1);
+				circle(drawing, Point2f(it->second.center.x,it->second.center.y), radius, Scalar(0,255,0), -1);
 			}
 		}
 	}

@@ -28,8 +28,8 @@ bool Kinect::hasInitialized(){
 };
 
 //Get the next frame
-bool Kinect::hasNextFrame(char s, NUI_IMAGE_FRAME *imageFrame){
-	stream = whichStream(s);
+bool Kinect::hasNextFrame(NUI_IMAGE_FRAME *imageFrame){
+	stream = &depthStream;
 	if(*stream&&isInit){
 		if(sensor->NuiImageStreamGetNextFrame(*stream, 10, imageFrame) >= 0){
 			return true;
@@ -39,8 +39,8 @@ bool Kinect::hasNextFrame(char s, NUI_IMAGE_FRAME *imageFrame){
 };
 
 //Releases the current frame
-HRESULT Kinect::releaseFrame(char s, NUI_IMAGE_FRAME *imageFrame){
-	return sensor->NuiImageStreamReleaseFrame(*whichStream(s), imageFrame);
+HRESULT Kinect::releaseFrame(NUI_IMAGE_FRAME *imageFrame){
+	return sensor->NuiImageStreamReleaseFrame(depthStream, imageFrame);
 };
 
 //Compute the correct depth image data in milimiters
@@ -57,20 +57,4 @@ BYTE* Kinect::getDepthData(NUI_LOCKED_RECT *LockedRect){
 		j++;
 	}
 	return data;
-};
-
-//------------------------------Private-------------------------
-
-//Returns the requested stream
-HANDLE* Kinect::whichStream(char s){
-	if(s == 'r'){
-		return &rgbStream;
-	}
-	else if(s == 'd'){
-		return &depthStream;
-	}
-	else{
-		cerr<<"Flag 1 is incorrect";
-		return &depthStream;
-	}
 };

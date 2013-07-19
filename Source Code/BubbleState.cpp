@@ -43,7 +43,7 @@ void BubbleState::printBubbles(){
 };
 
 //Update the position of a bubble
-void BubbleState::updateBubble(unsigned int ID, Point2f center, float radius){
+void BubbleState::updateBubble(unsigned int ID, Point3f center, float radius){
 	trackedBubbles[ID].center = center;
 	trackedBubbles[ID].radius=radius;
 	//cout<<ID<<" "<<center.x<<" "<<center.y<<" "<<radius<<'\n';

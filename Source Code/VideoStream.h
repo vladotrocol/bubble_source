@@ -17,8 +17,7 @@
 
 class VideoStream: Stream{
 	public:
-		VideoStream(Filters* f,char* fileNam);
-		Filters* filter;
+		VideoStream(char* fileNam);
 		virtual void readFrame();
 		Mat	depth_src;
 		char* fileName;

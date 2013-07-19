@@ -2,7 +2,7 @@
 #define _BUBBLE_DETECTOR
 
 #include <iostream>
-#include "KOCVStream.h"
+#include <fstream>
 #include <assert.h>
 #include <stdio.h>
 #include <sys/timeb.h>
@@ -10,10 +10,13 @@
 #include <string>
 #include <vector>
 #include <pthread.h>
+
+#include "KOCVStream.h"
 #include "IBubbleTracker.h"
 #include "Calibrator.h"
 #include "ProjectionEngine.h"
 #include "VideoStream.h"
+#include "IClock.h"
 
 class IBubbleDetector{
 	public:
@@ -39,19 +42,18 @@ class BubbleDetector: public IBubbleDetector{
 
 	public:
 		vector<Bubble> bubbles;
-		Filters filter;
-		Kinect kinect;
 		Stream* _capture;
 		Mat* _homography;
 
 		BubbleDetector(IBubbleTracker * observer){
 			_observer=observer;
 		}
+
 		bool init(void);
 		bool start(void);
 		void run(void);
 		bool stop(void);
-		vector<Bubble> detectBubbles(Filters* filter, Mat* src);
+		vector<Bubble> detectBubbles();
 		void updateFPS(bool newFrame);
 		void getHomography(Mat* H);
 };

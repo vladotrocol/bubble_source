@@ -92,7 +92,7 @@ void BubbleApplication::updateNodesPositions(){
 		if(it!=graphicBubbles.end())
 		{//This bubble already existed... we simply update its position
 			//it->second.node->setScale(itBubbles->second.radius,-itBubbles->second.radius,itBubbles->second.radius);	
-			it->second.node->setPosition(itBubbles->second.center.x-512,itBubbles->second.center.y-384, 0); //DIEGO: BUBBLES SHOULD NOT USE 2D COORDINATES!!!! Bubble::center should not be cv::Point2f!!!!!
+			it->second.node->setPosition(itBubbles->second.center.x-512,itBubbles->second.center.y-384, itBubbles->second.center.z); //DIEGO: BUBBLES SHOULD NOT USE 2D COORDINATES!!!! Bubble::center should not be cv::Point2f!!!!!
 
 			it->second.dirty=false;
 		}
@@ -106,7 +106,7 @@ void BubbleApplication::updateNodesPositions(){
 			//Set its size and position
 			//aux->scale(itBubbles->second.radius,itBubbles->second.radius,-itBubbles->second.radius);	
 			aux->scale(itBubbles->second.radius,-itBubbles->second.radius,itBubbles->second.radius);	
-			aux->setPosition(itBubbles->second.center.x-512,itBubbles->second.center.y-384, 0); //DIEGO: BUBBLES SHOULD NOT USE 2D COORDINATES!!!! Bubble::center should not be cv::Point2f!!!!!
+			aux->setPosition(itBubbles->second.center.x-512,itBubbles->second.center.y-384, itBubbles->second.center.z); //DIEGO: BUBBLES SHOULD NOT USE 2D COORDINATES!!!! Bubble::center should not be cv::Point2f!!!!!
 			//Store it
 			_GraphicalBubble gb;
 			gb.dirty=false;

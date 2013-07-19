@@ -29,8 +29,8 @@ class Kinect{
 
 		Kinect(void); //Constructor
 		void initialiseKinect(void); //Initialise Kinect
-		bool hasNextFrame(char s, NUI_IMAGE_FRAME *imageFrame); //Get the next frame
-		HRESULT releaseFrame(char s, NUI_IMAGE_FRAME *imageFrame); //Releases the current frame
+		bool hasNextFrame(NUI_IMAGE_FRAME *imageFrame); //Get the next frame
+		HRESULT releaseFrame(NUI_IMAGE_FRAME *imageFrame); //Releases the current frame
 		BYTE* getDepthData(NUI_LOCKED_RECT *LockedRect); //Compute the correct depth image data in milimiters
 		bool hasInitialized(void); //Check if Kinect is detected
 

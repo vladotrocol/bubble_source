@@ -1,10 +1,9 @@
 #include "VideoStream.h"
 
-VideoStream::VideoStream(Filters* f, char* fileNam):
-				filter(f),
+VideoStream::VideoStream(char* fileNam):
 				fileName(fileNam){
-	TestON = true;
 	cap = new VideoCapture(fileNam);
+	filter = new Filters();
 	_stream  = new Mat();
 };
 
@@ -18,7 +17,5 @@ void VideoStream::readFrame(){
 	}else{
 		image.copyTo(*_stream);
 	}
-			imshow("haha", *_stream);
-		waitKey(1);
 	image.release();
 };

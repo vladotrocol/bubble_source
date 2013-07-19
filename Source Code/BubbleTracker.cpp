@@ -10,7 +10,6 @@ bool BubbleTracker::init(){
 		_calibrator = new Calibrator(_detector->_capture);
 		_calibrator->calibrateCameraProjector();
 		_detector->getHomography(&_calibrator->_homography);
-		//_projector = new ProjectionEngine(_state, _calibrator);
 	return true;
 };
 
@@ -63,7 +62,7 @@ bool assignID(map<unsigned int, Bubble>::iterator iter,
 			detected = 0;
 			for(map<unsigned int, Bubble>::iterator it = iter; it != trackedBubbles->end(); ++it) {
 				
-				d = distanceBetweenPoints(_detector->bubbles[i].center, it->second.center);
+				d = distanceBetweenPoints(Point2f(_detector->bubbles[i].center.x, _detector->bubbles[i].center.y), Point2f(it->second.center.x,it->second.center.y));
 				if(min>d&&d!=0){
 					min = d;
 					tempID = it->first;

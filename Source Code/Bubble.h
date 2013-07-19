@@ -9,7 +9,7 @@ using namespace cv;
 class Bubble {
 public:
 	unsigned int ID;
-	Point2f center;
+	Point3f center;
 	float radius;
 	int state;
 	unsigned int closeID;

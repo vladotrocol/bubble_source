@@ -1,10 +1,10 @@
 #include "Ogre.h"
 #include "BubbleDetector.h"
-
 unsigned int static minBubbleSize = 10;
 unsigned int static maxBubbleSize = 200;
-
-bool TESTS_ON = false;
+ofstream myfile;
+bool TESTS_ON = true;
+queue<float> times;
 
 vector<vector<Point>> contours;
 vector<Vec4i> hier;
@@ -21,17 +21,14 @@ void* fwthreadFunction(void* a){
 
 //Detection Initialisation
 bool BubbleDetector::init(){
+	myfile.open ("bubblelog.txt");
 	if(!TESTS_ON){
-		kinect.initialiseKinect();
-		if(kinect.hasInitialized()){
-			_capture = (Stream*) (new KOCVStream(&kinect, &filter, 'd'));
-			status = ST_READY;
-		}
+		_capture = (Stream*) (new KOCVStream());
 	}
 	else{
-		_capture = (Stream*) (new VideoStream(&filter, "_twoBubbles.avi"));
-		status = ST_READY;
+		_capture = (Stream*) (new VideoStream("_twoBubbles.avi"));
 	}
+	status = ST_READY;
 	return true;
 };
 
@@ -52,17 +49,22 @@ void BubbleDetector::run(){
 	while(status==ST_PLAYING){
 		//Do your processing
 		_capture->readFrame();
-		bubbles = detectBubbles(&filter, _capture->_stream);
-		//_stream->display("di");
-		//_stream->displayBubbles(bubbles);
+		bubbles = detectBubbles();
 
-		//char c = waitKey( 1 );
-		//this->updateFPS(true);
-		_observer->update();
-		//If escape is pressed exit
-		//if( (char)c == 27 ){
-		//	break; 
+		//-----------------Display stuff----------------
+		//_capture->display("di");
+		//_capture->displayBubbles(bubbles);
+
+		//--------------Print bubble positions to file----------------
+		//for(int i=0;i<bubbles.size();i++){
+		//	myfile<<bubbles[i].center.x<<" "<<bubbles[i].center.y<<'\n';
 		//}
+		//myfile<<"\n\n";
+
+		//--------------Print the fps--------------
+		//this->updateFPS(true);
+
+		_observer->update();
 
 		//Leave the processor (do this always! You have to let other threads get the processor)
 		Sleep(1);
@@ -83,11 +85,13 @@ bool BubbleDetector::stop(){
 };
 
 //Main Detection Method
-vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat* src){
-
+vector<Bubble> BubbleDetector::detectBubbles(){
+	Point2f circleCentre;
+	float start = IClock::instance().getTimeMiliseconds();
 	//Apply the whole processing pipeline (threshold, erode, dilate)
-	findContours(*filter->applyFilter('i',src), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-	
+	findContours(*(_capture->filter->applyFilter('i',_capture->_stream)), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	float finish = IClock::instance().getTimeMiliseconds();
+	times.push(finish-start);
 	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());
 	vector<vector<Point>> contours_poly(contours.size());
@@ -100,7 +104,8 @@ vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat* src){
 				//Find minimum circle
 				approxPolyDP(Mat(contours[i]), contours_poly[i], 3, true);
 				//Compute its radius and position
-				minEnclosingCircle( (Mat)contours_poly[i], bubbles[i].center, bubbles[i].radius);
+				minEnclosingCircle( (Mat)contours_poly[i], circleCentre, bubbles[i].radius);
+				bubbles[i].center = Point3f(circleCentre.x, circleCentre.y, 0);
 			}
 		}
 	}
@@ -115,11 +120,11 @@ vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat* src){
 		vector<Point2f> proj(bubbles.size());
 		vector<Point2f> init(bubbles.size());
 		for(unsigned int i=0;i<proj.size();i++){
-			init[i] = bubbles[i].center;
+			init[i] = Point2f(bubbles[i].center.x,bubbles[i].center.y);
 		}
 		perspectiveTransform(init, proj, *_homography);
 		for(unsigned int i=0;i<proj.size();i++){
-			bubbles[i].center = proj[i];
+			bubbles[i].center = Point3f(proj[i].x,proj[i].y,0);
 		}
 	}
 	return bubbles;

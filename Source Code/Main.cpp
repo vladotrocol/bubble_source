@@ -37,7 +37,7 @@ int main(){
 	//FruitNinja app = new FruitNinja();
 	unsigned int ID = 10;
 
-	//createBubble(ID, "Examples/watermelon",&BS, &BG);
+	createBubble(ID, "Examples/watermelon",&BS, &BG);
 	createBubble(ID+1, "Examples/orange", &BS, &BG);
 
 	//-------------Record code--------------
