@@ -4,8 +4,10 @@
 unsigned int static minBubbleSize = 10;
 unsigned int static maxBubbleSize = 200;
 
-	vector<vector<Point>> contours;
-	vector<Vec4i> hier;
+bool TESTS_ON = false;
+
+vector<vector<Point>> contours;
+vector<Vec4i> hier;
 
 //Helper function to create the thread
 void* fwthreadFunction(void* a);
@@ -19,10 +21,15 @@ void* fwthreadFunction(void* a){
 
 //Detection Initialisation
 bool BubbleDetector::init(){
-	kinect.initialiseKinect();
-	if(kinect.hasInitialized()){
-		KOCVStream* s = new KOCVStream(&kinect, &filter);
-		_stream = s;
+	if(!TESTS_ON){
+		kinect.initialiseKinect();
+		if(kinect.hasInitialized()){
+			_capture = (Stream*) (new KOCVStream(&kinect, &filter, 'd'));
+			status = ST_READY;
+		}
+	}
+	else{
+		_capture = (Stream*) (new VideoStream(&filter, "_twoBubbles.avi"));
 		status = ST_READY;
 	}
 	return true;
@@ -44,15 +51,14 @@ void BubbleDetector::run(){
 		
 	while(status==ST_PLAYING){
 		//Do your processing
-		_stream->readFrame('d');
-		bubbles = detectBubbles(&filter, _stream->depth_src);
+		_capture->readFrame();
+		bubbles = detectBubbles(&filter, _capture->_stream);
 		//_stream->display("di");
 		//_stream->displayBubbles(bubbles);
 
 		//char c = waitKey( 1 );
 		//this->updateFPS(true);
 		_observer->update();
-		
 		//If escape is pressed exit
 		//if( (char)c == 27 ){
 		//	break; 
@@ -77,10 +83,10 @@ bool BubbleDetector::stop(){
 };
 
 //Main Detection Method
-vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat src){
+vector<Bubble> BubbleDetector::detectBubbles(Filters* filter, Mat* src){
 
 	//Apply the whole processing pipeline (threshold, erode, dilate)
-	findContours(*filter->applyFilter('i',&src), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	findContours(*filter->applyFilter('i',src), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	
 	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());

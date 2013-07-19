@@ -3,6 +3,7 @@
 unsigned int static const width=640; //width of kinect stream
 unsigned int static const height=480; //height of kiect stream
 
+
 //Constructor
 Kinect::Kinect(void)
 {;};

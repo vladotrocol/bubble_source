@@ -13,6 +13,7 @@
 #include "IBubbleTracker.h"
 #include "Calibrator.h"
 #include "ProjectionEngine.h"
+#include "VideoStream.h"
 
 class IBubbleDetector{
 	public:
@@ -40,7 +41,7 @@ class BubbleDetector: public IBubbleDetector{
 		vector<Bubble> bubbles;
 		Filters filter;
 		Kinect kinect;
-		KOCVStream* _stream;
+		Stream* _capture;
 		Mat* _homography;
 
 		BubbleDetector(IBubbleTracker * observer){
@@ -50,9 +51,8 @@ class BubbleDetector: public IBubbleDetector{
 		bool start(void);
 		void run(void);
 		bool stop(void);
-		vector<Bubble> detectBubbles(Filters* filter, Mat src);
+		vector<Bubble> detectBubbles(Filters* filter, Mat* src);
 		void updateFPS(bool newFrame);
 		void getHomography(Mat* H);
 };
-
 #endif

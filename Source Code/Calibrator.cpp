@@ -8,9 +8,9 @@
 		int srcCount;
 		Point2f dstPoints[4];
 		Point2f srcPoints[4];
-		KOCVStream* STREAM;
+		Stream* STREAM;
 
-Calibrator::Calibrator(KOCVStream* stream):s(stream){};
+Calibrator::Calibrator(Stream* stream):s(stream){};
 
 void tryComputeHomography(Point2f srcPoints[],int srcCount, Point2f dstPoints[], int dstCount,Mat source, Mat distortion){
 	if(srcCount<4 || dstCount<4)
@@ -48,8 +48,8 @@ void on_mouse_source(int evt, int x, int y, int flags, void* param){
 
 	if (!iHomog)
 	{
-		STREAM->readFrame('d');
-		distortion2 = STREAM->depth_src;
+		STREAM->readFrame();
+		distortion2 = *STREAM->_stream;
 		imshow("distortion", distortion2);
 	}
 	srcCount++;
@@ -63,7 +63,7 @@ void on_mouse_distortion(int evt, int x, int y, int flags, void* param){
 	 if(dstCount>=4)
 		return;
 	 dstPoints[dstCount]=Point2f((float)x,(float)y);
-	 distortion2 = STREAM->depth_src;
+	 distortion2 = *STREAM->_stream;
 	 circle(distortion2, dstPoints[dstCount], 5, Scalar(0.0, 1.0, 1.0),5);
 	 imshow("distortion",distortion2);
 	 dstCount++;
@@ -118,17 +118,11 @@ void Calibrator::calibrateCameraProjector(){
 	setWindowProperty("source", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
 	waitKey(10);
 
-	Mat res;
-
 	int i = 0;
 
-	STREAM->readFrame('d');
-	res = STREAM->depth_src;
-
-	res.copyTo(distortion2);
-	
+	STREAM->readFrame();
 	//Create windows
-	imshow("distortion",distortion2);
+	imshow("distortion",*(STREAM->_stream));
 	
 	//Add callbacks
 	setMouseCallback("source", on_mouse_source, NULL );

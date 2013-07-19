@@ -37,15 +37,29 @@ int main(){
 	//FruitNinja app = new FruitNinja();
 	unsigned int ID = 10;
 
-	createBubble(ID, "Examples/watermelon",&BS, &BG);
+	//createBubble(ID, "Examples/watermelon",&BS, &BG);
 	createBubble(ID+1, "Examples/orange", &BS, &BG);
 
+	//-------------Record code--------------
+	//Kinect k;
+	//Filters f;
+	//KOCVStream s(&k,&f);
+	//k.initialiseKinect();
+	//s.record("_inOutBubbles.avi");
+	//------------------------------------------
+
 	BT.init();
-	if(BT._detector->kinect.hasInitialized()){
-		ope.init();
-		BT.start();
-		ope.start();
-	}
+	ope.init();
+	BT.start();
+	ope.start();
+
+	//--------------Test VideoReader-----------------
+	//Filters f;
+	//VideoStream s(&f, "_oneBubbles.avi");
+	//while(1){
+	//	s.readFrame();
+	//}
+
 
 	cin.get();
 	return 0;
