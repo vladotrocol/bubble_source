@@ -60,6 +60,8 @@ int main(){
 
 
 	cin.get();
+	ope.stop();
+	BT.stop();
 	return 0;
 };
 

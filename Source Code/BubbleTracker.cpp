@@ -2,6 +2,7 @@
 
 BubbleTracker::BubbleTracker(BubbleState* BS):_state(BS){};
 
+//Initialise the bubble tracker
 bool BubbleTracker::init(){
 	_detector = new BubbleDetector(this);
 	_detector->init();
@@ -11,21 +12,25 @@ bool BubbleTracker::init(){
 	return true;
 };
 
+//Start the detection on it's own thread
 bool BubbleTracker::start(){
 	_detector->start();
 	return true;
 };
 
+//Kill the application
 bool BubbleTracker::stop(){
 	_detector->stop();
 	return true;
 };
 
+//Compute the distance between two points
 double distanceBetweenPoints(Point2f a, Point2f b){
 	double res = pow((double)b.x - a.x, 2.0) + pow((double)b.y - a.y, 2.0);
 	return sqrt(res);
 };
 
+//Recursive function which tracks the ids of the bubbles
 bool assignID(map<unsigned int, Bubble>::iterator iter,
 				BubbleDetector* _detector,
 				BubbleState* _state, 
@@ -34,6 +39,7 @@ bool assignID(map<unsigned int, Bubble>::iterator iter,
 	double min,d;
 	unsigned int tempID=0, untrID=0, detected=0, tempI=0;
 	
+	//Start tracking any unknown bubbles
 	while(_state->hasUnknownBubble()){
 		if(_detector->bubbles.size()>0){
 			untrID = _state->getUnknownBubble();
@@ -46,12 +52,14 @@ bool assignID(map<unsigned int, Bubble>::iterator iter,
 			_detector->bubbles.pop_back();
 		}
 	}
-
+	
+	//Recursion base case
 	if(iter == trackedBubbles->end()){
 		return true;
 	}
 
 	if(_detector->bubbles.size()>0&&trackedBubbles->size()>0){
+		//Compute the closest bubble to each bubble
 		for(unsigned int i=0; i<_detector->bubbles.size(); i++){
 			min = 100000;
 			detected = 0;
@@ -74,6 +82,7 @@ bool assignID(map<unsigned int, Bubble>::iterator iter,
 		min = 10000;
 		detected = 0;
 
+		//Assign the bubble ids
 		for(unsigned int j=0; j<_detector->bubbles.size(); j++){
 			if(_detector->bubbles[j].closeID == iter->first && min>_detector->bubbles[j].minD){
 				min = _detector->bubbles[j].minD;
@@ -93,12 +102,14 @@ bool assignID(map<unsigned int, Bubble>::iterator iter,
 
 };
 
+//Update the new bubble positions(called by the detector)
 void BubbleTracker::update(){
 	map<unsigned int, Bubble>* trackedBubbles = _state->getCurrentState();
 	map<unsigned int, Bubble>::iterator iter = trackedBubbles->begin();
 	assignID(iter, _detector, _state, trackedBubbles);
 };
 
+//Prin the bubble positions to console
 void BubbleTracker::printBubbles(){
 	_state->printBubbles();
 };

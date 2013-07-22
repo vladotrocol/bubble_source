@@ -2,11 +2,22 @@
 #include "BubbleDetector.h"
 
 ofstream myfile;
-bool TESTS_ON = true;
+bool TESTS_ON = false;
 queue<float> times;
 
 vector<vector<Point>> contours;
 vector<Vec4i> hier;
+
+
+void dumpLogs(){
+	ofstream file1;
+	file1.open ("DetectionLog.txt");
+	while(!times.empty()){
+		file1<<times.front()<<"\n";
+		times.pop();
+	}
+	file1.close();
+};
 
 //Helper function to create the thread
 void* fwthreadFunction(void* a);
@@ -81,6 +92,7 @@ bool BubbleDetector::stop(){
 	//await termination
 	void* result;
 	pthread_join(thread,&result);
+	dumpLogs();
 	return true;
 };
 
@@ -90,8 +102,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 	float start = IClock::instance().getTimeMiliseconds();
 	//Apply the whole processing pipeline (threshold, erode, dilate)
 	findContours(*(_capture->filter->applyFilter('i',_capture->_stream)), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-	float finish = IClock::instance().getTimeMiliseconds();
-	times.push(finish-start);
+	
 	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());
 	vector<vector<Point>> contours_poly(contours.size());
@@ -127,6 +138,8 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 			bubbles[i].center = Point3f(proj[i].x,proj[i].y,0);
 		}
 	}
+	float finish = IClock::instance().getTimeMiliseconds();
+	times.push(finish-start);
 	return bubbles;
 };
 
