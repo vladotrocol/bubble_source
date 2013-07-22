@@ -1,7 +1,6 @@
 #include "Ogre.h"
 #include "BubbleDetector.h"
-unsigned int static minBubbleSize = 10;
-unsigned int static maxBubbleSize = 200;
+
 ofstream myfile;
 bool TESTS_ON = true;
 queue<float> times;
@@ -112,7 +111,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 	}
 	//Remove bubbles that do not fit min and max sizes
 	for (unsigned int i = 0; i < bubbles.size(); i++){
-		if (bubbles[i].radius < minBubbleSize || bubbles[i].radius > maxBubbleSize || bubbles[i].center.x < 50){
+		if (bubbles[i].radius < _capture->minBubbleSize || bubbles[i].radius > _capture->maxBubbleSize || bubbles[i].center.x < 50){
 			bubbles.erase(bubbles.begin() + i);
 			i--;
 		}
