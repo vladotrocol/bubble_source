@@ -60,11 +60,12 @@ void on_mouse_source(int evt, int x, int y, int flags, void* param){
 
 	//Set one of the source points as the newly clicked point
 	srcPoints[srcCount]=Point2f((float)x,(float)y);
-	srcCount++;
 
 	//Draw a black circle to mark the clicked spot
 	circle(src, srcPoints[srcCount], 5, Scalar(1.0, 1.0, 0),5);
 	
+	srcCount++;
+
 	//Display image
 	imshow("source",src);
 
@@ -85,13 +86,14 @@ void on_mouse_distortion(int evt, int x, int y, int flags, void* param){
 
 	//Set one of the source points as the newly clicked point
 	dstPoints[dstCount]=Point2f((float)x,(float)y);
-	dstCount++;
 	
 	//Get a new frame from stream
 	distortion = *STREAM->_stream;
 
 	//Draw a black circle to mark the clicked spot
 	circle(distortion, dstPoints[dstCount], 5, Scalar(0.0, 1.0, 1.0),5);
+
+	dstCount++;
 
 	//Display image
 	imshow("distortion",distortion);

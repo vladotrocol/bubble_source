@@ -1,6 +1,6 @@
 #include "KOCVStream.h"
 
-CvSize size = cvSize(640,480);
+CvSize size = cvSize(640,480); //Size for recording video
 
 //Constructor
 KOCVStream::KOCVStream(){
@@ -9,8 +9,6 @@ KOCVStream::KOCVStream(){
 	filter = new Filters();
 	kinect->initialiseKinect();
 };
-
-//----------------------------API------------------------
 
 //Reads the current frames into the source materials
 void KOCVStream::readFrame(){
