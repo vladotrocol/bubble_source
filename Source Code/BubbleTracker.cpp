@@ -1,7 +1,5 @@
 #include "BubbleTracker.h"
 
-
-
 BubbleTracker::BubbleTracker(BubbleState* BS):_state(BS){};
 
 bool BubbleTracker::init(){
@@ -28,13 +26,10 @@ double distanceBetweenPoints(Point2f a, Point2f b){
 	return sqrt(res);
 };
 
-
-
 bool assignID(map<unsigned int, Bubble>::iterator iter,
 				BubbleDetector* _detector,
 				BubbleState* _state, 
 				map<unsigned int, Bubble>* trackedBubbles){
-
 
 	double min,d;
 	unsigned int tempID=0, untrID=0, detected=0, tempI=0;
@@ -62,8 +57,9 @@ bool assignID(map<unsigned int, Bubble>::iterator iter,
 			detected = 0;
 			for(map<unsigned int, Bubble>::iterator it = iter; it != trackedBubbles->end(); ++it) {
 				
-				d = distanceBetweenPoints(Point2f(_detector->bubbles[i].center.x, _detector->bubbles[i].center.y), Point2f(it->second.center.x,it->second.center.y));
-				if(min>d&&d!=0){
+				d = distanceBetweenPoints(Point2f(_detector->bubbles[i].center.x, _detector->bubbles[i].center.y),
+											Point2f(it->second.center.x, it->second.center.y));
+				if(min>d){
 					min = d;
 					tempID = it->first;
 					detected =1;
@@ -91,7 +87,6 @@ bool assignID(map<unsigned int, Bubble>::iterator iter,
 				_detector->bubbles.erase(_detector->bubbles.begin()+tempI);
 			}
 	}
-
 
 		iter++;
 		assignID(iter, _detector, _state, trackedBubbles);

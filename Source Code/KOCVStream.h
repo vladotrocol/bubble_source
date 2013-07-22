@@ -28,9 +28,7 @@ class KOCVStream: public Stream{
 		char options;
 
 		KOCVStream(); //Constructor
-		void display(char* s); //Display streams in windows
 		virtual void readFrame(); //Reads the current frames into the source materials
-		void displayBubbles(vector<Bubble>& bubbles); //Display detected bubbles as circles
 		void record(char* fileName);
 
 	private:
@@ -40,8 +38,5 @@ class KOCVStream: public Stream{
 		Mat tryReadFrame(); //Read the Mat data into a image frame
 		NUI_IMAGE_FRAME tryRecordFrame(char s); //Read the Mat data into a image frame
 		Mat kFrameToMat(NUI_IMAGE_FRAME imageFrame); //Put the kinect frame data onto a Mat
-		void generateWindows(char* s); //Generates windows according to grammar
-		void generateControls(void); //Generates the window with the filter sliders 
-		
 };
 #endif

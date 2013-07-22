@@ -21,12 +21,12 @@ void* fwthreadFunction(void* a){
 
 //Detection Initialisation
 bool BubbleDetector::init(){
-	myfile.open ("bubblelog.txt");
+	//myfile.open ("bubblelog.txt");
 	if(!TESTS_ON){
 		_capture = (Stream*) (new KOCVStream());
 	}
 	else{
-		_capture = (Stream*) (new VideoStream("_twoBubbles.avi"));
+		_capture = (Stream*) (new VideoStream("_inOutBubbles.avi"));
 	}
 	status = ST_READY;
 	return true;
@@ -50,10 +50,11 @@ void BubbleDetector::run(){
 		//Do your processing
 		_capture->readFrame();
 		bubbles = detectBubbles();
-
 		//-----------------Display stuff----------------
-		//_capture->display("di");
+		//_capture->display("d");
 		//_capture->displayBubbles(bubbles);
+		_capture->generateControls();
+		waitKey(1);
 
 		//--------------Print bubble positions to file----------------
 		//for(int i=0;i<bubbles.size();i++){

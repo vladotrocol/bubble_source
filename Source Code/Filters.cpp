@@ -9,7 +9,7 @@ static Mat src_grey,
 Filters::Filters():
 	thresholdValue(1),
 	thresholdType(1),
-	erosionSize(17),
+	erosionSize(32),
 	dilationSize(52)
 {;};
 

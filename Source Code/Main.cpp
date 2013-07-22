@@ -37,15 +37,13 @@ int main(){
 	//FruitNinja app = new FruitNinja();
 	unsigned int ID = 10;
 
-	createBubble(ID, "Examples/watermelon",&BS, &BG);
+	//createBubble(ID, "Examples/watermelon",&BS, &BG);
 	createBubble(ID+1, "Examples/orange", &BS, &BG);
+	//createBubble(ID+10, "Examples/orange", &BS, &BG);
 
 	//-------------Record code--------------
-	//Kinect k;
-	//Filters f;
-	//KOCVStream s(&k,&f);
-	//k.initialiseKinect();
-	//s.record("_inOutBubbles.avi");
+	//KOCVStream s;
+	//s.record("_multipleBubbles.avi");
 	//------------------------------------------
 
 	BT.init();
