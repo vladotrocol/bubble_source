@@ -2,7 +2,7 @@
 #include "BubbleDetector.h"
 
 ofstream myfile;
-bool TESTS_ON = false;
+bool TESTS_ON = true;
 queue<float> times;
 
 vector<vector<Point>> contours;

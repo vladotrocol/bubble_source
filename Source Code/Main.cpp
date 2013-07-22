@@ -39,29 +39,20 @@ int main(){
 
 	//createBubble(ID, "Examples/watermelon",&BS, &BG);
 	createBubble(ID+1, "Examples/orange", &BS, &BG);
-	//createBubble(ID+10, "Examples/orange", &BS, &BG);
-
-	//-------------Record code--------------
-	//KOCVStream s;
-	//s.record("_multipleBubbles.avi");
-	//------------------------------------------
 
 	BT.init();
 	ope.init();
 	BT.start();
 	ope.start();
 
-	//--------------Test VideoReader-----------------
-	//Filters f;
-	//VideoStream s(&f, "_oneBubbles.avi");
-	//while(1){
-	//	s.readFrame();
-	//}
-
-
 	cin.get();
 	ope.stop();
 	BT.stop();
 	return 0;
 };
+
+//-------------Record code--------------
+	//KOCVStream s;
+	//s.record("_multipleBubbles.avi");
+//------------------------------------------
 

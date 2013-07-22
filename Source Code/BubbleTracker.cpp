@@ -97,6 +97,7 @@ bool assignID(map<unsigned int, Bubble>::iterator iter,
 			}
 	}
 
+		//Next recusion step
 		iter++;
 		assignID(iter, _detector, _state, trackedBubbles);
 

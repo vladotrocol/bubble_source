@@ -61,13 +61,13 @@ Mat KOCVStream::kFrameToMat(NUI_IMAGE_FRAME imageFrame){
 	return frame;
 };
 
+//Record kinect data into a file
 void KOCVStream::record(char* fileName){
 	VideoWriter writer(fileName,-1,30,size);
-	if (!writer.isOpened())
-{
+	if (!writer.isOpened()){
         std::cout << "!!! Output video could not be opened" << std::endl;
         return;
-}
+	}
 	Mat image;
 	namedWindow("record panel",0);
 	cout<<"press r to record\n";
