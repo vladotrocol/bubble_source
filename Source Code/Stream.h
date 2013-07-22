@@ -22,8 +22,8 @@ class Stream{
 	public:
 		Mat* _stream;
 		Filters* filter;
-		unsigned int minBubbleSize;
-		unsigned int maxBubbleSize;
+		int minBubbleSize;
+		int maxBubbleSize;
 		bool TestON;
 		Stream(){minBubbleSize=10;maxBubbleSize=100;};
 		virtual void readFrame()=0;

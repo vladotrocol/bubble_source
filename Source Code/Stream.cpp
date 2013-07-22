@@ -46,4 +46,10 @@ void Stream::generateControls(){
 	cvCreateTrackbar("DilSize","Controls",
 				  &filter->dilationSize,
                   200, NULL);
+	cvCreateTrackbar("MinRadius","Controls",
+				  &minBubbleSize,
+                  100, NULL);
+	cvCreateTrackbar("MaxRadiu","Controls",
+				  &maxBubbleSize,
+                  500, NULL);
 };
