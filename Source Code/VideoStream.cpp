@@ -28,7 +28,6 @@ void VideoStream::readFrame(){
 		//Read the frame
 		image.copyTo(*_stream);
 	}
-
 	//No memory leaks
 	image.release();
 };

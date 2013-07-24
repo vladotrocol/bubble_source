@@ -3,7 +3,7 @@
 
 ofstream myfile;
 ifstream myfile2;
-bool TESTS_ON = false;
+bool TESTS_ON = true;
 queue<float> times;
 
 vector<vector<Point>> contours;
@@ -33,7 +33,6 @@ void* fwthreadFunction(void* a){
 //Detection Initialisation
 bool BubbleDetector::init(){
 	//myfile.open ("bubblelog.txt");
-	_homography = new Mat(); 
 	if(!TESTS_ON){
 		_capture = (Stream*) (new KOCVStream());
 	}
@@ -60,8 +59,11 @@ void BubbleDetector::run(){
 		
 	while(status==ST_PLAYING){
 		//Do your processing
+		//cout<<"aaaaaaaaaa\n";
 		_capture->readFrame();
+		//cout<<"bbbbbbbbbbbbb\n";
 		bubbles = detectBubbles();
+		//cout<<"cccccccccccc\n";
 		_capture->_stream->release();
 		//-----------------Display stuff----------------
 		//_capture->display("d");
@@ -69,17 +71,11 @@ void BubbleDetector::run(){
 		//_capture->generateControls();
 		waitKey(1);
 
-		//--------------Print bubble positions to file----------------
-		//for(int i=0;i<bubbles.size();i++){
-		//	myfile<<bubbles[i].center.x<<" "<<bubbles[i].center.y<<'\n';
-		//}
-		//myfile<<"\n\n";
-
 		//--------------Print the fps--------------
 		//this->updateFPS(true);
 
 		_observer->update();
-
+		//cout<<"ddddddddddddd\n";
 		//Leave the processor (do this always! You have to let other threads get the processor)
 		Sleep(1);
 	}
@@ -104,13 +100,13 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 	Point2f circleCentre;
 	float start = IClock::instance().getTimeMiliseconds();
 	//Apply the whole processing pipeline (threshold, erode, dilate)
+	if(!(_capture->filter->applyFilter('i',_capture->_stream))->empty())
 	findContours(*(_capture->filter->applyFilter('i',_capture->_stream)), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-	
 	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());
 	vector<vector<Point>> contours_poly(contours.size());
 	if(contours.size() < 1){
-		cout << "No Bubbles in frame\n";
+		//cout << "No Bubbles in frame\n";
 	}
 	else{
 		for (unsigned int i = 0; i < contours.size(); i++){
@@ -123,6 +119,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 			}
 		}
 	}
+	
 	//Remove bubbles that do not fit min and max sizes
 	for (unsigned int i = 0; i < bubbles.size(); i++){
 		if (bubbles[i].radius < _capture->minBubbleSize || bubbles[i].radius > _capture->maxBubbleSize || bubbles[i].center.x < 50){
@@ -130,6 +127,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 			i--;
 		}
 	}
+	
 	if(bubbles.size()>0){
 		vector<Point2f> proj(bubbles.size());
 		vector<Point2f> init(bubbles.size());
@@ -140,7 +138,9 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 		for(unsigned int i=0;i<proj.size();i++){
 			bubbles[i].center = Point3f(proj[i].x,proj[i].y,0);
 		}
+			
 	}
+
 	float finish = IClock::instance().getTimeMiliseconds();
 	times.push(finish-start);
 	return bubbles;
@@ -175,19 +175,20 @@ void BubbleDetector::updateFPS(bool newFrame){
 			
 };
 
-//Fetch the homography
+//Fetch the homography and optionally save it to file
 void BubbleDetector::getHomography(Mat* H){
+	
 	_homography = H;
-	//-------------Save the homography----------
+
 	string filename = "Homography.xml";
 	FileStorage fs(filename, FileStorage::WRITE);
 	fs<<"H"<<*H;
 };
 
-/*void BubbleDetector::readHomography(){
-	FileStorage fs.open(filename, FileStorage::READ);
-	myfile2.open("homography.txt");
-	myfile2>>readH;
-
-	_homography = readH;
-};*/
+//Read homography from file
+void BubbleDetector::readHomography(){
+	FileStorage fs("Homography.xml", FileStorage::READ);
+	_homography = new Mat();
+	fs["H"]>>*_homography;
+	//cout<<*_homography;
+};
