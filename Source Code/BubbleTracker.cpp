@@ -6,6 +6,7 @@ BubbleTracker::BubbleTracker(BubbleState* BS):_state(BS){};
 bool BubbleTracker::init(){
 	_detector = new BubbleDetector(this);
 	_detector->init();
+	//-------------------Calibrate(if decommented make sure you comment the hardcoded homography)
 		_calibrator = new Calibrator(_detector->_capture);
 		_calibrator->calibrateCameraProjector();
 		_detector->getHomography(&_calibrator->_homography);

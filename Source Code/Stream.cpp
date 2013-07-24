@@ -4,18 +4,18 @@
 //FLAG grammar is: (d(t||e||i)*)*
 void Stream::display(char* s){
 	string b = "_window_";
-	generateControls();
+	//generateControls();
 	unsigned int j=0;
 	while(j<strlen(s)){
 		unsigned int i=j;
 		do{
 			imshow(s[j]+b+s[i], *(filter->applyFilter(s[i], _stream)));
-			waitKey( 20 );
+			waitKey( 1 );
+			_stream->release();
 			i++;
 		}while((char)s[i]!='d'&&i<strlen(s));
 		j=i;
 	}	
-	char c = waitKey( 20 );
 };
 
 //Display detected bubbles as circles

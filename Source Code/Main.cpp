@@ -30,24 +30,29 @@ void createBubble(unsigned int ID, char* material, BubbleState* BS, BubbleGenera
 };
 
 int main(){
-	BubbleState& BS = BubbleState::instance();
-	BubbleGenerator BG;
-	BubbleTracker BT(&BS);
-	OgreProjectionEngine ope;
+	//BubbleState& BS = BubbleState::instance();
+	//BubbleGenerator BG;
+	//BubbleTracker BT(&BS);
+	//OgreProjectionEngine ope;
 	//FruitNinja app = new FruitNinja();
 	unsigned int ID = 10;
 
 	//createBubble(ID, "Examples/watermelon",&BS, &BG);
-	createBubble(ID+1, "Examples/orange", &BS, &BG);
-
-	BT.init();
-	ope.init();
-	BT.start();
-	ope.start();
-
+	//createBubble(ID+1, "Examples/orange", &BS, &BG);
+	
+	//BT.init();
+	//ope.init();
+	//BT.start();
+	//ope.start();
+	KOCVStream s;
+	while(1){
+		s.readFrame();
+		s.display("d");
+		waitKey(1);
+	}
 	cin.get();
-	ope.stop();
-	BT.stop();
+	//ope.stop();
+	//BT.stop();
 	return 0;
 };
 
@@ -56,3 +61,11 @@ int main(){
 	//s.record("_multipleBubbles.avi");
 //------------------------------------------
 
+//--------------Test kinect mode-----------
+	//KOCVStream s;
+	//while(1){
+	//	s.readFrame();
+	//	s.display("d");
+	//	waitKey(1);
+	//}
+//--------------------------------------------

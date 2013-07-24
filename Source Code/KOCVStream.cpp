@@ -4,7 +4,6 @@ CvSize size = cvSize(640,480); //Size for recording video
 
 //Constructor
 KOCVStream::KOCVStream(){
-	TestON = false;
 	kinect = new Kinect();
 	filter = new Filters();
 	kinect->initialiseKinect();
@@ -12,40 +11,55 @@ KOCVStream::KOCVStream(){
 
 //Reads the current frames into the source materials
 void KOCVStream::readFrame(){
+
 	Mat* temp = new Mat();
-	while (temp->empty())
+
+	//We only ask for the next non-empty kinect frame
+	while (temp->empty()){
 		*temp = tryReadFrame();
-		_stream = temp;
+	}
+
+	//Assign the frame to main stream
+	_stream = temp;
 };
 
 //--------------------------Internal----------------------------
 
-//Read the Mat data into a image frame
+//Get the Mat frame
 Mat KOCVStream::tryReadFrame(){
-	NUI_IMAGE_FRAME imageFrame;
 
+	NUI_IMAGE_FRAME imageFrame; //from kinect stream
+
+	//Proceed only if kinnect has a frame
 	if (!kinect->hasNextFrame(&imageFrame)) {
 		return Mat();
 	}
 
+	//Convert the kinect frame to a Mat
 	Mat depthFrame = kFrameToMat(imageFrame);
 	kinect->releaseFrame(&imageFrame);
 
-	flip(depthFrame, depthFrame, 1);
+	//Depth frame need to be flipped
+	flip(depthFrame, depthFrame, 1);//or not? IMPROVE:
 
 	return depthFrame;
 };
 
-//Put the kinect frame data onto a Mat
+//Put the kinect imageframe data onto a Mat
 Mat KOCVStream::kFrameToMat(NUI_IMAGE_FRAME imageFrame){
+
 	Mat frame(height, width, CV_8U);
 	NUI_LOCKED_RECT LockedRect;
 
+	//Lock the imageFrame such that kinnect cannot write on it
 	INuiFrameTexture* texture = imageFrame.pFrameTexture;
 	texture->LockRect(0, &LockedRect, NULL, 0);
 
+	//Get the kinect depth data
 	BYTE* imageData;
 	imageData =  kinect->getDepthData(&LockedRect);
+
+	//If the data is not empty convert it to Mat
 	if (LockedRect.Pitch != 0 && imageData){
 		Mat tempMat(height, width, CV_8U, imageData);
 		tempMat.copyTo(frame);
@@ -54,6 +68,7 @@ Mat KOCVStream::kFrameToMat(NUI_IMAGE_FRAME imageFrame){
 		return Mat();
 	}
 
+	//Release the frame
 	texture->UnlockRect(0);
 
 	return frame;
@@ -61,13 +76,20 @@ Mat KOCVStream::kFrameToMat(NUI_IMAGE_FRAME imageFrame){
 
 //Record kinect data into a file
 void KOCVStream::record(char* fileName){
+	
+	Mat image; //frame to be written to file
+
+	//We need a window for the keylisteners
+	namedWindow("record panel",0);
+
+	//Set up the writer
 	VideoWriter writer(fileName,-1,30,size);
 	if (!writer.isOpened()){
         std::cout << "!!! Output video could not be opened" << std::endl;
         return;
 	}
-	Mat image;
-	namedWindow("record panel",0);
+
+	//Don't start until 'r' is pressed
 	cout<<"press r to record\n";
 	while(1){
 	char x = waitKey(10);
@@ -75,16 +97,27 @@ void KOCVStream::record(char* fileName){
 			break; 
 		}
 	}
+
+	//Recording
 	cout<<"Recording...\nPress s to stop.\n";
 	while(1){
+		
+		//When s is pressed stop
 		char x = waitKey(10);
 		if((char)x=='s'){
 			break;
 		}
+
+		//Read the image
 		image = tryReadFrame();
+		
+		//Optionally display it on the screen
 		imshow("record panel",image);
 		waitKey( 20 );
+
+		//Write it to file
 		writer.write(image);
-	} 
+	}
+
 	cout<<"finished recording";
 };

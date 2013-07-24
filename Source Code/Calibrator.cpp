@@ -27,7 +27,7 @@ void tryComputeHomography(Point2f srcPoints[],int srcCount, Point2f dstPoints[],
 
 	// Calculate the perspective transform from 4 pairs of corresponding points
 	H=getPerspectiveTransform(dstPoints,srcPoints);
-
+	cout << "H=" <<H << "\n";
 	// Create a zeroed matrix the same size as the distortion matrix
 	result = Mat::zeros(distortion.rows, distortion.cols, distortion.type());
 
@@ -149,7 +149,7 @@ void Calibrator::calibrateCameraProjector(){
 	
 	//Show and move the image to the projector
 	imshow("source",src);
-	moveWindow("source", 0, 0); //1680
+	moveWindow("source", 1680, 0); //1680
 	setWindowProperty("source", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
 	waitKey(10);
 

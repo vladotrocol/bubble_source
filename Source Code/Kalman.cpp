@@ -40,14 +40,6 @@ void correct2(){
 
 void predict2(){}
 
-
-
-
-
-
-
-
-
 void correct(void);
 
 void on_mouse(int event, int x, int y, int flags, void* param) {
@@ -58,11 +50,7 @@ void on_mouse(int event, int x, int y, int flags, void* param) {
 		mouse_info.y = y;
 		mouse_info.vx=x-last_mouse.x;
 		mouse_info.vy=y-last_mouse.y;
-		mouse_info.time=myTime;
-
-		
-		
-			
+		mouse_info.time=myTime;		
 //		cout << "got mouse " << x <<","<< y <<endl;
 	}
 }

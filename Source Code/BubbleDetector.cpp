@@ -2,7 +2,8 @@
 #include "BubbleDetector.h"
 
 ofstream myfile;
-bool TESTS_ON = true;
+ifstream myfile2;
+bool TESTS_ON = false;
 queue<float> times;
 
 vector<vector<Point>> contours;
@@ -32,6 +33,7 @@ void* fwthreadFunction(void* a){
 //Detection Initialisation
 bool BubbleDetector::init(){
 	//myfile.open ("bubblelog.txt");
+	_homography = new Mat(); 
 	if(!TESTS_ON){
 		_capture = (Stream*) (new KOCVStream());
 	}
@@ -60,10 +62,11 @@ void BubbleDetector::run(){
 		//Do your processing
 		_capture->readFrame();
 		bubbles = detectBubbles();
+		_capture->_stream->release();
 		//-----------------Display stuff----------------
 		//_capture->display("d");
 		//_capture->displayBubbles(bubbles);
-		_capture->generateControls();
+		//_capture->generateControls();
 		waitKey(1);
 
 		//--------------Print bubble positions to file----------------
@@ -175,4 +178,16 @@ void BubbleDetector::updateFPS(bool newFrame){
 //Fetch the homography
 void BubbleDetector::getHomography(Mat* H){
 	_homography = H;
+	//-------------Save the homography----------
+	string filename = "Homography.xml";
+	FileStorage fs(filename, FileStorage::WRITE);
+	fs<<"H"<<*H;
 };
+
+/*void BubbleDetector::readHomography(){
+	FileStorage fs.open(filename, FileStorage::READ);
+	myfile2.open("homography.txt");
+	myfile2>>readH;
+
+	_homography = readH;
+};*/
