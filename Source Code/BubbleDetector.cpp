@@ -59,11 +59,8 @@ void BubbleDetector::run(){
 		
 	while(status==ST_PLAYING){
 		//Do your processing
-		//cout<<"aaaaaaaaaa\n";
 		_capture->readFrame();
-		//cout<<"bbbbbbbbbbbbb\n";
 		bubbles = detectBubbles();
-		//cout<<"cccccccccccc\n";
 		_capture->_stream->release();
 		//-----------------Display stuff----------------
 		//_capture->display("d");
@@ -75,7 +72,6 @@ void BubbleDetector::run(){
 		//this->updateFPS(true);
 
 		_observer->update();
-		//cout<<"ddddddddddddd\n";
 		//Leave the processor (do this always! You have to let other threads get the processor)
 		Sleep(1);
 	}
