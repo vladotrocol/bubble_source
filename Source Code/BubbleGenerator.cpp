@@ -1,7 +1,10 @@
 #include "BubbleGenerator.h"
 
-BubbleGenerator::BubbleGenerator(){};
+BubbleGenerator::BubbleGenerator(){
+	 COMToolkit:: connect();
+};
 
 bool BubbleGenerator::createPhysicalBubble(){
+	 COMToolkit:: sendByte('g');
 	return true;
 };

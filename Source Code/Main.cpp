@@ -32,22 +32,22 @@ void createBubble(unsigned int ID, char* material, BubbleState* BS, BubbleGenera
 int main(){
 	BubbleState& BS = BubbleState::instance();
 	BubbleGenerator BG;
-	BubbleTracker BT(&BS);
-	OgreProjectionEngine ope;
-	//FruitNinja app = new FruitNinja();
+	//BubbleTracker BT(&BS);
+	//OgreProjectionEngine ope;
+	////FruitNinja app = new FruitNinja();
 	unsigned int ID = 10;
 
 	createBubble(ID, "Examples/watermelon",&BS, &BG);
-	//createBubble(ID+1, "Examples/orange", &BS, &BG);
-	
-	BT.init();
-	ope.init();
-	BT.start();
-	ope.start();
+	////createBubble(ID+1, "Examples/orange", &BS, &BG);
+	//
+	//BT.init();
+	//ope.init();
+	//BT.start();
+	//ope.start();
 
-	cin.get();
-	ope.stop();
-	BT.stop();
+	//cin.get();
+	//ope.stop();
+	//BT.stop();
 	return 0;
 };
 
