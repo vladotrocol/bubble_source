@@ -32,7 +32,7 @@ void createBubble(unsigned int ID, char* material, BubbleState* BS, BubbleGenera
 int main(){
 	BubbleState& BS = BubbleState::instance();
 	BubbleGenerator BG;
-	//BubbleTracker BT(&BS);
+	BubbleTracker BT(&BS);
 	//OgreProjectionEngine ope;
 	////FruitNinja app = new FruitNinja();
 	unsigned int ID = 10;

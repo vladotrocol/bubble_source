@@ -1,15 +1,14 @@
 #include "Ogre.h"
 #include "BubbleDetector.h"
 
-ofstream myfile;
-ifstream myfile2;
 bool TESTS_ON = true;
 queue<float> times;
 
 vector<vector<Point>> contours;
 vector<Vec4i> hier;
 
-
+//Dump the list of times to file
+//Done when the project stops such that it does not slow it down
 void dumpLogs(){
 	ofstream file1;
 	file1.open ("DetectionLog.txt");
@@ -32,12 +31,11 @@ void* fwthreadFunction(void* a){
 
 //Detection Initialisation
 bool BubbleDetector::init(){
-	//myfile.open ("bubblelog.txt");
 	if(!TESTS_ON){
 		_capture = (Stream*) (new KOCVStream());
 	}
 	else{
-		_capture = (Stream*) (new VideoStream("_inOutBubbles.avi"));
+		_capture = (Stream*) (new VideoStream("_oneBubbles.avi"));
 	}
 	status = ST_READY;
 	return true;
@@ -58,15 +56,17 @@ void BubbleDetector::run(){
 	//Thread's main loop
 		
 	while(status==ST_PLAYING){
-		//Do your processing
+
+		//--------------Do your processing--------------
 		_capture->readFrame();
 		bubbles = detectBubbles();
 		_capture->_stream->release();
+
 		//-----------------Display stuff----------------
 		//_capture->display("d");
 		//_capture->displayBubbles(bubbles);
 		//_capture->generateControls();
-		waitKey(1);
+		//waitKey(1);
 
 		//--------------Print the fps--------------
 		//this->updateFPS(true);
@@ -94,10 +94,12 @@ bool BubbleDetector::stop(){
 //Main Detection Method
 vector<Bubble> BubbleDetector::detectBubbles(){
 	Point2f circleCentre;
-	float start = IClock::instance().getTimeMiliseconds();
+	float start = IClock::instance().getTimeMiliseconds();//Timer
+
 	//Apply the whole processing pipeline (threshold, erode, dilate)
 	if(!(_capture->filter->applyFilter('i',_capture->_stream))->empty())
 	findContours(*(_capture->filter->applyFilter('i',_capture->_stream)), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	
 	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());
 	vector<vector<Point>> contours_poly(contours.size());
@@ -123,7 +125,8 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 			i--;
 		}
 	}
-	
+
+	//Apply the homography
 	if(bubbles.size()>0){
 		vector<Point2f> proj(bubbles.size());
 		vector<Point2f> init(bubbles.size());
@@ -137,8 +140,10 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 			
 	}
 
+	//Timer
 	float finish = IClock::instance().getTimeMiliseconds();
 	times.push(finish-start);
+
 	return bubbles;
 };
 
@@ -186,5 +191,4 @@ void BubbleDetector::readHomography(){
 	FileStorage fs("Homography.xml", FileStorage::READ);
 	_homography = new Mat();
 	fs["H"]>>*_homography;
-	//cout<<*_homography;
 };
