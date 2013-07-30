@@ -18,20 +18,6 @@
 
 using namespace std;
 
-
-
-void createBubble(unsigned int ID, char* material, BubbleState* BS, BubbleGenerator* BG){
-	Bubble b;
-	b.ID = ID;
-	b.material = material;
-	if(BG->createPhysicalBubble()){
-		BS->addBubble(b);
-	}
-	else{ 
-		cerr<<"Bubble not generated";
-	}
-};
-
 int main(){
 	bool test = false;
 	bool record = false;
@@ -54,25 +40,26 @@ int main(){
 	//Normal mode
 	else{
 		BubbleState& BS = BubbleState::instance();
-		BubbleGenerator BG;
+		BubbleGenerator* BG = new BubbleGenerator();
 		BubbleTracker BT(&BS);
 		OgreProjectionEngine ope;
-		////FruitNinja app = new FruitNinja();
-		unsigned int ID = 10;
+		FruitNinja app(&BS, BG);
 
 		//createBubble(ID, "Examples/watermelon",&BS, &BG);
 		//createBubble(ID+1, "Examples/orange", &BS, &BG);
 		//createBubble(ID+12, "Examples/orange", &BS, &BG);
-		createBubble(ID+13, "Examples/orange", &BS, &BG);
+		//createBubble(ID+13, "Examples/orange", &BS, &BG);
 		
 		BT.init();
 		ope.init();
 		BT.start();
 		ope.start();
+		app.start();
 
 		cin.get();
 		ope.stop();
 		BT.stop();
+		app.stop();
 	}
 	return 0;
 };

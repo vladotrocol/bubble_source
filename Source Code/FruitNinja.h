@@ -24,6 +24,6 @@ class FruitNinja{
 		bool start();
 		void run();
 		bool stop();
-		void createBubble(unsigned int ID, char* material);
+		void createBubble(unsigned int ID, char* material, BubbleState*, BubbleGenerator*);
 };
 #endif

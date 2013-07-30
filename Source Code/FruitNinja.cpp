@@ -1,5 +1,5 @@
 #include "FruitNinja.h"
-
+#include <conio.h>
 //Helper function to create the thread
 void* fwthreadFunction(void* a);
 
@@ -27,14 +27,17 @@ bool FruitNinja::start(){
 void FruitNinja::run(){
 	unsigned int ID = 1;
 	char input;
-	while(cin >> input && status==ST_PLAYING){
-		cin.clear();
+	cout<<"Fruitty\n";
+	while(status==ST_PLAYING){
+		input = _getch();
 		if(input == 'w'){
-			createBubble(ID, "Examples/watermelon");
+			cout<<"bubble\n";
+			createBubble(ID, "Examples/watermelon", _state, _generator);
 		}
 		else if(input == 'o'){
-			createBubble(ID+1, "Examples/orange");
+			createBubble(ID, "Examples/orange", _state, _generator);
 		}
+		ID++;
 	}
 };
 
@@ -48,12 +51,12 @@ bool FruitNinja::stop(){
 	return true;
 };
 
-void FruitNinja::createBubble(unsigned int ID, char* material){
+void FruitNinja::createBubble(unsigned int ID, char* material, BubbleState* BS, BubbleGenerator* BG){
 	Bubble b;
 	b.ID = ID;
 	b.material = material;
-	if(_generator->createPhysicalBubble()){
-		_state->addBubble(b);
+	if(BG->createPhysicalBubble()){
+		BS->addBubble(b);
 	}
 	else{ 
 		cerr<<"Bubble not generated";
