@@ -1,10 +1,10 @@
 #include "RTTApplication.h"
-#include "./CameraManager/CameraManager.h"
-#include "./CameraManager/ViewportData.h"
-#include "./CameraManager/CameraData.h"
-#include "./CameraManager/CameraUtils.h"
+#include "CameraManager.h"
+#include "ViewportData.h"
+#include "CameraData.h"
+#include "CameraUtils.h"
 #include "SimulationManager.h"
-#include "IConfigManager.h"
+//#include "IConfigManager.h"
 //#define SEE_MINISCREENS	
 
 

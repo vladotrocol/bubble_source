@@ -1,7 +1,7 @@
 #include "Ogre.h"
 #include "BubbleDetector.h"
 
-bool TESTS_ON = true;
+bool TESTS_ON = false;
 queue<float> times;
 
 vector<vector<Point>> contours;
@@ -35,7 +35,7 @@ bool BubbleDetector::init(){
 		_capture = (Stream*) (new KOCVStream());
 	}
 	else{
-		_capture = (Stream*) (new VideoStream("_oneBubbles.avi"));
+		_capture = (Stream*) (new VideoStream("_inOutBubbles.avi"));
 	}
 	status = ST_READY;
 	return true;
@@ -60,17 +60,16 @@ void BubbleDetector::run(){
 		//--------------Do your processing--------------
 		_capture->readFrame();
 		bubbles = detectBubbles();
-		_capture->_stream->release();
+		
 
 		//-----------------Display stuff----------------
-		//_capture->display("d");
+		//_capture->display("di");
 		//_capture->displayBubbles(bubbles);
-		//_capture->generateControls();
 		//waitKey(1);
 
 		//--------------Print the fps--------------
 		//this->updateFPS(true);
-
+		_capture->_stream->release();
 		_observer->update();
 		//Leave the processor (do this always! You have to let other threads get the processor)
 		Sleep(1);
@@ -87,14 +86,14 @@ bool BubbleDetector::stop(){
 	//await termination
 	void* result;
 	pthread_join(thread,&result);
-	dumpLogs();
+	//dumpLogs();
 	return true;
 };
 
 //Main Detection Method
 vector<Bubble> BubbleDetector::detectBubbles(){
 	Point2f circleCentre;
-	float start = IClock::instance().getTimeMiliseconds();//Timer
+	//float start = IClock::instance().getTimeMiliseconds();//Timer
 
 	//Apply the whole processing pipeline (threshold, erode, dilate)
 	if(!(_capture->filter->applyFilter('i',_capture->_stream))->empty())
@@ -141,8 +140,8 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 	}
 
 	//Timer
-	float finish = IClock::instance().getTimeMiliseconds();
-	times.push(finish-start);
+	//float finish = IClock::instance().getTimeMiliseconds();
+	//times.push(finish-start);
 
 	return bubbles;
 };

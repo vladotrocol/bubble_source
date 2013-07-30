@@ -7,9 +7,9 @@ bool BubbleTracker::init(){
 	_detector = new BubbleDetector(this);
 	_detector->init();
 	//-------------------Calibrate(this or read form file)-------------
-		//_calibrator = new Calibrator(_detector->_capture);
-		//_calibrator->calibrateCameraProjector();
-		//_detector->getHomography(&_calibrator->_homography);
+		/*_calibrator = new Calibrator(_detector->_capture);
+		_calibrator->calibrateCameraProjector();
+		_detector->getHomography(&_calibrator->_homography);*/
 	
 	//If already calibrated
 		_detector->readHomography();

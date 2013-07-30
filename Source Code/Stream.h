@@ -25,7 +25,7 @@ class Stream{
 		int minBubbleSize;
 		int maxBubbleSize;
 		bool TestON;
-		Stream(){minBubbleSize=10;maxBubbleSize=10000;};
+		Stream(){minBubbleSize=10;maxBubbleSize=100;};
 		virtual void readFrame()=0;
 		void display(char* s);
 		void displayBubbles(vector<Bubble> &bubbles);

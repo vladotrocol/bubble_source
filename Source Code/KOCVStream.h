@@ -35,8 +35,8 @@ class KOCVStream: public Stream{
 		unsigned int static const width = 640;
 		unsigned int static const height = 480;
 
-		Mat tryReadFrame(); //Read the Mat data into a image frame
+		Mat* tryReadFrame(); //Read the Mat data into a image frame
 		NUI_IMAGE_FRAME tryRecordFrame(char s); //Read the Mat data into a image frame
-		Mat kFrameToMat(NUI_IMAGE_FRAME imageFrame); //Put the kinect frame data onto a Mat
+		Mat* kFrameToMat(NUI_IMAGE_FRAME* imageFrame); //Put the kinect frame data onto a Mat
 };
 #endif

@@ -43,10 +43,11 @@ HRESULT Kinect::releaseFrame(NUI_IMAGE_FRAME *imageFrame){
 	return sensor->NuiImageStreamReleaseFrame(depthStream, imageFrame);
 };
 
+BYTE data[width*height*3];
+
 //Compute the correct depth image data in milimiters
 BYTE* Kinect::getDepthData(NUI_LOCKED_RECT *LockedRect){
 
-	BYTE data[width*height*3];
 	int j = 0;
 
 	const USHORT* curr = (const USHORT*) LockedRect->pBits;
@@ -59,6 +60,5 @@ BYTE* Kinect::getDepthData(NUI_LOCKED_RECT *LockedRect){
 		}
 		j++;
 	}
-
 	return data;
 };
