@@ -2,13 +2,14 @@
 
 Servo servoPump;
 Servo servoSwing;
-int incomingByte = 0;
+char incomingByte = 0;
 int led = 13;
 void setup() {                
   Serial.begin(9600);
   servoPump.attach(4);
   servoSwing.attach(5);
   pinMode(led, OUTPUT);
+  
   servoSwing.write(90);
   servoPump.write(145);
 }
@@ -23,15 +24,16 @@ void loop() {
   if (Serial.available() >0) {
     incomingByte = Serial.read();
     digitalWrite(led, HIGH);
-    delay(1000);   
-    if(incomingByte == 'g'){ //'g'
+    delay(1000); 
+    //Serial.println(incomingByte); 
+    if(incomingByte == 103){ //'g'
       
       //move in position for smoke
       servoSwing.write(40);
       delay(1400);
       
       //suck smoke
-      servoPump.write(20);
+      servoPump.write(120);
       delay(600);
       
       //dip into solution
@@ -43,13 +45,13 @@ void loop() {
       delay(140);
       
       //slow blow
-      for(pos = 21; pos<=180; pos+=1){ 
+      for(pos = 121; pos<=150; pos++){ 
         servoPump.write(pos);
         delay(30);
       }
       
       //fast blow
-      servoPump.write(145);
+      servoPump.write(180);
       delay(600);
       
       //return to initial stage
