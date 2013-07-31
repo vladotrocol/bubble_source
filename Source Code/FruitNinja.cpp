@@ -14,24 +14,26 @@ FruitNinja::FruitNinja(BubbleState* bs, BubbleGenerator* bg):
 	_state(bs),
 	_generator(bg){};
 
-bool FruitNinja::init(){return true;};
+bool FruitNinja::init(){
+	status = ST_READY;
+	return true;
+};
 
 bool FruitNinja::start(){
 	if(status==ST_READY){
 		status=ST_PLAYING;
-		pthread_create(&thread,NULL,fwthreadFunction2,(void*)this);
+		pthread_create(&thread2,NULL,fwthreadFunction2,(void*)this);
 	}
 	return true;
 };
 
 void FruitNinja::run(){
 	unsigned int ID = 1;
-	char input;
-	cout<<"Fruitty\n";
+	char input;	
+	cout<<"Press w for watermelon, o for orange:\n";
 	while(status==ST_PLAYING){
 		input = _getch();
 		if(input == 'w'){
-			cout<<"bubble\n";
 			createBubble(ID, "Examples/watermelon", _state, _generator);
 		}
 		else if(input == 'o'){
@@ -47,7 +49,7 @@ bool FruitNinja::stop(){
 	status=ST_READY;
 	//await termination
 	void* result;
-	pthread_join(thread,&result);
+	pthread_join(thread2,&result);
 	return true;
 };
 

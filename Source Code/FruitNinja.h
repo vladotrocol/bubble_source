@@ -16,7 +16,7 @@ class FruitNinja{
 		//Thread data
 		pthread_mutex_t mutex;//lock while writing to avoid conflicts.
 		pthread_mutex_t captureStarted;//Will be set to 1 when the first image is grabbed.
-		pthread_t thread;
+		pthread_t thread2;
 		BubbleState* _state;
 		BubbleGenerator* _generator;
 		FruitNinja(BubbleState* BS, BubbleGenerator* BG);
