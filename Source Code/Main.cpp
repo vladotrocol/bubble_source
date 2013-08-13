@@ -25,7 +25,7 @@ int main(){
 	//Record
 	if(record){
 		KOCVStream s;
-		s.record("_multipleBubbles.avi");
+		s.record("_Jarred3.avi");
 	}
 	//or test kinect
 	else if(test){

@@ -10,7 +10,7 @@ void setup() {
   servoSwing.attach(5);
   pinMode(led, OUTPUT);
   
-  servoSwing.write(90);
+  servoSwing.write(80);
   servoPump.write(145);
 }
 
@@ -25,7 +25,7 @@ void loop() {
     incomingByte = Serial.read();
     digitalWrite(led, HIGH);
     delay(1000); 
-    //Serial.println(incomingByte); 
+    Serial.println(incomingByte); 
     if(incomingByte == 103){ //'g'
       
       //move in position for smoke
@@ -37,7 +37,7 @@ void loop() {
       delay(600);
       
       //dip into solution
-      servoSwing.write(90);
+      servoSwing.write(80);
       delay(1400);
       
       //swing into bubble making position
@@ -55,7 +55,7 @@ void loop() {
       delay(600);
       
       //return to initial stage
-      servoSwing.write(90);
+      servoSwing.write(80);
       delay(600);
       servoPump.write(145);
       delay(600);

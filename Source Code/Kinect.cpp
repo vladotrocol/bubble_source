@@ -16,7 +16,7 @@ void Kinect::initialiseKinect(void){
 	isInit = false;
 	if (!(NuiGetSensorCount(&numSensors) < 0 || numSensors < 1) && !(NuiCreateSensorByIndex(0, &sensor) < 0)){
 		sensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_DEPTH | NUI_INITIALIZE_FLAG_USES_COLOR);
-		sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH, NUI_IMAGE_RESOLUTION_640x480,0 ,2,NULL, &depthStream); //0x00040000 for white background
+		sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH, NUI_IMAGE_RESOLUTION_640x480,NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE ,2,NULL, &depthStream); //0x00040000 for white background
 		sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_COLOR, NUI_IMAGE_RESOLUTION_640x480, 0, 2, NULL, &rgbStream);
 		isInit = true;
 	}
@@ -44,7 +44,7 @@ HRESULT Kinect::releaseFrame(NUI_IMAGE_FRAME *imageFrame){
 };
 
 BYTE data[width*height*3];
-
+float data2[width*height*3];
 //Compute the correct depth image data in milimiters
 BYTE* Kinect::getDepthData(NUI_LOCKED_RECT *LockedRect){
 
@@ -52,13 +52,23 @@ BYTE* Kinect::getDepthData(NUI_LOCKED_RECT *LockedRect){
 
 	const USHORT* curr = (const USHORT*) LockedRect->pBits;
 	const USHORT* dataEnd = curr + (width*height);
-
+	float max = 0;
 	while (curr < dataEnd) {
 		USHORT depth = NuiDepthPixelToDepth(*curr++);
 		for (int i = 0; i < 3; ++i){
-			data[j] = (BYTE) depth%256;
+			data2[j] = depth;
+			if(depth>max){
+				max = depth;
+			}
 		}
 		j++;
+	}
+
+	for(int i=0;i<width*height*3;i++){
+		data[i] = (BYTE)((USHORT)data2[i]/max * 255);
+		if(data[i]!=0){
+			data[i] = 255- data[i];
+		}
 	}
 	return data;
 };

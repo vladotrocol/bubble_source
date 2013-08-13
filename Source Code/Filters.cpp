@@ -7,10 +7,10 @@ static Mat src_grey,
 
 //Constructor
 Filters::Filters():
-	thresholdValue(1),
-	thresholdType(1),
-	erosionSize(32),
-	dilationSize(52)
+	thresholdValue(60),
+	thresholdType(0),
+	erosionSize(4),
+	dilationSize(10)
 {;};
 
 //Applies the requested filter to the corresponding source stream

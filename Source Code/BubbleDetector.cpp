@@ -63,7 +63,7 @@ void BubbleDetector::run(){
 		
 
 		//-----------------Display stuff----------------
-		//_capture->display("di");
+		//_capture->display("dti");
 		//_capture->displayBubbles(bubbles);
 		//waitKey(1);
 
@@ -90,14 +90,15 @@ bool BubbleDetector::stop(){
 	return true;
 };
 
+
 //Main Detection Method
 vector<Bubble> BubbleDetector::detectBubbles(){
 	Point2f circleCentre;
 	//float start = IClock::instance().getTimeMiliseconds();//Timer
-
+	Mat* _tempStream = _capture->filter->applyFilter('i',_capture->_stream);
 	//Apply the whole processing pipeline (threshold, erode, dilate)
-	if(!(_capture->filter->applyFilter('i',_capture->_stream))->empty())
-	findContours(*(_capture->filter->applyFilter('i',_capture->_stream)), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	if(!(_tempStream)->empty())
+	findContours(*(_tempStream), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 	
 	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());
@@ -117,11 +118,28 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 		}
 	}
 	
-	//Remove bubbles that do not fit min and max sizes
+	
 	for (unsigned int i = 0; i < bubbles.size(); i++){
+		//Remove bubbles that do not fit min and max sizes
 		if (bubbles[i].radius < _capture->minBubbleSize || bubbles[i].radius > _capture->maxBubbleSize || bubbles[i].center.x < 50){
 			bubbles.erase(bubbles.begin() + i);
 			i--;
+		}
+		else{
+		//float averageDist = 0;
+		//for (int x = -(int)bubbles[i].radius; x < (int)bubbles[i].radius; x++) {
+		//	for (int y = -(int)bubbles[i].radius; y < (int)bubbles[i].radius; y++) {
+		//		if (sqrt((float)x*x + y*y)<bubbles[i].radius) {
+		//			if(x+bubbles[i].center.x>0&& y+bubbles[i].center.y>0)
+		//			averageDist += (float) _capture->_stream->at<USHORT>(x+bubbles[i].center.x, y+bubbles[i].center.y);
+		//			//_capture->_stream->data[_capture->_stream->channels()*(_capture->_stream->cols*x + y) + 0]=100;
+		//			//->_stream->data[_capture->_stream->channels()*(_capture->_stream->cols*x + y) + 1] = 0;
+		//			//_capture->_stream->data[_capture->_stream->channels()*(_capture->_stream->cols*x + y) + 2] = 0;
+		//		}          
+		//	}
+		//}
+		//bubbles[i].center.z = averageDist;
+		//cout<<bubbles[i].center.x<<" "<<bubbles[i].center.y<<" "<<bubbles[i].center.z<<'\n';
 		}
 	}
 
