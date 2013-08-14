@@ -15,6 +15,7 @@ public:
 	unsigned int closeID;
 	double minD;
 	char* material;
+	Point3f pixelsToMilimiters();
 };
 
 #endif

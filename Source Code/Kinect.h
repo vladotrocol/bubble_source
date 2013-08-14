@@ -19,19 +19,22 @@
 #include <opencv2\contrib\contrib.hpp>
 #include <opencv2\calib3d\calib3d.hpp>
 #include <opencv2\imgproc\imgproc.hpp>
+#include <nuisensor.h>
+
 
 using namespace std;
 using namespace cv;
 class Kinect{
 	public:
+		USHORT* dataMil;
+		BYTE* dataPix;
 		HANDLE rgbStream; //kinect colour stream
 		HANDLE depthStream; //kinect depth stream
-
 		Kinect(void); //Constructor
 		void initialiseKinect(void); //Initialise Kinect
 		bool hasNextFrame(NUI_IMAGE_FRAME *imageFrame); //Get the next frame
 		HRESULT releaseFrame(NUI_IMAGE_FRAME *imageFrame); //Releases the current frame
-		BYTE* getDepthData(NUI_LOCKED_RECT *LockedRect); //Compute the correct depth image data in milimiters
+		void getDepthData(NUI_LOCKED_RECT *LockedRect); //Compute the correct depth image data in milimiters
 		bool hasInitialized(void); //Check if Kinect is detected
 
 	private:

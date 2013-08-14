@@ -12,7 +12,10 @@ void* fwthreadFunction2(void* a){
 
 FruitNinja::FruitNinja(BubbleState* bs, BubbleGenerator* bg):
 	_state(bs),
-	_generator(bg){};
+	_generator(bg)
+	{
+		
+	};
 
 bool FruitNinja::init(){
 	status = ST_READY;

@@ -1,6 +1,6 @@
 #include "Ogre.h"
 #include "BubbleDetector.h"
-
+#include <math.h>
 bool TESTS_ON = false;
 queue<float> times;
 
@@ -61,10 +61,27 @@ void BubbleDetector::run(){
 		_capture->readFrame();
 		bubbles = detectBubbles();
 		
+		for(unsigned int i = 0; i<bubbles.size(); i++){
+			bubbles[i].pixelsToMilimiters();
+			//printf("%f %f %f %f\n", bubbles[i].center.x, bubbles[i].center.y, bubbles[i].center.z, bubbles[i].radius);
+		}
+
+		//	//Apply the homography
+		//if(bubbles.size()>0){
+		//vector<Point2f> proj(bubbles.size());
+		//vector<Point2f> init(bubbles.size());
+		//for(unsigned int i=0;i<proj.size();i++){
+		//	init[i] = Point2f(bubbles[i].center.x,bubbles[i].center.y);
+		//}
+		//perspectiveTransform(init, proj, *_homography);
+		//for(unsigned int i=0;i<proj.size();i++){
+		//	bubbles[i].center = Point3f(proj[i].x,proj[i].y,bubbles[i].center.z);
+		//}
+		//}
 
 		//-----------------Display stuff----------------
-		//_capture->display("dti");
-		//_capture->displayBubbles(bubbles);
+		_capture->display("dti");
+		_capture->displayBubbles(bubbles);
 		//waitKey(1);
 
 		//--------------Print the fps--------------
@@ -126,33 +143,21 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 			i--;
 		}
 		else{
-		//float averageDist = 0;
-		//for (int x = -(int)bubbles[i].radius; x < (int)bubbles[i].radius; x++) {
-		//	for (int y = -(int)bubbles[i].radius; y < (int)bubbles[i].radius; y++) {
-		//		if (sqrt((float)x*x + y*y)<bubbles[i].radius) {
-		//			if(x+bubbles[i].center.x>0&& y+bubbles[i].center.y>0)
-		//			averageDist += (float) _capture->_stream->at<USHORT>(x+bubbles[i].center.x, y+bubbles[i].center.y);
-		//			//_capture->_stream->data[_capture->_stream->channels()*(_capture->_stream->cols*x + y) + 0]=100;
-		//			//->_stream->data[_capture->_stream->channels()*(_capture->_stream->cols*x + y) + 1] = 0;
-		//			//_capture->_stream->data[_capture->_stream->channels()*(_capture->_stream->cols*x + y) + 2] = 0;
-		//		}          
-		//	}
-		//}
-		//bubbles[i].center.z = averageDist;
-		//cout<<bubbles[i].center.x<<" "<<bubbles[i].center.y<<" "<<bubbles[i].center.z<<'\n';
+		float averageDist = 0;
+		int count=0;
+		for (int x = -(int)bubbles[i].radius/3; x < (int)bubbles[i].radius/3; x++) {
+			for (int y = -(int)bubbles[i].radius/3; y < (int)bubbles[i].radius/3; y++) {
+				if ((float)x*x + y*y<(bubbles[i].radius/3)*(bubbles[i].radius/3)) {
+					if(x+bubbles[i].center.x>0&& y+bubbles[i].center.y>0&&_capture->dataMil[(int)((x+bubbles[i].center.x)+(y+bubbles[i].center.y)*640)]!=0){
+						averageDist +=1.0f*_capture->dataMil[(int)((x+bubbles[i].center.x)+(y+bubbles[i].center.y)*640)];
+						count+=1;
+						//cout<<_capture->dataMil[(int)((bubbles[i].center.x)+(bubbles[i].center.y)*640)]<<'\n';
+					}
+				}
+			}
 		}
-	}
-
-	//Apply the homography
-	if(bubbles.size()>0){
-		vector<Point2f> proj(bubbles.size());
-		vector<Point2f> init(bubbles.size());
-		for(unsigned int i=0;i<proj.size();i++){
-			init[i] = Point2f(bubbles[i].center.x,bubbles[i].center.y);
-		}
-		perspectiveTransform(init, proj, *_homography);
-		for(unsigned int i=0;i<proj.size();i++){
-			bubbles[i].center = Point3f(proj[i].x,proj[i].y,0);
+		bubbles[i].center.z = averageDist/count;
+		cout<<"average: "<<bubbles[i].center.z<<'\n';
 		}
 			
 	}

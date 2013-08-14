@@ -43,7 +43,7 @@ void COMToolkit::connect(){
 	if(status!=INIT)
 		return; //Already connected!
 	//Configure the conneciton
-	std::cout << "Connecting to COM6" << std::endl ;
+	std::cout << "Connecting to COM5" << std::endl ;
 	createFile();
 	setCommMask();
 	defineControlSettings();
@@ -153,12 +153,13 @@ void COMToolkit::sendByte(unsigned char byte){
 
 	unsigned char buffer = 0;
 	DWORD numOfBytesWritten = 0;
-	buffer = (unsigned char)byte + 48;
+	buffer = (unsigned char)byte ;
 	if(!WriteFile(hSerial, &buffer, sizeof(buffer), &numOfBytesWritten, NULL)){
 		cout << "error writing" << endl ;
 	}
 	else{
-		printf("Sent '%d'\n", byte);//cout << "Sent: " << buffer << endl ;
+		//printf("Sent %d\n", byte);
+		cout << "Sent: " << buffer << endl ;
 	}
 	SetFilePointer(hSerial,0,0,FILE_BEGIN);
 }
@@ -316,7 +317,7 @@ void defineControlSettings(){
 	dcbSerialParams.StopBits=ONESTOPBIT;
 	//dcbSerialParams.fRtsControl=RTS_CONTROL_DISABLE;*/
 	
-	dcbSerialParams.BaudRate=1000000;
+	dcbSerialParams.BaudRate=CBR_9600;
 	//dcbSerialParams.BaudRate=BAUD_115200;
 	dcbSerialParams.ByteSize=8;
 	dcbSerialParams.StopBits=ONESTOPBIT;

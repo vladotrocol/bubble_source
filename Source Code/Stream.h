@@ -22,6 +22,8 @@ class Stream{
 	public:
 		Mat* _stream;
 		Filters* filter;
+		USHORT* dataMil;
+		BYTE* dataPix;
 		int minBubbleSize;
 		int maxBubbleSize;
 		bool TestON;

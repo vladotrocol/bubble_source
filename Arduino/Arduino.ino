@@ -18,15 +18,17 @@ void setup() {
 int pos = 0;
 
 void loop() {
+  char str[2];
+  str[1]='\0';
   digitalWrite(led, LOW);
   delay(1000);
-  
+  incomingByte = Serial.read();
+  str[0]=incomingByte;
   if (Serial.available() >0) {
-    incomingByte = Serial.read();
     digitalWrite(led, HIGH);
     delay(1000); 
-    Serial.println(incomingByte); 
-    if(incomingByte == 103){ //'g'
+    Serial.println(str); 
+    if(incomingByte == 'g'){ //'g'
       
       //move in position for smoke
       servoSwing.write(40);

@@ -6,6 +6,8 @@ KOCVStream::KOCVStream(){
 	kinect = new Kinect();
 	filter = new Filters();
 	kinect->initialiseKinect();
+	dataMil = kinect->dataMil;
+	dataPix = kinect->dataPix;
 };
 
 //Reads the current frames into the source materials
@@ -55,7 +57,8 @@ Mat* KOCVStream::kFrameToMat(NUI_IMAGE_FRAME* imageFrame){
 
 	//Get the kinect depth data
 	BYTE* imageData = new BYTE();
-	imageData =  kinect->getDepthData(&LockedRect);
+	kinect->getDepthData(&LockedRect);
+	imageData = kinect->dataPix;
 
 	//If the data is not empty convert it to Mat
 	if (LockedRect.Pitch != 0){

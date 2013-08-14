@@ -42,7 +42,7 @@ int main(){
 		BubbleState& BS = BubbleState::instance();
 		BubbleGenerator* BG = new BubbleGenerator();
 		BubbleTracker BT(&BS);
-		OgreProjectionEngine ope;
+		//OgreProjectionEngine ope;
 		FruitNinja app(&BS, BG);
 
 		//createBubble(ID, "Examples/watermelon",&BS, &BG);
@@ -52,14 +52,14 @@ int main(){
 		
 		BT.init();
 		app.init();
-		ope.init();
+		//ope.init();
 		BT.start();
-		ope.start();
+		//ope.start();
 		app.start();
 
 		while(1){
 		}
-		ope.stop();
+		//ope.stop();
 		BT.stop();
 		app.stop();
 	}
