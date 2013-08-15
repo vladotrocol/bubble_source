@@ -42,6 +42,9 @@ void FruitNinja::run(){
 		else if(input == 'o'){
 			createBubble(ID, "Examples/orange", _state, _generator);
 		}
+		else if(input == 'b'){
+			createBubble(ID, "Examples/blueberry", _state, _generator);
+		}
 		ID++;
 	}
 };

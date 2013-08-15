@@ -17,19 +17,20 @@ void VideoStream::readFrame(){
 	}
 
 	//Read the next frame from video
-	Mat image;
-	cap->read(image);
+	Mat* image = new Mat();
+	cap->read(*image);
 
-	if(image.empty()){
+	if(image->empty()){
 		//The last frame is always empty..
 		//If so, reset the reader
+		cap->release();
 		cap = new VideoCapture(fileName);
 	}else{
 		//Read the frame
-		image.copyTo(*_stream);
+		image->copyTo(*_stream);
 	}
 	//No memory leaks
-	image.release();
+	image->release();
 };
 
 //-------------------------------IDEAL IMAGE---------------------

@@ -1,7 +1,7 @@
 #include "Ogre.h"
 #include "BubbleDetector.h"
 #include <math.h>
-bool TESTS_ON = false;
+bool TESTS_ON = true;
 queue<float> times;
 
 vector<vector<Point>> contours;
@@ -35,7 +35,7 @@ bool BubbleDetector::init(){
 		_capture = (Stream*) (new KOCVStream());
 	}
 	else{
-		_capture = (Stream*) (new VideoStream("_inOutBubbles.avi"));
+		_capture = (Stream*) (new VideoStream("_b2.avi"));
 	}
 	status = ST_READY;
 	return true;
@@ -61,22 +61,22 @@ void BubbleDetector::run(){
 		_capture->readFrame();
 		bubbles = detectBubbles();
 		
-		for(unsigned int i = 0; i<bubbles.size(); i++){
-			bubbles[i].pixelsToMilimiters();
-			cout<<'\n';
-			//printf("%f %f %f %f\n", bubbles[i].center.x, bubbles[i].center.y, bubbles[i].center.z, bubbles[i].radius);
-		}
+		//for(unsigned int i = 0; i<bubbles.size(); i++){
+		//	bubbles[i].pixelsToMilimiters();
+		////	cout<<'\n';
+		//	//printf("%f %f %f %f\n", bubbles[i].center.x, bubbles[i].center.y, bubbles[i].center.z, bubbles[i].radius);
+		//}
 
 
 
 		//-----------------Display stuff----------------
-		_capture->display("di");
+		_capture->display("dti");
 		//_capture->displayBubbles(bubbles);
 		//waitKey(1);
 
 		//--------------Print the fps--------------
 		//this->updateFPS(true);
-		_capture->_stream->release();
+		//_capture->_stream->release();
 		_observer->update();
 		//Leave the processor (do this always! You have to let other threads get the processor)
 		Sleep(1);
@@ -121,7 +121,6 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 				//Compute its radius and position
 				minEnclosingCircle( (Mat)contours_poly[i], circleCentre, bubbles[i].radius);
 				bubbles[i].center = Point3f(circleCentre.x, circleCentre.y, 0);
-				//cout<<"Bubble center "<< circleCentre.x << " " <<circleCentre.y<<" "<<_capture->dataMil[(int)((bubbles[i].center.x)+(bubbles[i].center.y)*640)]<<'\n';
 			}
 		}
 	}
@@ -129,7 +128,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 	
 	for (unsigned int i = 0; i < bubbles.size(); i++){
 		//Remove bubbles that do not fit min and max sizes
-		if (bubbles[i].radius < _capture->minBubbleSize || bubbles[i].radius > _capture->maxBubbleSize || bubbles[i].center.x < 50){
+		if (bubbles[i].radius < _capture->minBubbleSize || bubbles[i].radius > _capture->maxBubbleSize){
 			bubbles.erase(bubbles.begin() + i);
 			i--;
 		}
@@ -147,7 +146,9 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 				float aux_y=y+b_centre_y;
 				if ((x*x + y*y)<(rad*rad)&&aux_x<640&&aux_y<480&&aux_x>0&&aux_y>0){
 					//drawing.at<BYTE>(Point2f(aux_x, aux_y))=(unsigned char)(this->kinect->dataMil[(int)(aux_x+640*aux_y)]*256/4000);
-					averageDist +=(float)(_capture->dataMil[(int)(aux_x+640*aux_y)]);
+
+					//averageDist +=(float)(_capture->dataMil[(int)(aux_x+640*aux_y)]); //real data
+					averageDist +=1;//(float)(_capture->_stream->at<ushort>(aux_x,aux_y)); //test data
 					//cout<<(int)(_capture->dataMil[(int)(aux_x+640*aux_y)])<<' ';
 					count+=1;
 				}
@@ -155,21 +156,10 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 		if(count>0)
 		bubbles[i].center.z = averageDist/count;
 		//cout<<"average: "<<bubbles[i].center.z<<"\n\n\n";
-		/*//DEBUG: Print the line in the centre 
-		for (int x = 0; x < 200; x+=10) {
-			cout<< x <<" mil"<<_capture->dataMil[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<" pix"<<(int)_capture->dataPix[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<'\n';
-		}
-		for (int x = 200; x < 400; x+=10) {
-			cout<< x <<" mil"<<_capture->dataMil[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<" pix"<<(int)_capture->dataPix[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<'\n';
-		}
-		for (int x = 400; x < 640; x+=10) {
-			cout<< x <<" mil"<<_capture->dataMil[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<" pix"<<(int)_capture->dataPix[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<'\n';
-		}*/
 		}
 			
 	}
-
-			//Apply the homography
+		//Apply the homography
 		if(bubbles.size()>0){
 		vector<Point2f> proj(bubbles.size());
 		vector<Point2f> init(bubbles.size());

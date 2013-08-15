@@ -40,7 +40,7 @@ Mat* KOCVStream::tryReadFrame(){
 	kinect->releaseFrame(imageFrame);
 
 	//Depth frame need to be flipped
-	//flip(*depthFrame, *depthFrame, 1);//or not? IMPROVE:
+	flip(*depthFrame, *depthFrame, 1);//or not? IMPROVE:
 	
 	return depthFrame;
 };
