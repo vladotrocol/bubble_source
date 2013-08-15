@@ -38,5 +38,6 @@ class KOCVStream: public Stream{
 		Mat* tryReadFrame(); //Read the Mat data into a image frame
 		NUI_IMAGE_FRAME tryRecordFrame(char s); //Read the Mat data into a image frame
 		Mat* kFrameToMat(NUI_IMAGE_FRAME* imageFrame); //Put the kinect frame data onto a Mat
+		virtual void displayBubbles(vector<Bubble> &bubbles);
 };
 #endif

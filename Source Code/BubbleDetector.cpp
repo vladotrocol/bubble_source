@@ -63,25 +63,15 @@ void BubbleDetector::run(){
 		
 		for(unsigned int i = 0; i<bubbles.size(); i++){
 			bubbles[i].pixelsToMilimiters();
+			cout<<'\n';
 			//printf("%f %f %f %f\n", bubbles[i].center.x, bubbles[i].center.y, bubbles[i].center.z, bubbles[i].radius);
 		}
 
-		//	//Apply the homography
-		//if(bubbles.size()>0){
-		//vector<Point2f> proj(bubbles.size());
-		//vector<Point2f> init(bubbles.size());
-		//for(unsigned int i=0;i<proj.size();i++){
-		//	init[i] = Point2f(bubbles[i].center.x,bubbles[i].center.y);
-		//}
-		//perspectiveTransform(init, proj, *_homography);
-		//for(unsigned int i=0;i<proj.size();i++){
-		//	bubbles[i].center = Point3f(proj[i].x,proj[i].y,bubbles[i].center.z);
-		//}
-		//}
+
 
 		//-----------------Display stuff----------------
-		_capture->display("dti");
-		_capture->displayBubbles(bubbles);
+		_capture->display("di");
+		//_capture->displayBubbles(bubbles);
 		//waitKey(1);
 
 		//--------------Print the fps--------------
@@ -116,7 +106,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 	//Apply the whole processing pipeline (threshold, erode, dilate)
 	if(!(_tempStream)->empty())
 	findContours(*(_tempStream), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-	
+	//imshow("DepthMil", Mat(480,640, CV_8U, _capture->dataPix));
 	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());
 	vector<vector<Point>> contours_poly(contours.size());
@@ -131,6 +121,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 				//Compute its radius and position
 				minEnclosingCircle( (Mat)contours_poly[i], circleCentre, bubbles[i].radius);
 				bubbles[i].center = Point3f(circleCentre.x, circleCentre.y, 0);
+				//cout<<"Bubble center "<< circleCentre.x << " " <<circleCentre.y<<" "<<_capture->dataMil[(int)((bubbles[i].center.x)+(bubbles[i].center.y)*640)]<<'\n';
 			}
 		}
 	}
@@ -144,23 +135,52 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 		}
 		else{
 		float averageDist = 0;
-		int count=0;
-		for (int x = -(int)bubbles[i].radius/3; x < (int)bubbles[i].radius/3; x++) {
-			for (int y = -(int)bubbles[i].radius/3; y < (int)bubbles[i].radius/3; y++) {
-				if ((float)x*x + y*y<(bubbles[i].radius/3)*(bubbles[i].radius/3)) {
-					if(x+bubbles[i].center.x>0&& y+bubbles[i].center.y>0&&_capture->dataMil[(int)((x+bubbles[i].center.x)+(y+bubbles[i].center.y)*640)]!=0){
-						averageDist +=1.0f*_capture->dataMil[(int)((x+bubbles[i].center.x)+(y+bubbles[i].center.y)*640)];
-						count+=1;
-						//cout<<_capture->dataMil[(int)((bubbles[i].center.x)+(bubbles[i].center.y)*640)]<<'\n';
-					}
+		float count=0;
+
+
+		int rad=(int)bubbles[i].radius/3;
+		int b_centre_x=(int)bubbles[i].center.x;
+		int b_centre_y=(int)bubbles[i].center.y;
+		for (int x = -rad; x < rad; x++) 
+			for (int y = -rad; y < rad; y++){
+				float aux_x=x+b_centre_x;
+				float aux_y=y+b_centre_y;
+				if ((x*x + y*y)<(rad*rad)&&aux_x<640&&aux_y<480&&aux_x>0&&aux_y>0){
+					//drawing.at<BYTE>(Point2f(aux_x, aux_y))=(unsigned char)(this->kinect->dataMil[(int)(aux_x+640*aux_y)]*256/4000);
+					averageDist +=(float)(_capture->dataMil[(int)(aux_x+640*aux_y)]);
+					//cout<<(int)(_capture->dataMil[(int)(aux_x+640*aux_y)])<<' ';
+					count+=1;
 				}
 			}
-		}
+		if(count>0)
 		bubbles[i].center.z = averageDist/count;
-		cout<<"average: "<<bubbles[i].center.z<<'\n';
+		//cout<<"average: "<<bubbles[i].center.z<<"\n\n\n";
+		/*//DEBUG: Print the line in the centre 
+		for (int x = 0; x < 200; x+=10) {
+			cout<< x <<" mil"<<_capture->dataMil[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<" pix"<<(int)_capture->dataPix[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<'\n';
+		}
+		for (int x = 200; x < 400; x+=10) {
+			cout<< x <<" mil"<<_capture->dataMil[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<" pix"<<(int)_capture->dataPix[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<'\n';
+		}
+		for (int x = 400; x < 640; x+=10) {
+			cout<< x <<" mil"<<_capture->dataMil[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<" pix"<<(int)_capture->dataPix[(int)((x+bubbles[i].center.x)+bubbles[i].center.y*640)]<<'\n';
+		}*/
 		}
 			
 	}
+
+			//Apply the homography
+		if(bubbles.size()>0){
+		vector<Point2f> proj(bubbles.size());
+		vector<Point2f> init(bubbles.size());
+		for(unsigned int i=0;i<proj.size();i++){
+			init[i] = Point2f(bubbles[i].center.x,bubbles[i].center.y);
+		}
+		perspectiveTransform(init, proj, *_homography);
+		for(unsigned int i=0;i<proj.size();i++){
+			bubbles[i].center = Point3f(proj[i].x,proj[i].y,bubbles[i].center.z);
+		}
+		}
 
 	//Timer
 	//float finish = IClock::instance().getTimeMiliseconds();

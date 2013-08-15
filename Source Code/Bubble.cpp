@@ -9,12 +9,12 @@ Point3f Bubble::pixelsToMilimiters(){
 	float x = this->center.x - 320; //half width
 	float y = 240 - this->center.y; //half height
 	
-	float fx = 320/ tan(57*M_PI/180);
-	float fy = 240/ tan(43*M_PI/190);
+	float fx = 320/ tan(28.5*M_PI/180);
+	float fy = 240/ tan(21.5*M_PI/190);
 	
 	float X = x * this->center.z / fx;
 	float Y = y * this->center.z / fy;
 	float Z = this->center.z;
-	//printf("%f %f %f\n", X, Y, Z);
+	printf("%f %f %f\n", X, Y, Z);
 	return Point3f(X, Y, Z);
 };

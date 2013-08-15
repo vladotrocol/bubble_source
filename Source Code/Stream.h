@@ -30,7 +30,7 @@ class Stream{
 		Stream(){minBubbleSize=10;maxBubbleSize=100;};
 		virtual void readFrame()=0;
 		void display(char* s);
-		void displayBubbles(vector<Bubble> &bubbles);
+		virtual void displayBubbles(vector<Bubble> &bubbles);
 		void generateControls();
 };
 #endif

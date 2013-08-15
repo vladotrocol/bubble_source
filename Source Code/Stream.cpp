@@ -21,9 +21,13 @@ void Stream::display(char* s){
 //Display detected bubbles as circles
 void Stream::displayBubbles(vector<Bubble> &bubbles){
 	RNG rng(12345);
-	Mat drawing = Mat::zeros(_stream->size(), CV_8UC3 );
+	Mat drawing = Mat::zeros(_stream->size(), CV_8U );
+	//std::vector<Mat> RGB;
+   // split(*_stream, RGB);
+
 	for( unsigned int i = 0; i< bubbles.size(); i++ ){
-		Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+		//draw the contour
+		Scalar color = Scalar( 255, 255, 255 );
 		if((int)bubbles[i].radius>0)
         circle( drawing, Point2f(bubbles[i].center.x, bubbles[i].center.y), (int)bubbles[i].radius, color, 2, 8, 0 );
     }
