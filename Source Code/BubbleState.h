@@ -13,7 +13,7 @@ class IBubbleState{
 	public:
 		virtual void addBubble(Bubble b)=0;
 		virtual unsigned int getUnknownBubble(void)=0;
-		virtual void updateBubble(unsigned int ID, Point3f center, float radius)=0;
+		virtual void updateBubble(unsigned int ID, Point3f center, float radius, bool tracked)=0;
 		virtual map<unsigned int, Bubble>* getCurrentState(void)=0;
 		virtual void notifyUserBreaks(unsigned int ID)=0;
 		virtual void notifyTrackingFrame(void)=0;
@@ -52,7 +52,7 @@ class BubbleState: public IBubbleState{
 		unsigned int getUnknownBubble(void);
 
 		//Update the position of a bubble
-		void updateBubble(unsigned int ID, Point3f center, float radius);
+		void updateBubble(unsigned int ID, Point3f center, float radius, bool tracked);
 
 		//Returns a copy of all tracked bubles
 		map<unsigned int, Bubble>* getCurrentState(void);

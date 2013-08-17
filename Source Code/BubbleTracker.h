@@ -21,6 +21,12 @@ class BubbleTracker: public IBubbleTracker{
 		void printBubbles();
 		BubbleTracker(BubbleState* BS);
 		void updateFPS(bool newFrame);
+		void insertUntracked(map<unsigned int, Bubble>* trackedBubbles);
+		void computeCloseIds(map<unsigned int, Bubble>::iterator iter,map<unsigned int, Bubble>* trackedBubbles);
+		bool assignID(map<unsigned int, Bubble>::iterator iter,
+				BubbleDetector* _detector,
+				BubbleState* _state, 
+				map<unsigned int, Bubble>* trackedBubbles);
 };
 
 #endif

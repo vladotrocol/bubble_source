@@ -43,7 +43,7 @@ void BubbleState::printBubbles(){
 };
 
 //Update the position of a bubble
-void BubbleState::updateBubble(unsigned int ID, Point3f center, float radius){
+void BubbleState::updateBubble(unsigned int ID, Point3f center, float radius, bool tracked){
 	trackedBubbles[ID].center = center;
 	trackedBubbles[ID].radius=radius;
 	//cout<<ID<<" "<<center.x<<" "<<center.y<<" "<<radius<<'\n';
@@ -51,13 +51,15 @@ void BubbleState::updateBubble(unsigned int ID, Point3f center, float radius){
 
 //Returns a copy of all tracked bubles
 map<unsigned int, Bubble>* BubbleState::getCurrentState(void){
-	return &trackedBubbles;
+	map<unsigned int, Bubble>* result=new map<unsigned int, Bubble>();
+	*result=trackedBubbles;
+	return result;
 };
 
 //Handles the event when a user pops a bubble
 void BubbleState::notifyUserBreaks(unsigned int ID){
 	trackedBubbles.erase(ID);
-	cout<<"User popped bubble: "<<ID;
+	cout<<"User popped bubble: "<<ID<<'\n';
 };
 
 void BubbleState::dontTrack(unsigned int ID){

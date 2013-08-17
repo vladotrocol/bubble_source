@@ -8,6 +8,7 @@ using namespace cv;
 
 class Bubble {
 public:
+	Bubble();
 	unsigned int ID;
 	Point3f center;
 	float radius;

@@ -1,7 +1,7 @@
 #include "Ogre.h"
 #include "BubbleDetector.h"
 #include <math.h>
-bool TESTS_ON = true;
+bool TESTS_ON = false;
 queue<float> times;
 
 vector<vector<Point>> contours;
@@ -35,7 +35,7 @@ bool BubbleDetector::init(){
 		_capture = (Stream*) (new KOCVStream());
 	}
 	else{
-		_capture = (Stream*) (new VideoStream("_b2.avi"));
+		_capture = (Stream*) (new VideoStream("_2bubbles.avi"));
 	}
 	status = ST_READY;
 	return true;
@@ -51,6 +51,21 @@ bool BubbleDetector::start(){
 	return true;
 };
 
+void BubbleDetector::applyHomography(){
+		//Apply the homography
+		if(bubbles.size()>0){
+		vector<Point2f> proj(bubbles.size());
+		vector<Point2f> init(bubbles.size());
+		for(unsigned int i=0;i<proj.size();i++){
+			init[i] = Point2f(bubbles[i].center.x,bubbles[i].center.y);
+		}
+		perspectiveTransform(init, proj, *_homography);
+		for(unsigned int i=0;i<proj.size();i++){
+			bubbles[i].center = Point3f(proj[i].x,proj[i].y,bubbles[i].center.z);
+		}
+		}
+};
+
 //Detection main loop
 void BubbleDetector::run(){
 	//Thread's main loop
@@ -62,16 +77,19 @@ void BubbleDetector::run(){
 		bubbles = detectBubbles();
 		
 		//for(unsigned int i = 0; i<bubbles.size(); i++){
-		//	bubbles[i].pixelsToMilimiters();
+		//cout<<bubbles[i].center.x<<" "<<i<<'\n';
+			//	bubbles[i].pixelsToMilimiters();
 		////	cout<<'\n';
 		//	//printf("%f %f %f %f\n", bubbles[i].center.x, bubbles[i].center.y, bubbles[i].center.z, bubbles[i].radius);
 		//}
+		//cout<<'\n';
 
 
 
 		//-----------------Display stuff----------------
-		_capture->display("dti");
+		_capture->display("d");
 		//_capture->displayBubbles(bubbles);
+		applyHomography();
 		//waitKey(1);
 
 		//--------------Print the fps--------------
@@ -84,6 +102,8 @@ void BubbleDetector::run(){
 	//The status says we have to end
 	Sleep(1000);//Keep it	
 };
+
+
 
 //Detection kill
 bool BubbleDetector::stop(){
@@ -159,18 +179,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 		}
 			
 	}
-		//Apply the homography
-		if(bubbles.size()>0){
-		vector<Point2f> proj(bubbles.size());
-		vector<Point2f> init(bubbles.size());
-		for(unsigned int i=0;i<proj.size();i++){
-			init[i] = Point2f(bubbles[i].center.x,bubbles[i].center.y);
-		}
-		perspectiveTransform(init, proj, *_homography);
-		for(unsigned int i=0;i<proj.size();i++){
-			bubbles[i].center = Point3f(proj[i].x,proj[i].y,bubbles[i].center.z);
-		}
-		}
+
 
 	//Timer
 	//float finish = IClock::instance().getTimeMiliseconds();

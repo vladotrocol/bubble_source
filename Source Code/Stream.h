@@ -11,12 +11,9 @@
 #include <opencv2\contrib\contrib.hpp>
 #include <opencv2\calib3d\calib3d.hpp>
 #include <opencv2\imgproc\imgproc.hpp>
-#include <string>
 #include "Filters.h"
 #include "Bubble.h"
-
-
-using namespace std;
+#include "BubbleState.h"
 using namespace cv;
 class Stream{
 	public:
@@ -31,6 +28,7 @@ class Stream{
 		virtual void readFrame()=0;
 		void display(char* s);
 		virtual void displayBubbles(vector<Bubble> &bubbles);
+		virtual void displayTrackedBubbles(BubbleState* _state);
 		void generateControls();
 };
 #endif

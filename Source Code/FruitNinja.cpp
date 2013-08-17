@@ -13,9 +13,7 @@ void* fwthreadFunction2(void* a){
 FruitNinja::FruitNinja(BubbleState* bs, BubbleGenerator* bg):
 	_state(bs),
 	_generator(bg)
-	{
-		
-	};
+	{};
 
 bool FruitNinja::init(){
 	status = ST_READY;
@@ -31,7 +29,7 @@ bool FruitNinja::start(){
 };
 
 void FruitNinja::run(){
-	unsigned int ID = 1;
+	unsigned int ID = 5;
 	char input;	
 	cout<<"Press w for watermelon, o for orange:\n";
 	while(status==ST_PLAYING){
@@ -65,6 +63,7 @@ void FruitNinja::createBubble(unsigned int ID, char* material, BubbleState* BS, 
 	b.material = material;
 	if(BG->createPhysicalBubble()){
 		BS->addBubble(b);
+		cout<<"Bubble created!\n";
 	}
 	else{ 
 		cerr<<"Bubble not generated";

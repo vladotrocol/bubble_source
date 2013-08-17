@@ -18,3 +18,5 @@ Point3f Bubble::pixelsToMilimiters(){
 	printf("%f %f %f\n", X, Y, Z);
 	return Point3f(X, Y, Z);
 };
+
+Bubble::Bubble():center(Point3f(0.0,0.0,0.0)),closeID(0){};

@@ -71,8 +71,10 @@ void BubbleApplication::setAllNodesDirty(){
 void BubbleApplication::removeDirtyNodes(){
 	std::map<unsigned int, _GraphicalBubble>::iterator it=graphicBubbles.begin();
 	while(it!=graphicBubbles.end())
-		if(it->second.dirty)
-			it=graphicBubbles.erase(it);
+		if(it->second.dirty){
+			mSceneMgr->getRootSceneNode()->removeChild(it->second.node);
+			it=graphicBubbles.erase(it);			
+		}
 		else it++;
 }
 
@@ -115,6 +117,7 @@ void BubbleApplication::updateNodesPositions(){
 			
 		}
 	}
+	delete curBubbles;
 	/*
 	//Let's see what happens when fliping normals
 	static int i=0;

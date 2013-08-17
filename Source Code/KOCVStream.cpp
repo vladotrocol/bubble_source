@@ -79,6 +79,7 @@ void KOCVStream::displayBubbles(vector<Bubble> &bubbles){
 Mat* KOCVStream::kFrameToMat(NUI_IMAGE_FRAME* imageFrame){
 
 	Mat* frame = new Mat(height, width, CV_8U);
+	
 	NUI_LOCKED_RECT LockedRect;
 
 	//Lock the imageFrame such that kinnect cannot write on it
@@ -86,12 +87,16 @@ Mat* KOCVStream::kFrameToMat(NUI_IMAGE_FRAME* imageFrame){
 	texture->LockRect(0, &LockedRect, NULL, 0);
 
 	//Get the kinect depth data
-	BYTE* imageData = new BYTE();
+	BYTE* imageData;
+	
 	kinect->getDepthData(&LockedRect);
 	imageData = kinect->dataPix;
-
+	
 	//If the data is not empty convert it to Mat
 	if (LockedRect.Pitch != 0){
+		/* //Do not do new above!
+		   frame=new Mat(height, width, CV_8U, imageData);	
+		*/
 		Mat tempMat(height, width, CV_8U, imageData);
 		tempMat.copyTo(*frame);
 	}

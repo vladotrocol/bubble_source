@@ -39,14 +39,16 @@ class BubbleDetector: public IBubbleDetector{
 		static const int ST_PLAYING=2;
 		int status;
 		IBubbleTracker* _observer;
+		BubbleState* _state;
 
 	public:
 		vector<Bubble> bubbles;
 		Stream* _capture;
 		Mat* _homography;
 
-		BubbleDetector(IBubbleTracker * observer){
+		BubbleDetector(IBubbleTracker* observer, BubbleState* state){
 			_observer=observer;
+			_state = state;
 		}
 
 		bool init(void);
@@ -57,5 +59,6 @@ class BubbleDetector: public IBubbleDetector{
 		void updateFPS(bool newFrame);
 		void getHomography(Mat* H);
 		void readHomography();
+		void applyHomography();
 };
 #endif
