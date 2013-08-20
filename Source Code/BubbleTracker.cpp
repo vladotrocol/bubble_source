@@ -153,7 +153,7 @@ void BubbleTracker::update(){
 	map<unsigned int, Bubble>::iterator iter = trackedBubbles->begin();
 	computeCloseIds(iter,trackedBubbles);
 	assignID(iter, _detector, _state, trackedBubbles);
-	_detector->_capture->displayTrackedBubbles(_state);
+	//_detector->_capture->displayTrackedBubbles(_state);
 	delete trackedBubbles;
 };
 

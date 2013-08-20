@@ -16,7 +16,10 @@ public:
 	unsigned int closeID;
 	double minD;
 	char* material;
-	Point3f pixelsToMilimiters();
+	void pixelsToMilimiters();
+private :
+	inline cv::Point3f _getKinectCoordinates(float x,float y, float depth);
+	inline cv::Point3f _fromKinectToWorldCoordinates(cv::Point3f p);
 };
 
 #endif

@@ -40,7 +40,7 @@ Mat* KOCVStream::tryReadFrame(){
 	kinect->releaseFrame(imageFrame);
 
 	//Depth frame need to be flipped
-	flip(*depthFrame, *depthFrame, 1);//or not? IMPROVE:
+	//6flip(*depthFrame, *depthFrame, 1);//or not? IMPROVE:
 	
 	return depthFrame;
 };
@@ -56,7 +56,7 @@ void KOCVStream::displayBubbles(vector<Bubble> &bubbles){
 
 	for( unsigned int i = 0; i< bubbles.size(); i++ ){
 		//Copy the elements within the contour
-		/*int rad=(int)bubbles[i].radius;
+		int rad=(int)bubbles[i].radius;
 		int b_centre_x=(int)bubbles[i].center.x;
 		int b_centre_y=(int)bubbles[i].center.y;
 		for (int x = -rad; x < rad; x++) 
@@ -64,8 +64,13 @@ void KOCVStream::displayBubbles(vector<Bubble> &bubbles){
 				if ((x*x + y*y)<(rad*rad)) {
 					float aux_x=x+b_centre_x;
 					float aux_y=y+b_centre_y;
-					drawing.at<BYTE>(Point2f(aux_x, aux_y))=(unsigned char)(this->kinect->dataMil[(int)(aux_x+640*aux_y)]*256/4000);
-				}*/
+					if(aux_x>0&&aux_x<640&&aux_y>0&&aux_y<480){
+						drawing.at<BYTE>(Point2f(aux_x, aux_y))=(unsigned char)(this->kinect->dataMil[(int)(aux_x+640*aux_y)]*256/4000);
+					}
+					else{
+						;
+					}
+				}
 		//draw the contour
 		Scalar color = Scalar( 255, 255, 255 );
 		if((int)bubbles[i].radius>0)

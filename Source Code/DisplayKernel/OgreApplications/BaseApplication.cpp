@@ -1,19 +1,4 @@
-/*
------------------------------------------------------------------------------
-Filename:    BaseApplication.cpp
------------------------------------------------------------------------------
 
-This source file is part of the
-   ___                 __    __ _ _    _ 
-  /___\__ _ _ __ ___  / / /\ \ (_) | _(_)
- //  // _` | '__/ _ \ \ \/  \/ / | |/ / |
-/ \_// (_| | | |  __/  \  /\  /| |   <| |
-\___/ \__, |_|  \___|   \/  \/ |_|_|\_\_|
-      |___/                              
-      Tutorial Framework
-      http://www.ogre3d.org/tikiwiki/
------------------------------------------------------------------------------
-*/
 #include "./DisplayKernel/OgreApplications/BaseApplication.h"
 //#include "CompositeConfigManager.h"     
 
@@ -71,14 +56,14 @@ bool BaseApplication::configure(void)
         // If returned true, user clicked OK so initialise
         Ogre::NameValuePairList misc;
 		misc["monitorIndex"] = "1";  //I use two monitors, so I tell Ogre to draw on my main (#1) monitor
-		misc["FullScreen"] = "No";  
-		misc["FullScreen"] = "No";  
+		misc["FullScreen"] = "Yes";  
+		misc["FullScreen"] = "Yes";  
 		misc["Colour Depth"]="32";
 		misc["Display Frequency"]="60";
 		// Here we tell the system not to create a default rendering window by passing 'false'
         mWindow = mRoot->initialise(false, "WaterDisplay2");
 		//now we need to create a render window manually
-		mWindow = mRoot->createRenderWindow("WaterDisplay2",1024,768,false, &misc ); //pass our custom attributes in "misc"
+		mWindow = mRoot->createRenderWindow("WaterDisplay2",1024,768,true, &misc ); //pass our custom attributes in "misc"
 		mWindow->setVSyncEnabled(true);
 		Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 		OIS::ParamList paramList;

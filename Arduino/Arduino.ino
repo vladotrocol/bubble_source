@@ -11,7 +11,7 @@ void setup() {
   pinMode(led, OUTPUT);
   
   servoSwing.write(80);
-  servoPump.write(145);
+  servoPump.write(145); //145
 }
 
 
@@ -24,11 +24,10 @@ void loop() {
   delay(1000);
   incomingByte = Serial.read();
   str[0]=incomingByte;
-  if (Serial.available() >0) {
+  //if (Serial.available() >0) {
     digitalWrite(led, HIGH);
-    delay(1000); 
-    Serial.println(str); 
-    if(incomingByte == 'g'){ //'g'
+    //Serial.println(str); 
+    //if(incomingByte == 'g'){ //'g'
       
       //move in position for smoke
       servoSwing.write(40);
@@ -36,11 +35,11 @@ void loop() {
       
       //suck smoke
       servoPump.write(120);
-      delay(600);
+      delay(100);
       
       //dip into solution
       servoSwing.write(80);
-      delay(1400);
+      delay(100);
       
       //swing into bubble making position
       servoSwing.write(140);
@@ -49,7 +48,7 @@ void loop() {
       //slow blow
       for(pos = 121; pos<=150; pos++){ 
         servoPump.write(pos);
-        delay(30);
+        delay(25);
       }
       
       //fast blow
@@ -61,6 +60,6 @@ void loop() {
       delay(600);
       servoPump.write(145);
       delay(600);
-    }
-  }
+   // }
+  //}
 }

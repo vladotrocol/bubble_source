@@ -11,6 +11,7 @@ void Stream::display(char* s){
 	while(j<strlen(s)){
 		unsigned int i=j;
 		do{
+			circle(  *(filter->applyFilter((char)s[i], _stream)), Point2f(320, 240), 2, Scalar(0,0,0), 2, 8, 0 );
 			imshow(s[j]+b+s[i], *(filter->applyFilter((char)s[i], _stream)));
 			waitKey( 1 );
 			i++;
@@ -31,15 +32,27 @@ void Stream::displayBubbles(vector<Bubble> &bubbles){
 		if(bubbles[i].state){
 			Scalar color = Scalar( 255, 255, 255 );
 			if((int)bubbles[i].radius>0){
-				circle( drawing, Point2f(bubbles[i].center.x, bubbles[i].center.y), (int)bubbles[i].radius, color, 2, 8, 0 );
-				std::stringstream ss;
-				ss << bubbles[i].ID;
-				std::string s(ss.str());
-				cv::putText(drawing, s , cvPoint(bubbles[i].center.x-bubbles[i].radius/5, bubbles[i].center.y+bubbles[i].radius/5), FONT_HERSHEY_SCRIPT_SIMPLEX, 0.6, Scalar( 255, 255, 255 ), 2,3);
+				//circle( drawing, Point2f(bubbles[i].center.x, bubbles[i].center.y), (int)bubbles[i].radius, color, 2, 8, 0 );
+				//std::stringstream ss;
+				//ss << bubbles[i].ID;
+				//std::string s(ss.str());
+				//cv::putText(drawing, s , cvPoint(bubbles[i].center.x-bubbles[i].radius/5, bubbles[i].center.y+bubbles[i].radius/5), FONT_HERSHEY_SCRIPT_SIMPLEX, 0.6, Scalar( 255, 255, 255 ), 2,3);
+			
+				int rad=(int)bubbles[i].radius/3;
+				int b_centre_x=(int)bubbles[i].center.x;
+				int b_centre_y=(int)bubbles[i].center.y;
+				for (int x = -rad; x < rad; x++) 
+					for (int y = -rad; y < rad; y++){
+					float aux_x=x+b_centre_x;
+					float aux_y=y+b_centre_y;
+					if ((x*x + y*y)<(rad*rad)&&aux_x<640&&aux_y<480&&aux_x>0&&aux_y>0){
+						drawing.at<BYTE>(Point2f(aux_x, aux_y))=255; //real data
+					}
+			}
 			}
 		}
     }
-    imshow( "Contours", drawing );
+    imshow( "Bubbles", drawing );
     cvWaitKey(1);
 };
 

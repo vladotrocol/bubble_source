@@ -75,21 +75,14 @@ void BubbleDetector::run(){
 		//--------------Do your processing--------------
 		_capture->readFrame();
 		bubbles = detectBubbles();
-		
-		//for(unsigned int i = 0; i<bubbles.size(); i++){
-		//cout<<bubbles[i].center.x<<" "<<i<<'\n';
-			//	bubbles[i].pixelsToMilimiters();
-		////	cout<<'\n';
-		//	//printf("%f %f %f %f\n", bubbles[i].center.x, bubbles[i].center.y, bubbles[i].center.z, bubbles[i].radius);
-		//}
-		//cout<<'\n';
-
-
-
-		//-----------------Display stuff----------------
-		_capture->display("d");
+		//_capture->display("di");
 		//_capture->displayBubbles(bubbles);
-		applyHomography();
+		for(unsigned int i = 0; i<bubbles.size(); i++){
+			bubbles[i].pixelsToMilimiters();
+		}
+		//-----------------Display stuff----------------
+
+		//applyHomography();
 		//waitKey(1);
 
 		//--------------Print the fps--------------
@@ -126,6 +119,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 	//Apply the whole processing pipeline (threshold, erode, dilate)
 	if(!(_tempStream)->empty())
 	findContours(*(_tempStream), contours, hier, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+	//drawContours(*(_capture->_stream), contours, -1, Scalar(0, 0,0), -1);
 	//imshow("DepthMil", Mat(480,640, CV_8U, _capture->dataPix));
 	//Look for bubbles. 
 	vector<Bubble> bubbles (contours.size());
@@ -166,15 +160,17 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 				float aux_y=y+b_centre_y;
 				if ((x*x + y*y)<(rad*rad)&&aux_x<640&&aux_y<480&&aux_x>0&&aux_y>0){
 					//drawing.at<BYTE>(Point2f(aux_x, aux_y))=(unsigned char)(this->kinect->dataMil[(int)(aux_x+640*aux_y)]*256/4000);
-
-					//averageDist +=(float)(_capture->dataMil[(int)(aux_x+640*aux_y)]); //real data
-					averageDist +=1;//(float)(_capture->_stream->at<ushort>(aux_x,aux_y)); //test data
-					//cout<<(int)(_capture->dataMil[(int)(aux_x+640*aux_y)])<<' ';
-					count+=1;
+					float value=(float)(_capture->dataMil[(int)(aux_x+640*aux_y)]);
+					if(value<4000 && value>500){//If the value is within the kinect range, we count it.
+						averageDist +=(float)(_capture->dataMil[(int)(aux_x+640*aux_y)]); //real data
+						count+=1;
+						//averageDist +=1;//(float)(_capture->_stream->at<ushort>(aux_x,aux_y)); //test data
+						//cout<<(int)(_capture->dataMil[(int)(aux_x+640*aux_y)])<<' ';
+					}
 				}
 			}
 		if(count>0)
-		bubbles[i].center.z = averageDist/count;
+			bubbles[i].center.z = averageDist/count+bubbles[i].radius; //We detected to frontal part of the bubble, the center is radius cm behind (Not totally correct, ASK DIEGO)
 		//cout<<"average: "<<bubbles[i].center.z<<"\n\n\n";
 		}
 			

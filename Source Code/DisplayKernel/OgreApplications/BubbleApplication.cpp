@@ -1,48 +1,88 @@
 #include "./DisplayKernel/OgreApplications/BubbleApplication.h"
 #include "BubbleState.h"
 #include "./DisplayKernel/OgreUtils/Primitives.h"
+
+//2. Control parameters (Gathered measuring projector distance, image height and width...All in cm)
+float Zdistance=1000;						//Distance between the projector and the wall
+float screenWidth=1390, screenHeight=1040;	//Size of the image generated
+float screenTop=1160, screenBottom=120;					//Bottom and top position of the image (relative to projector)
+float screenLeft=-screenWidth/2, screenRight=screenWidth/2;
+float centerX=(screenLeft+screenRight)/2;
+float centerY=(screenTop+screenBottom)/2;
+
+
+
+
 void BubbleApplication::createCamera(void)
 {
     // Create the camera
     mCamera = mSceneMgr->createCamera("mainCamera");
-
-    // Position it at 500 in Z direction
-	float dist=768*Ogre::Math::Cos(30*6.28f/360);
-    mCamera->setPosition(Ogre::Vector3(0,0,-dist));
     // Look back along -Z
-	mCamera->pitch(Ogre::Radian(3.14f));
-    //mCamera->lookAt(Ogre::Vector3(0,0,0));
-    //mCamera->setNearClipDistance(5);
-	mCamera->setFOVy(Ogre::Radian(3.14f/3));//60 degrees vertical FOV.
+	mCamera->setPosition(Ogre::Vector3(0,0,0));
+	//Compute Frustum related stuff
+	Ogre::Radian FOVy=2*Ogre::Math::ATan(screenHeight/(2*Zdistance));
+	Ogre::Radian FOVx=2*Ogre::Math::ATan(screenWidth/(2*Zdistance));
+    float Xoffset=centerX/Zdistance;
+	float Yoffset=centerY/Zdistance;
+	//Apply Frustum related stuff
+	mCamera->setAspectRatio(screenWidth/screenHeight);
+    mCamera->setFOVy(FOVy);//60 degrees vertical FOV.
+	mCamera->setFrustumOffset(Xoffset, Yoffset);
 }
 
 void BubbleApplication::createScene(void)
 {
-	{//1. Configure a Background (DEBUG)
+	{//1. Create some light
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
     Ogre::Light* light = mSceneMgr->createLight("MainLight");
     light->setPosition(20, 80, 50);
-	BaseApplication::createAxis(mSceneMgr->getRootSceneNode(), 1024, 5);
-	//BaseApplication::createTablePlane(1024,768,0,mSceneMgr->getRootSceneNode());
+	}
+	{//2. Configure a background to adjust the projector...
+	Ogre::SceneNode* wall=mSceneMgr->getRootSceneNode()->createChildSceneNode("wall", Ogre::Vector3(centerX,centerY,-Zdistance));
+	//BaseApplication::createAxis(wall, screenWidth, 5);//Axis should be 5 cm thick on the wall
+	//BaseApplication::createTablePlane(screenWidth, screenHeight,0,wall,"Examples/Chess");
+		//2.b) Cube to the left
+		{
+			Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
+			Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
+			auxEnt->setMaterialName("Examples/OgreLogo");
+			aux->attachObject(auxEnt);
+			aux->scale(0.1,0.1,0.1);	
+			aux->setPosition(screenLeft,0,0);
+		}
+		//2.c) Cube to the right
+		{
+			Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
+			Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
+			auxEnt->setMaterialName("Examples/OgreLogo");
+			aux->attachObject(auxEnt);
+			aux->scale(0.1,0.1,0.1);		
+			aux->setPosition(screenRight,0,0);
+		}
+		//2.d) Cube to the top
+		{
+			Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
+			Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
+			auxEnt->setMaterialName("Examples/OgreLogo");
+			aux->attachObject(auxEnt);
+			aux->scale(0.1,0.1,0.1);	
+			aux->setPosition(0,screenTop,0);
+		}
+		//2.e) Cube to the bottom
+		{
+			Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
+			Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
+			auxEnt->setMaterialName("Examples/OgreLogo");
+			aux->attachObject(auxEnt);
+			aux->scale(0.1,0.1,0.1);		
+			aux->setPosition(0,screenBottom,0);
+		}
 	}
 	//2. Load a sphere
 	Primitives::createSphere("sampleBubble.mesh", 1, 8,8);
 
 
-	Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
-	auxEnt->setMaterialName("Examples/OgreLogo");
-	aux->attachObject(auxEnt);
-	float SCALE=0.002f;
-	aux->scale(100*SCALE,SCALE*100,SCALE*100);	
-	aux->setPosition(512,0,0);
-
-	aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	auxEnt=mSceneMgr->createEntity("cube.mesh");
-	auxEnt->setMaterialName("Examples/BeachStones");
-	aux->attachObject(auxEnt);
-	aux->scale(100*SCALE,SCALE*100,SCALE*100);	
-	aux->setPosition(0,384,0);
+	
 
 
 
@@ -59,6 +99,16 @@ bool BubbleApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	//3. Remove dirty nodes (they poped or wathever. This is none of our business)
 	removeDirtyNodes();
 
+
+	//Apply Frustum related stuff
+	static Ogre::Radian FOVy=2*Ogre::Math::ATan(screenHeight/(2*Zdistance));
+	static Ogre::Radian FOVx=2*Ogre::Math::ATan(screenWidth/(2*Zdistance));
+    static float Xoffset=centerX/Zdistance;
+	static float Yoffset=centerY/Zdistance;
+	static float x=0,y=0,z=0;
+    mCamera->setFOVy(FOVy);//60 degrees vertical FOV.
+	mCamera->setFrustumOffset(Xoffset, Yoffset);
+	mCamera->setPosition(x,y,z);
 	return BaseApplication::frameRenderingQueued(evt);
 }
 
@@ -94,7 +144,7 @@ void BubbleApplication::updateNodesPositions(){
 		if(it!=graphicBubbles.end())
 		{//This bubble already existed... we simply update its position
 			it->second.node->setScale(itBubbles->second.radius,-itBubbles->second.radius,itBubbles->second.radius);	
-			it->second.node->setPosition(itBubbles->second.center.x-512,itBubbles->second.center.y-384, 0); //DIEGO: BUBBLES SHOULD NOT USE 2D COORDINATES!!!! Bubble::center should not be cv::Point2f!!!!!
+			it->second.node->setPosition(itBubbles->second.center.x,itBubbles->second.center.y, itBubbles->second.center.z); 
 
 			it->second.dirty=false;
 		}
@@ -107,8 +157,9 @@ void BubbleApplication::updateNodesPositions(){
 			aux->attachObject(auxEnt);
 			//Set its size and position
 			//aux->scale(itBubbles->second.radius,itBubbles->second.radius,-itBubbles->second.radius);	
+			aux->rotate(Ogre::Vector3(0,1,0), Ogre::Radian(3.1415f));
 			aux->scale(itBubbles->second.radius,-itBubbles->second.radius,itBubbles->second.radius);	
-			aux->setPosition(itBubbles->second.center.x-512,itBubbles->second.center.y-384, 0); //DIEGO: BUBBLES SHOULD NOT USE 2D COORDINATES!!!! Bubble::center should not be cv::Point2f!!!!!
+			aux->setPosition(itBubbles->second.center.x,itBubbles->second.center.y, itBubbles->second.center.z);
 			//Store it
 			_GraphicalBubble gb;
 			gb.dirty=false;
@@ -126,3 +177,4 @@ void BubbleApplication::updateNodesPositions(){
 		aux->scale(1,1,-1);	*/
 
 }
+

@@ -55,19 +55,19 @@ void Kinect::getDepthData(NUI_LOCKED_RECT *LockedRect){
 	const USHORT* dataEnd = curr + (width*height);
 	
 	
-	static float max = 0;
+	//static float max = 0;
 	if (LockedRect->Pitch != 0){
 	while (curr < dataEnd) {
 		USHORT depth = NuiDepthPixelToDepth(*curr++);
 		dataMil[j] = depth;
-		if(depth>max){
-			max = depth;
-		}
+		//if(depth>max){
+		//	max = depth;
+		//}
 		j++;
 	}
 
 	for(int i=0;i<width*height;i++){
-		dataPix[i] = (BYTE)(dataMil[i]/max*255);
+		dataPix[i] = (BYTE)(dataMil[i]/4000.0f*255);
 		if(dataPix[i]!=0){
 			dataPix[i] = 255- dataPix[i];
 			//dataMil[i] = 16*dataMil[i];//Expand depth image (0,4000) to ful 16 bit range

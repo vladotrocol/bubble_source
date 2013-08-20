@@ -56,18 +56,21 @@ public:
 		Ogre::Entity* model = mSceneMgr->createEntity("axis_X", "cube.mesh");
 		Ogre::SceneNode* node = r_node->createChildSceneNode();
 		node->scale(length*SCALE,SCALE*width,SCALE*width);
+		node->translate(length/2,0,0);
 		model->setMaterialName("Examples/Red");
 		node->attachObject(model);
 
 		model = mSceneMgr->createEntity("axis_Y", "cube.mesh");
 		node = r_node->createChildSceneNode();
 		node->scale(SCALE*width,SCALE*length,SCALE*width);
+		node->translate(0,length/2,0);
 		model->setMaterialName("Examples/Green");
 		node->attachObject(model);
 
 		model = mSceneMgr->createEntity("axis_Z", "cube.mesh");
 		node =r_node->createChildSceneNode();
 		node->scale(SCALE*width,SCALE*width,SCALE*length);
+		node->translate(0,0,length/2);
 		model->setMaterialName("Examples/Blue");
 		node->attachObject(model);
 
