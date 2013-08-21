@@ -24,8 +24,8 @@ int pos = 0;
 void create(int n,int s){
  //move in position for smoke
     servoSwing.write(130);
-    delay(400);
-   // delay(2400);
+    //delay(400);
+    delay(2400);
    
 
     //takle air out
@@ -54,7 +54,7 @@ void create(int n,int s){
       //fast blow
       for(pos =77-s; pos<=82-s; pos++){ 
         servoPump.write(pos);
-        delay(18);
+        delay(20);
       }
     }
 
