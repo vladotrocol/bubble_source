@@ -75,7 +75,7 @@ void BubbleDetector::run(){
 		//--------------Do your processing--------------
 		_capture->readFrame();
 		bubbles = detectBubbles();
-		//_capture->display("di");
+		//_capture->display("dti");
 		//_capture->displayBubbles(bubbles);
 		for(unsigned int i = 0; i<bubbles.size(); i++){
 			bubbles[i].pixelsToMilimiters();
@@ -87,7 +87,7 @@ void BubbleDetector::run(){
 
 		//--------------Print the fps--------------
 		//this->updateFPS(true);
-		//_capture->_stream->release();
+		_capture->_stream->release();
 		_observer->update();
 		//Leave the processor (do this always! You have to let other threads get the processor)
 		Sleep(1);

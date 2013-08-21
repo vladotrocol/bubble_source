@@ -6,60 +6,82 @@ char incomingByte = 0;
 int led = 13;
 void setup() {                
   Serial.begin(9600);
-  servoPump.attach(4);
-  servoSwing.attach(5);
-  pinMode(led, OUTPUT);
-  
-  servoSwing.write(80);
-  servoPump.write(145); //145
+  servoPump.attach(5);
+  servoSwing.attach(4);
+
+  servoSwing.write(90);
+  servoPump.write(75);
 }
 
 
 int pos = 0;
 
-void loop() {
-  char str[2];
-  str[1]='\0';
-  digitalWrite(led, LOW);
-  delay(1000);
-  incomingByte = Serial.read();
-  str[0]=incomingByte;
-  //if (Serial.available() >0) {
-    digitalWrite(led, HIGH);
-    //Serial.println(str); 
-    //if(incomingByte == 'g'){ //'g'
-      
-      //move in position for smoke
-      servoSwing.write(40);
-      delay(1400);
-      
-      //suck smoke
-      servoPump.write(120);
-      delay(100);
-      
-      //dip into solution
-      servoSwing.write(80);
-      delay(100);
-      
-      //swing into bubble making position
-      servoSwing.write(140);
-      delay(140);
-      
+//38-77 sp
+//85 fp
+//45 pr
+//pr2 a10
+
+void create(int n,int s){
+ //move in position for smoke
+    servoSwing.write(130);
+    delay(400);
+   // delay(2400);
+   
+
+    //takle air out
+    servoPump.write(75);
+    delay(600);
+    
+    
+    //suck smoke
+    servoPump.write(35);
+    delay(1000);
+
+    //dip into solution
+    servoSwing.write(90);
+    delay(1000);
+
+    //swing into bubble making position
+    servoSwing.write(10);
+    delay(1400);
+  
+    for(int i=0;i<n;i++){
       //slow blow
-      for(pos = 121; pos<=150; pos++){ 
+      for(pos = 38; pos<=76-s; pos++){ 
         servoPump.write(pos);
-        delay(25);
+        delay(45); 
       }
-      
       //fast blow
-      servoPump.write(180);
-      delay(600);
-      
-      //return to initial stage
-      servoSwing.write(80);
-      delay(600);
-      servoPump.write(145);
-      delay(600);
-   // }
-  //}
+      for(pos =77-s; pos<=82-s; pos++){ 
+        servoPump.write(pos);
+        delay(18);
+      }
+    }
+
+ delay(600);   
+    servoSwing.write(90);
+    
+    
+    
+    //return to initial stage
+    
+    delay(600);
 }
+
+void loop() {
+  incomingByte = Serial.read();
+  char a=incomingByte;
+  if(incomingByte == 'b'){
+    create(1,15);
+  }
+  else if(incomingByte == 's'){
+    create(1,24);
+  }
+  else if(incomingByte == 'n'){
+    create(1,30);
+  }
+  else if(incomingByte == 't'){
+    create(1,39);
+  }
+}
+

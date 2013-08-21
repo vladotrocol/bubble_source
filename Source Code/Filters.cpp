@@ -7,7 +7,7 @@ static Mat src_grey,
 
 //Constructor
 Filters::Filters():
-	thresholdValue(198), //was 60 /182
+	thresholdValue(145), //was 60 /182
 	thresholdType(0),
 	erosionSize(4),
 	dilationSize(10)

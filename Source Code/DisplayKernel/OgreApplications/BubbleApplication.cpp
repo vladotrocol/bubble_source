@@ -143,7 +143,7 @@ void BubbleApplication::updateNodesPositions(){
 		//1.2. Check if it already existed...
 		if(it!=graphicBubbles.end())
 		{//This bubble already existed... we simply update its position
-			it->second.node->setScale(itBubbles->second.radius,-itBubbles->second.radius,itBubbles->second.radius);	
+			it->second.node->setScale(50,-50,50);	
 			it->second.node->setPosition(itBubbles->second.center.x,itBubbles->second.center.y, itBubbles->second.center.z); 
 
 			it->second.dirty=false;
@@ -158,7 +158,7 @@ void BubbleApplication::updateNodesPositions(){
 			//Set its size and position
 			//aux->scale(itBubbles->second.radius,itBubbles->second.radius,-itBubbles->second.radius);	
 			aux->rotate(Ogre::Vector3(0,1,0), Ogre::Radian(3.1415f));
-			aux->scale(itBubbles->second.radius,-itBubbles->second.radius,itBubbles->second.radius);	
+			aux->scale(40,-40,40);	
 			aux->setPosition(itBubbles->second.center.x,itBubbles->second.center.y, itBubbles->second.center.z);
 			//Store it
 			_GraphicalBubble gb;
