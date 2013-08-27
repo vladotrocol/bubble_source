@@ -55,7 +55,8 @@ class BubbleDetector: public IBubbleDetector{
 		bool start(void);
 		void run(void);
 		bool stop(void);
-		vector<Bubble> detectBubbles();
+		vector<Bubble> detectBubbles();		
+		vector<Bubble> simulateBubbles();
 		void updateFPS(bool newFrame);
 		void getHomography(Mat* H);
 		void readHomography();

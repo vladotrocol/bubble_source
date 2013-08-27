@@ -260,7 +260,7 @@ void* xmosListeningThreadBody(void*){
 
 void createFile(){
 
-	hSerial = CreateFile(L"\\\\.\\COM5",
+	hSerial = CreateFile(L"\\\\.\\COM6",
 						GENERIC_READ | GENERIC_WRITE,
 						0, 
 						0,

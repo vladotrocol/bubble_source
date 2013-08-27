@@ -75,7 +75,8 @@ void BubbleDetector::run(){
 		//--------------Do your processing--------------
 		_capture->readFrame();
 		bubbles = detectBubbles();
-		//_capture->display("dti");
+		//bubbles = simulateBubbles();
+		///_capture->display("di");
 		//_capture->displayBubbles(bubbles);
 		for(unsigned int i = 0; i<bubbles.size(); i++){
 			bubbles[i].pixelsToMilimiters();
@@ -110,6 +111,25 @@ bool BubbleDetector::stop(){
 	return true;
 };
 
+int simulateCounter;
+vector<Bubble> BubbleDetector::simulateBubbles(){
+	vector<Bubble> bubbles(1);
+	if(simulateCounter==0){
+		bubbles[0].center = Point3f(-200.0f, 0.0f, 0.0f);
+	}
+	else if(simulateCounter==1){
+		bubbles[0].center = Point3f(0.0f, 200.0f, 0.0f);
+	}
+		else if(simulateCounter==1){
+		bubbles[0].center = Point3f(200.0f, 0.0f, 0.0f);
+	}
+	else if(simulateCounter==1){
+		bubbles[0].center = Point3f(200.0f, 200.0f, 0.0f);
+	}
+	simulateCounter++;
+	Sleep(300);
+	return bubbles;
+};
 
 //Main Detection Method
 vector<Bubble> BubbleDetector::detectBubbles(){

@@ -35,13 +35,13 @@ void FruitNinja::run(){
 	while(status==ST_PLAYING){
 		input = _getch();
 		if(input == 'w'){
-			createBubble(ID, "Examples/10points", _state, _generator);
+			createBubble(ID, "Examples/10points", _state, _generator, 'b');
 		}
 		else if(input == 'o'){
-			createBubble(ID, "Examples/orange", _state, _generator);
+			createBubble(ID, "Examples/orange", _state, _generator, 't');
 		}
 		else if(input == 'b'){
-			createBubble(ID, "Examples/blueberry", _state, _generator);
+			createBubble(ID, "Examples/orange", _state, _generator, '4');
 		}
 		ID++;
 	}
@@ -57,11 +57,11 @@ bool FruitNinja::stop(){
 	return true;
 };
 
-void FruitNinja::createBubble(unsigned int ID, char* material, BubbleState* BS, BubbleGenerator* BG){
+void FruitNinja::createBubble(unsigned int ID, char* material, BubbleState* BS, BubbleGenerator* BG, char w){
 	Bubble b;
 	b.ID = ID;
 	b.material = material;
-	if(BG->createPhysicalBubble()){
+	if(BG->createPhysicalBubble(w)){
 		BS->addBubble(b);
 		cout<<"Bubble created!\n";
 	}

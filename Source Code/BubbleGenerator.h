@@ -6,6 +6,6 @@ class BubbleGenerator{
 	public:
 		Serial* arduino;
 		BubbleGenerator(void);
-		bool createPhysicalBubble(void);	
+		bool createPhysicalBubble(char b);	
 };
 #endif

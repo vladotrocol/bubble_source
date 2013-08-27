@@ -9,12 +9,13 @@
 using namespace cv;
 using namespace std;
 
-
-
+struct mouse_info_struct { int x,y; double vx,vy, ax, ay; int time;};
+struct mouse_info_struct mouse_info = {-1,-1,0,0,0,0}, last_mouse;
+struct _predictor{ struct mouse_info_struct t_1, t_2, prediction;} predictor;
 double startTime;
 vector<Point> mousev,kalmanv, myPredictor, alphaBetaV;
 KalmanFilter KF(6, 4, 0);Mat_<float> measurement(4,1);
-
+static int myTime=0;
 
 //Alpha beta stuff:
 float dt = 1;
@@ -41,13 +42,8 @@ void predict2(){}
 
 void correct(void);
 
-
-static int myTime=0;
-struct mouse_info_struct { int x,y; double vx,vy, ax, ay; int time;};
-struct mouse_info_struct mouse_info = {-1,-1,0,0,0,0}, last_mouse;
-struct _predictor{ struct mouse_info_struct t_1, t_2, prediction;} predictor;
-
-void on_mouse(int x, int y) {
+void on_mouse(int event, int x, int y, int flags, void* param) {
+	//if (event == CV_EVENT_LBUTTONUP) 
 	{
 		last_mouse = mouse_info;
 		mouse_info.x = x;
@@ -55,6 +51,7 @@ void on_mouse(int x, int y) {
 		mouse_info.vx=x-last_mouse.x;
 		mouse_info.vy=y-last_mouse.y;
 		mouse_info.time=myTime;		
+//		cout << "got mouse " << x <<","<< y <<endl;
 	}
 }
 
@@ -115,7 +112,7 @@ int main (int argc, char * const argv[]) {
 	
 	namedWindow("mouse kalman");
 	setMouseCallback("mouse kalman", on_mouse, 0);
-	//Setting up the Kalman filter
+	
     for(;;)
     {
 		myTime+=2;
@@ -161,20 +158,17 @@ int main (int argc, char * const argv[]) {
 				myTime=0;
 				i=50;
 			}
-            
-			
-			///using Kalman filter
+            //Predecir
 			setIdentity(KF.measurementMatrix,0);
 			KF.correct(measurement);
 			Mat prediction = KF.predict();
-			
-			//Using second order model
-			predict(myTime); 
 
-			//Using alpha-beta
+			predict(myTime);  
 			predict2();
-			           
-			//Drawing three filters.
+			printf("Kalman (%d, %d)\n", prediction.at<float>(0), prediction.at<float>(1));
+
+            
+			//Pintar		
 			Point statePt(mouse_info.x,mouse_info.y);
 			Point kalmanPrediction(prediction.at<float>(0),prediction.at<float>(1));
 			Point myPredictedPoint(predictor.prediction.x,predictor.prediction.y);
@@ -238,7 +232,13 @@ Point( center.x - d, center.y + d ), color, 2, CV_AA, 0 )
 				measurement(1) = mouse_info.y;
 				measurement(2) = mouse_info.vx;
 				measurement(3) = mouse_info.vy;
+				// generate measurement
+				//measurement += KF.measurementMatrix*state;
+				setIdentity(KF.measurementMatrix);
+				Mat estimated = KF.correct(measurement);
+				KF.predict();
 				correct();
+				correct2();
 				correctIn=3;
 			}
 

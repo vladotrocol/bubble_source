@@ -10,7 +10,7 @@ void setup() {
   Serial.begin(9600);
   servoPump.attach(5);
   servoSwing.attach(4);
-
+  //SuckSmoke();
   servoSwing.write(90);
   servoPump.write(75);
 }
@@ -34,7 +34,7 @@ void func1(int n, int s){
 void Big(){
   for(pos = 38; pos<=78; pos++){ 
     servoPump.write(pos);
-    delay(45); 
+    delay(55); 
   }
   servoPump.write(83);
   delay(500);
@@ -78,7 +78,7 @@ void Small(){
 }
 
 void Tiny(){
-  servoPump.write(41);
+  servoPump.write(40);
   delay(100);
   if(full<40){
     full+=2;

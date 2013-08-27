@@ -42,5 +42,14 @@ cv::Point3f Bubble::_fromKinectToWorldCoordinates(cv::Point3f p){
 	return result;
 }
 
-Bubble::Bubble():center(Point3f(0.0,0.0,0.0)),closeID(0){};
+Bubble::Bubble():center(Point3f(0.0,0.0,0.0)),closeID(0),updated(false){};
 
+void Bubble::write(Point3f newCenter){
+	this->center = newCenter;
+	updated=true;
+};
+
+Point3f Bubble::read(){
+	updated=false;
+	return this->center;
+};

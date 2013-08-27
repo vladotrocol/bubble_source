@@ -96,7 +96,7 @@ bool BubbleTracker::assignID(map<unsigned int, Bubble>::iterator iter,
 
 	double min,d;
 	unsigned int tempID=0, detected=0, tempI=0;
-
+	//printf("%d ", trackedBubbles->size());
 	if(_detector->bubbles.size()>0&&trackedBubbles->size()>0){
 	
 		detected = 0;
@@ -134,12 +134,13 @@ bool BubbleTracker::assignID(map<unsigned int, Bubble>::iterator iter,
 		iter++;
 	}
 	insertUntracked(trackedBubbles);
-	//-----------------------------Next recusion step--------------------------------
+	
 	
 	//-----------------Recursion base case------------------------------------------
 	if(iter == trackedBubbles->end()){
 		return true;
 	}
+	//-----------------------------Next recusion step--------------------------------
 	assignID(iter, _detector, _state, trackedBubbles);
 
 };
