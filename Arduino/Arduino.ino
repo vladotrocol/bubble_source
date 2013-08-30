@@ -13,6 +13,7 @@ void setup() {
   //SuckSmoke();
   servoSwing.write(90);
   servoPump.write(75);
+   pinMode(8, OUTPUT);  
 }
 
 void func1(int n, int s){
@@ -137,12 +138,14 @@ void multiBubbles(int n){
     //move in position for smoke
     servoSwing.write(130);
     //delay(400);
-    delay(2400);
+    delay(400);
     
     //takle air out
     servoPump.write(75);
-    delay(600);
-    
+    delay(550);
+    digitalWrite(8,HIGH);
+    delay(50);
+    digitalWrite(8,LOW);
     //suck smoke
     servoPump.write(35);
     delay(1000);
@@ -170,11 +173,14 @@ void multiBubbles(int n){
     delay(600);
   }
 
+int smokeon = 0;
 void loop() {
   incomingByte = Serial.read();
+  
   if(incomingByte!=-1){
     if(full==0){
       SuckSmoke();
+
     }
     else{
       SuckAir();
@@ -185,6 +191,7 @@ void loop() {
     Dip(800);
     Big();
   }
+  
   else if(incomingByte == 'm'){
     Dip(800);
     Medium();
@@ -197,6 +204,7 @@ void loop() {
     Dip(800);
     Tiny();
   }
+
   else if((int)incomingByte>48&&(int)incomingByte<53){
     Dip(800);
     multiBubbles((int)incomingByte-48);

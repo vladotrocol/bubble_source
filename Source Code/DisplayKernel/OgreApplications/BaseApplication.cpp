@@ -64,7 +64,7 @@ bool BaseApplication::configure(void)
         mWindow = mRoot->initialise(false, "WaterDisplay2");
 		//now we need to create a render window manually
 		mWindow = mRoot->createRenderWindow("WaterDisplay2",1024,768,true, &misc ); //pass our custom attributes in "misc"
-		mWindow->setVSyncEnabled(true);
+		mWindow->setVSyncEnabled(false);
 		Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 		OIS::ParamList paramList;
 		size_t windowHnd = 0;

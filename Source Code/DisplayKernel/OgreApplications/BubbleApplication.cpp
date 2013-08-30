@@ -11,67 +11,67 @@ float centerX=(screenLeft+screenRight)/2;
 float centerY=(screenTop+screenBottom)/2;
 
 //------------------------------------------------Predictive Filter-----------------------------------------------
-static float myTime=0;
-struct mouse_info_struct { float x,y; float vx,vy, ax, ay; float time;};
-struct mouse_info_struct mouse_info = {-1,-1,0,0,0,0}, last_mouse;
-struct _predictor{ struct mouse_info_struct t_1, t_2, prediction;};
-map<unsigned int, _predictor> predictor;
-
-void assignFilterVals(int x, int y) {
-	{
-		last_mouse = mouse_info;
-		mouse_info.x = x;
-		mouse_info.y = y;
-		mouse_info.vx=x-last_mouse.x;
-		mouse_info.vy=y-last_mouse.y;
-		mouse_info.time=myTime;		
-	}
-}
-
-void initFilter(unsigned int id){
-	predictor[id].t_2=mouse_info;
-	predictor[id].t_2.time=0;
-	predictor[id].t_1=mouse_info;
-	predictor[id].t_1.time=0;
-	predictor[id].prediction=predictor[id].t_1;
-}
-
-float v_correction=0.2;
-float a_correction=0.2;
-void correctFilter(unsigned int id){
-	predictor[id].t_2=predictor[id].t_1;
-	predictor[id].t_1=mouse_info;
-	//Compute current velocity according to last two measures
-	predictor[id].t_1.vx=(predictor[id].t_1.x-predictor[id].prediction.x)/(myTime-predictor[id].t_2.time);
-	predictor[id].t_1.vy=(predictor[id].t_1.y-predictor[id].prediction.y)/(myTime-predictor[id].t_2.time);
-	//predictor[id].t_1.vx=(predictor[id].t_1.x-predictor[id].prediction.x);
-	//predictor[id].t_1.vy=(predictor[id].t_1.y-predictor[id].prediction.y);
-	if(predictor[id].t_1.vx==0)
-		predictor[id].t_1.time++;
-	else 
-		predictor[id].t_1.time++;
-	//Compute predicted velocity:
-	
-	predictor[id].prediction.vx=v_correction*predictor[id].t_1.vx + (1-v_correction)*predictor[id].prediction.vx;
-	predictor[id].prediction.vy=v_correction*predictor[id].t_1.vy + (1-v_correction)*predictor[id].prediction.vy;
-	// Correct acceleration from two last oberverd measures
-	//printf("%f%", predictor[id].prediction.vx);
-	predictor[id].prediction.ax=((predictor[id].t_1.vx-predictor[id].t_2.vx)*a_correction + (1-a_correction)*predictor[id].prediction.ax)/(myTime-predictor[id].t_2.time);
-	predictor[id].prediction.ay=((predictor[id].t_1.vy-predictor[id].t_2.vy)*a_correction + (1-a_correction)*predictor[id].prediction.ay)/(myTime-predictor[id].t_2.time);
-	//predictor[id].prediction.ax=((predictor[id].t_1.vx-predictor[id].t_2.vx)*a_correction + (1-a_correction)*predictor[id].prediction.ax);
-	//predictor[id].prediction.ay=((predictor[id].t_1.vy-predictor[id].t_2.vy)*a_correction + (1-a_correction)*predictor[id].prediction.ay);
-	
-	predictor[id].prediction.time=myTime;
-	myTime=0;
-}
-
-void predict(unsigned int id, double time){
-	double inc_t=(time-predictor[id].t_2.time);
-	predictor[id].prediction.x=predictor[id].prediction.x+predictor[id].prediction.vx*inc_t+predictor[id].prediction.ax*inc_t*inc_t/2;
-	predictor[id].prediction.y=predictor[id].prediction.y+predictor[id].prediction.vy*inc_t+predictor[id].prediction.ay*inc_t*inc_t/2;
-	//predictor[id].prediction.x=predictor[id].prediction.x+predictor[id].prediction.vx+predictor[id].prediction.ax;
-	//predictor[id].prediction.y=predictor[id].prediction.y+predictor[id].prediction.vy+predictor[id].prediction.ay;
-}
+//static float myTime=0;
+//struct mouse_info_struct { float x,y; float vx,vy, ax, ay; float time;};
+//struct mouse_info_struct mouse_info = {-1,-1,0,0,0,0}, last_mouse;
+//struct _predictor{ struct mouse_info_struct t_1, t_2, prediction;};
+//map<unsigned int, _predictor> predictor;
+//
+//void assignFilterVals(int x, int y) {
+//	{
+//		last_mouse = mouse_info;
+//		mouse_info.x = x;
+//		mouse_info.y = y;
+//		mouse_info.vx=x-last_mouse.x;
+//		mouse_info.vy=y-last_mouse.y;
+//		mouse_info.time=myTime;		
+//	}
+//}
+//
+//void initFilter(unsigned int id){
+//	predictor[id].t_2=mouse_info;
+//	predictor[id].t_2.time=0;
+//	predictor[id].t_1=mouse_info;
+//	predictor[id].t_1.time=0;
+//	predictor[id].prediction=predictor[id].t_1;
+//}
+//
+//float v_correction=0.2;
+//float a_correction=0.2;
+//void correctFilter(unsigned int id){
+//	predictor[id].t_2=predictor[id].t_1;
+//	predictor[id].t_1=mouse_info;
+//	//Compute current velocity according to last two measures
+//	predictor[id].t_1.vx=(predictor[id].t_1.x-predictor[id].prediction.x)/(myTime-predictor[id].t_2.time);
+//	predictor[id].t_1.vy=(predictor[id].t_1.y-predictor[id].prediction.y)/(myTime-predictor[id].t_2.time);
+//	//predictor[id].t_1.vx=(predictor[id].t_1.x-predictor[id].prediction.x);
+//	//predictor[id].t_1.vy=(predictor[id].t_1.y-predictor[id].prediction.y);
+//	if(predictor[id].t_1.vx==0)
+//		predictor[id].t_1.time++;
+//	else 
+//		predictor[id].t_1.time++;
+//	//Compute predicted velocity:
+//	
+//	predictor[id].prediction.vx=v_correction*predictor[id].t_1.vx + (1-v_correction)*predictor[id].prediction.vx;
+//	predictor[id].prediction.vy=v_correction*predictor[id].t_1.vy + (1-v_correction)*predictor[id].prediction.vy;
+//	// Correct acceleration from two last oberverd measures
+//	//printf("%f%", predictor[id].prediction.vx);
+//	predictor[id].prediction.ax=((predictor[id].t_1.vx-predictor[id].t_2.vx)*a_correction + (1-a_correction)*predictor[id].prediction.ax)/(myTime-predictor[id].t_2.time);
+//	predictor[id].prediction.ay=((predictor[id].t_1.vy-predictor[id].t_2.vy)*a_correction + (1-a_correction)*predictor[id].prediction.ay)/(myTime-predictor[id].t_2.time);
+//	//predictor[id].prediction.ax=((predictor[id].t_1.vx-predictor[id].t_2.vx)*a_correction + (1-a_correction)*predictor[id].prediction.ax);
+//	//predictor[id].prediction.ay=((predictor[id].t_1.vy-predictor[id].t_2.vy)*a_correction + (1-a_correction)*predictor[id].prediction.ay);
+//	
+//	predictor[id].prediction.time=myTime;
+//	myTime=0;
+//}
+//
+//void predict(unsigned int id, double time){
+//	double inc_t=(time-predictor[id].t_2.time);
+//	predictor[id].prediction.x=predictor[id].prediction.x+predictor[id].prediction.vx*inc_t+predictor[id].prediction.ax*inc_t*inc_t/2;
+//	predictor[id].prediction.y=predictor[id].prediction.y+predictor[id].prediction.vy*inc_t+predictor[id].prediction.ay*inc_t*inc_t/2;
+//	//predictor[id].prediction.x=predictor[id].prediction.x+predictor[id].prediction.vx+predictor[id].prediction.ax;
+//	//predictor[id].prediction.y=predictor[id].prediction.y+predictor[id].prediction.vy+predictor[id].prediction.ay;
+//}
 //------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -149,7 +149,7 @@ void BubbleApplication::createScene(void)
 //This method is called every frame.
 bool BubbleApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-	myTime+=evt.timeSinceLastFrame;
+	//myTime+=evt.timeSinceLastFrame;
 	//printf("%f \n", myTime);
 	//1. Mark all our nodes as dirty... if they are not updated, they will be removed
 	setAllNodesDirty();
@@ -168,6 +168,8 @@ bool BubbleApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     mCamera->setFOVy(FOVy);//60 degrees vertical FOV.
 	mCamera->setFrustumOffset(Xoffset, Yoffset);
 	mCamera->setPosition(x,y,z);
+	static const Ogre::RenderTarget::FrameStats& stats = mWindow->getStatistics();
+	//printf("FPS: %f\n", stats.avgFPS);
 	return BaseApplication::frameRenderingQueued(evt);
 }
 
@@ -199,21 +201,21 @@ void BubbleApplication::updateNodesPositions(){
 	for(;itBubbles!=curBubbles->end();itBubbles++){
 
 		//--------------------------------------Init filter----------------------------
-		if(curBubbles->find(itBubbles->first)==curBubbles->end()){
-			initFilter(itBubbles->first);
-		}
-		//-----------------------------------------------------------------------------
-		if(itBubbles->second.updated){
-		Point3f center = itBubbles->second.read();
-		assignFilterVals((int)center.x, (int)center.y);
-		if(init>2)
-				//Correct once in five measures.
-				correctFilter(itBubbles->first);
-		init++;
-			}
-		//-----------------------------------------------------------------------------
-		//Using second order model
-			predict(itBubbles->first, myTime); 
+		//if(curBubbles->find(itBubbles->first)==curBubbles->end()){
+		//	initFilter(itBubbles->first);
+		//}
+		////-----------------------------------------------------------------------------
+		//if(itBubbles->second.updated){
+		//Point3f center = itBubbles->second.read();
+		//assignFilterVals((int)center.x, (int)center.y);
+		//if(init>2)
+		//		//Correct once in five measures.
+		//		correctFilter(itBubbles->first);
+		//init++;
+		//	}
+		////-----------------------------------------------------------------------------
+		////Using second order model
+		//	predict(itBubbles->first, myTime); 
 
 		//1.1. Try and get a handler of the graphical representation of this bubble
 		std::map<unsigned int, _GraphicalBubble>::iterator it=graphicBubbles.find(itBubbles->first);
@@ -222,8 +224,8 @@ void BubbleApplication::updateNodesPositions(){
 		{//This bubble already existed... we simply update its position
 			static float size=50;
 			it->second.node->setScale(size,-size,size);	
-			it->second.node->setPosition(predictor[itBubbles->first].prediction.x,predictor[itBubbles->first].prediction.y, itBubbles->second.center.z); 
-			printf("%f %f\n", predictor[itBubbles->first].prediction.x,predictor[itBubbles->first].prediction.y);
+			//it->second.node->setPosition(predictor[itBubbles->first].prediction.x,predictor[itBubbles->first].prediction.y, itBubbles->second.center.z); 
+			//printf("%f %f\n", predictor[itBubbles->first].prediction.x,predictor[itBubbles->first].prediction.y);
 			it->second.dirty=false;
 		}
 		else{
@@ -237,7 +239,7 @@ void BubbleApplication::updateNodesPositions(){
 			//aux->scale(itBubbles->second.radius,itBubbles->second.radius,-itBubbles->second.radius);	
 			aux->rotate(Ogre::Vector3(0,1,0), Ogre::Radian(3.1415f));
 			aux->scale(40,-40,40);	
-			aux->setPosition(predictor[itBubbles->first].prediction.x,predictor[itBubbles->first].prediction.y, itBubbles->second.center.z);
+			//aux->setPosition(predictor[itBubbles->first].prediction.x,predictor[itBubbles->first].prediction.y, itBubbles->second.center.z);
 			//Store it
 			_GraphicalBubble gb;
 			gb.dirty=false;
