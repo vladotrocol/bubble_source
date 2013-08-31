@@ -16,12 +16,13 @@
 #include "FruitNinja.h"
 #include "./DisplayKernel/OgreProjectionEngine.h"
 
+
 using namespace std;
 
 int main(){
 	bool test = false;
 	bool record = false;
-
+	bool normal=true;
 	//Record
 	if(record){
 		KOCVStream s;
@@ -38,7 +39,7 @@ int main(){
 		}
 	}
 	//Normal mode
-	else{
+	else if(normal){
 		BubbleState& BS = BubbleState::instance();
 		BubbleGenerator* BG = new BubbleGenerator();
 		BubbleTracker BT(&BS);
@@ -62,6 +63,10 @@ int main(){
 		ope.stop();
 		BT.stop();
 		app.stop();
+	}
+	else{
+		Predictor p;
+		p.test();
 	}
 	return 0;
 };

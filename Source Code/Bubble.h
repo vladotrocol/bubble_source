@@ -2,6 +2,7 @@
 #define _BUBBLE_C
 
 #include <opencv2\opencv.hpp>
+#include "Predictor.h"
 #define TRACKED 1
 #define NON_TRACKED 0
 using namespace cv;
@@ -9,6 +10,7 @@ using namespace cv;
 class Bubble {
 public:
 	Bubble();
+	Predictor predict;
 	unsigned int ID;
 	Point3f center;
 	float radius;

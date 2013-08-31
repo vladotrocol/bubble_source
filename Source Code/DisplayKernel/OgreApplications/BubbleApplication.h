@@ -3,6 +3,9 @@
 #include <./DisplayKernel/OgreApplications/BaseApplication.h>
 //#include <./DisplayKernel/OgreUtils/CameraOISController.h>
 
+#include <map>
+
+
 class _GraphicalBubble{
 public:	
 	bool dirty;

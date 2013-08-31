@@ -76,7 +76,7 @@ void BubbleDetector::run(){
 		_capture->readFrame();
 		bubbles = detectBubbles();
 		//bubbles = simulateBubbles();
-		///_capture->display("di");
+		//_capture->display("di");
 		//_capture->displayBubbles(bubbles);
 		for(unsigned int i = 0; i<bubbles.size(); i++){
 			bubbles[i].pixelsToMilimiters();
