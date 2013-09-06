@@ -46,6 +46,7 @@ void BubbleState::printBubbles(){
 void BubbleState::updateBubble(unsigned int ID, Point3f center, float radius, bool tracked){
 	trackedBubbles[ID].write(center);
 	trackedBubbles[ID].radius=radius;
+	trackedBubbles[ID].state = tracked;
 	//cout<<ID<<" "<<center.x<<" "<<center.y<<" "<<radius<<'\n';
 };
 

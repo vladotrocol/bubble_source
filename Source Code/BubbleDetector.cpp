@@ -80,6 +80,7 @@ void BubbleDetector::run(){
 		//_capture->displayBubbles(bubbles);
 		for(unsigned int i = 0; i<bubbles.size(); i++){
 			bubbles[i].pixelsToMilimiters();
+			//printf("x: %f y: %f z: %f r: %f", bubbles[i].center.x, bubbles[i].center.y, bubbles[i].center.z, bubbles[i].radius);
 		}
 		//-----------------Display stuff----------------
 

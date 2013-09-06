@@ -8,36 +8,20 @@ int pos;
 
 void setup() {                
   Serial.begin(9600);
-  servoPump.attach(5);
+  servoPump.attach(3);
   servoSwing.attach(4);
   //SuckSmoke();
-  servoSwing.write(90);
-  servoPump.write(75);
+  servoSwing.write(100);
+  servoPump.write(50);
    pinMode(8, OUTPUT);  
 }
 
-void func1(int n, int s){
-
-    for(int i=0;i<n;i++){
-      //slow blow
-      for(pos = 38; pos<=78-s; pos++){ 
-        servoPump.write(pos);
-        delay(45); 
-      }
-      //fast blow
-      for(pos =77-s; pos<=82-s; pos++){ 
-        servoPump.write(pos);
-        delay(15);
-      }
-    }
-}
-
 void Big(){
-  for(pos = 38; pos<=78; pos++){ 
+  for(pos = 50; pos<=130; pos++){ 
     servoPump.write(pos);
     delay(55); 
   }
-  servoPump.write(83);
+  servoPump.write(175);
   delay(500);
   if(full<40){
     full+=10;
@@ -48,11 +32,11 @@ void Big(){
 }
 
 void Medium(){
-  for(pos = 38; pos<=58; pos++){ 
+  for(pos = 50; pos<=90; pos++){ 
     servoPump.write(pos);
     delay(45); 
   }
-  servoPump.write(63);
+  servoPump.write(150);
   delay(500);
   if(full<40){
     full+=7;
@@ -136,7 +120,7 @@ void multiBubbles(int n){
 
   void SuckSmoke(){
     //move in position for smoke
-    servoSwing.write(130);
+    servoSwing.write(145);
     //delay(400);
     delay(400);
     
@@ -147,24 +131,24 @@ void multiBubbles(int n){
     delay(50);
     digitalWrite(8,LOW);
     //suck smoke
-    servoPump.write(35);
+    servoPump.write(50);
     delay(1000);
   }
   
   void SuckAir(){
     //suck air
     servoPump.write(35);
-    delay(100);
+    delay(500);
   }
   
   void Dip(int d){
     //dip into solution
-    servoSwing.write(90);
-    delay(700);
+    servoSwing.write(100);
+    delay(1400);
 
     //swing into bubble making position
-    servoSwing.write(10);
-    delay(800);
+    servoSwing.write(20);
+    delay(1200);
   }
   
   void Reset(){

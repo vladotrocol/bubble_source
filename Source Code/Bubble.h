@@ -3,8 +3,8 @@
 
 #include <opencv2\opencv.hpp>
 #include "Predictor.h"
-#define TRACKED 1
-#define NON_TRACKED 0
+#define TRACKED true
+#define NON_TRACKED false
 using namespace cv;
 
 class Bubble {
@@ -14,7 +14,7 @@ public:
 	unsigned int ID;
 	Point3f center;
 	float radius;
-	int state;
+	bool state;
 	unsigned int closeID;
 	double minD;
 	char* material;

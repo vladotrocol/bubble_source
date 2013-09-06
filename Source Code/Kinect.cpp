@@ -19,7 +19,7 @@ void Kinect::initialiseKinect(void){
 	if (!(NuiGetSensorCount(&numSensors) < 0 || numSensors < 1) && !(NuiCreateSensorByIndex(0, &sensor) < 0)){
 		sensor->NuiInitialize(NUI_INITIALIZE_FLAG_USES_DEPTH | NUI_INITIALIZE_FLAG_USES_COLOR);
 		sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_DEPTH, NUI_IMAGE_RESOLUTION_640x480,NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE ,2,NULL, &depthStream); //0x00040000 for white background //NUI_IMAGE_STREAM_FLAG_ENABLE_NEAR_MODE
-		sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_COLOR, NUI_IMAGE_RESOLUTION_640x480, 0, 2, NULL, &rgbStream);
+		//sensor->NuiImageStreamOpen(NUI_IMAGE_TYPE_COLOR, NUI_IMAGE_RESOLUTION_640x480, 0, 2, NULL, &rgbStream);
 		isInit = true;
 	}
 };

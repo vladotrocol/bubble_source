@@ -45,38 +45,38 @@ void BubbleApplication::createScene(void)
 		//2.b) Cube to the left
 		{
 			Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
-			Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
-			auxEnt->setMaterialName("Examples/OgreLogo");
-			aux->attachObject(auxEnt);
-			aux->scale(0.1,0.1,0.1);	
-			aux->setPosition(screenLeft,0,0);
+			//Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
+			//auxEnt->setMaterialName("Examples/OgreLogo");
+			//aux->attachObject(auxEnt);
+			//aux->scale(0.1,0.1,0.1);	
+			//aux->setPosition(screenLeft,0,0);
 		}
 		//2.c) Cube to the right
 		{
 			Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
-			Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
-			auxEnt->setMaterialName("Examples/OgreLogo");
-			aux->attachObject(auxEnt);
-			aux->scale(0.1,0.1,0.1);		
-			aux->setPosition(screenRight,0,0);
+			//Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
+			//auxEnt->setMaterialName("Examples/OgreLogo");
+			//aux->attachObject(auxEnt);
+			//aux->scale(0.1,0.1,0.1);		
+			//aux->setPosition(screenRight,0,0);
 		}
 		//2.d) Cube to the top
 		{
 			Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
-			Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
-			auxEnt->setMaterialName("Examples/OgreLogo");
-			aux->attachObject(auxEnt);
-			aux->scale(0.1,0.1,0.1);	
-			aux->setPosition(0,screenTop,0);
+			//Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
+			//auxEnt->setMaterialName("Examples/OgreLogo");
+			//aux->attachObject(auxEnt);
+			//aux->scale(0.1,0.1,0.1);	
+			//aux->setPosition(0,screenTop,0);
 		}
 		//2.e) Cube to the bottom
 		{
 			Ogre::SceneNode* aux=mSceneMgr->getRootSceneNode()->createChildSceneNode();
-			Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
-			auxEnt->setMaterialName("Examples/OgreLogo");
-			aux->attachObject(auxEnt);
-			aux->scale(0.1,0.1,0.1);		
-			aux->setPosition(0,screenBottom,0);
+			//Ogre::Entity* auxEnt=mSceneMgr->createEntity("cube.mesh");
+			//auxEnt->setMaterialName("Examples/OgreLogo");
+			//aux->attachObject(auxEnt);
+			//aux->scale(0.1,0.1,0.1);		
+			//aux->setPosition(0,screenBottom,0);
 		}
 	}
 	//2. Load a sphere
@@ -135,19 +135,29 @@ void BubbleApplication::updateNodesPositions(){
 	std::map<unsigned int, Bubble>::iterator itBubbles=curBubbles->begin();
 	//1. Traverse each bubble
 	for(;itBubbles!=curBubbles->end();itBubbles++){
+		
+		//if bubble is updated then correct filter
 		if(itBubbles->second.updated){
 			itBubbles->second.predict.correct(itBubbles->second.read());
 		}
+		//get filter prediction
 		Point3f newCenter = itBubbles->second.predict.predict();
+		//compute new orientation
+		float alpha = atan(newCenter.y/newCenter.z);
+		float beta = atan(newCenter.x/newCenter.z);
+		Ogre::Quaternion q1( (Ogre::Radian)alpha, Ogre::Vector3(-1,0,0) );
+		Ogre::Quaternion q2((Ogre::Radian) (beta+3.1415f), Ogre::Vector3(0,1,0) );
+		static float size=50;
 		//1.1. Try and get a handler of the graphical representation of this bubble
 		std::map<unsigned int, _GraphicalBubble>::iterator it=graphicBubbles.find(itBubbles->first);
 		//1.2. Check if it already existed...
 		if(it!=graphicBubbles.end())
 		{//This bubble already existed... we simply update its position
-			static float size=50;
+			
 			
 			it->second.node->setScale(size,-size,size);	
-			it->second.node->setPosition(newCenter.x,newCenter.y, newCenter.z); 
+			it->second.node->setPosition(newCenter.x,newCenter.y, newCenter.z);
+			it->second.node->setOrientation(q1*q2);
 			//printf("%f %f\n", predictor[itBubbles->first].prediction.x,predictor[itBubbles->first].prediction.y);
 			it->second.dirty=false;
 		}
@@ -160,9 +170,11 @@ void BubbleApplication::updateNodesPositions(){
 			aux->attachObject(auxEnt);
 			//Set its size and position
 			//aux->scale(itBubbles->second.radius,itBubbles->second.radius,-itBubbles->second.radius);	
-			aux->rotate(Ogre::Vector3(0,1,0), Ogre::Radian(3.1415f));
-			aux->scale(40,-40,40);	
+			//aux->rotate(Ogre::Vector3(0,1,0), Ogre::Radian(3.1415f));
+			//aux->scale(40,-40,40);	
+			aux->setScale(size,-size,size);	
 			aux->setPosition(newCenter.x,newCenter.y, newCenter.z);
+			aux->setOrientation(q1*q2);
 			//Store it
 			_GraphicalBubble gb;
 			gb.dirty=false;

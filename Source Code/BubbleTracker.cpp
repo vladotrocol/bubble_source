@@ -45,12 +45,12 @@ void BubbleTracker::insertUntracked(map<unsigned int, Bubble>* trackedBubbles){
 	//insert the bubbles into the database
 	//cout<<"Size: "<<_detector->bubbles.size()<<'\n';
 	for(unsigned int i=0; i<_detector->bubbles.size(); i++){
-		if(_state->hasUnknownBubble()){
+		if(_state->hasUnknownBubble()&&trackedBubbles->size()<=_detector->bubbles.size()){
 				int untrID=0;
 				untrID = _state->getUnknownBubble();
 				if(untrID){
-					_state->updateBubble(untrID, _detector->bubbles.back().center, _detector->bubbles.back().radius, false);
-					lastSeen[untrID] = 0;
+					_state->updateBubble(untrID, _detector->bubbles.back().center, _detector->bubbles.back().radius, true);
+					lastSeen[untrID] = 30;
 					_detector->bubbles.pop_back();
 				}
 			}
@@ -112,8 +112,8 @@ bool BubbleTracker::assignID(map<unsigned int, Bubble>::iterator iter,
 		}
 
 		if(detected){
-			if(lastSeen[tempID]<11){
-				lastSeen[tempID]++;
+			if(lastSeen[tempID]<50){
+				lastSeen[tempID]+=2;
 			}
 			_state->updateBubble(tempID, _detector->bubbles[tempI].center, _detector->bubbles[tempI].radius, true);
 			_detector->bubbles.erase(_detector->bubbles.begin()+tempI);
@@ -122,7 +122,7 @@ bool BubbleTracker::assignID(map<unsigned int, Bubble>::iterator iter,
 
 	//-------------------------------Bubble popping----------------------------------
 	if(trackedBubbles->size()>0){
-		if(!detected){
+		if(!detected&&iter->second.state){
 			lastSeen[iter->first]--;
 		}
 

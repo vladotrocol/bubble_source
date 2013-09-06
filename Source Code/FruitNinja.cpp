@@ -35,13 +35,13 @@ void FruitNinja::run(){
 	while(status==ST_PLAYING){
 		input = _getch();
 		if(input == 'w'){
-			createBubble(ID, "Examples/10points", _state, _generator, 'b');
+			createBubble(ID, "Examples/twitter", _state, _generator, 'b');
 		}
 		else if(input == 'o'){
-			createBubble(ID, "Examples/orange", _state, _generator, 't');
+			createBubble(ID, "Examples/reddit", _state, _generator, 't');
 		}
 		else if(input == 'b'){
-			createBubble(ID, "Examples/orange", _state, _generator, '4');
+			createBubble(ID, "Examples/test", _state, _generator, '4');
 		}
 		ID++;
 	}
