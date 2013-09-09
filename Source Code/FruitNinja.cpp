@@ -38,10 +38,10 @@ void FruitNinja::run(){
 			createBubble(ID, "Examples/twitter", _state, _generator, 'b');
 		}
 		else if(input == 'o'){
-			createBubble(ID, "Examples/reddit", _state, _generator, 't');
+			createBubble(ID, "Examples/reddit", _state, _generator, 'm');
 		}
 		else if(input == 'b'){
-			createBubble(ID, "Examples/test", _state, _generator, '4');
+			createBubble(ID, "Examples/test", _state, _generator, 's');
 		}
 		ID++;
 	}
