@@ -28,6 +28,24 @@ bool FruitNinja::start(){
 	return true;
 };
 
+char* getMat(int seed){
+	if(seed%5==0){
+		return "Examples/blue";
+	}
+	else if(seed%5==1){
+		return "Examples/red";
+	}
+	else if(seed%5==2){
+		return "Examples/green";
+	}
+	else if(seed%5==3){
+		return "Examples/purple";
+	}
+	else if(seed%5==4){
+		return "Examples/orange";
+	}
+}
+
 void FruitNinja::run(){
 	unsigned int ID = 5;
 	char input;	
@@ -35,13 +53,40 @@ void FruitNinja::run(){
 	while(status==ST_PLAYING){
 		input = _getch();
 		if(input == 'w'){
-			createBubble(ID, "Examples/twitter", _state, _generator, 'b');
+			createBubble(ID, "Examples/blue", _state, _generator, 's');
+			_generator->createPhysicalBubble('s');
 		}
 		else if(input == 'o'){
-			createBubble(ID, "Examples/reddit", _state, _generator, 'm');
+			createBubble(ID, "Examples/green", _state, _generator, 's');
+			_generator->createPhysicalBubble('s');
 		}
 		else if(input == 'b'){
-			createBubble(ID, "Examples/test", _state, _generator, 's');
+			createBubble(ID, "Examples/purple", _state, _generator, 's');
+			_generator->createPhysicalBubble('s');
+		}
+		else if(input == 'n'){
+			createBubble(ID, "Examples/red", _state, _generator, 's');
+			_generator->createPhysicalBubble('s');
+		}
+		else if(input == 'm'){
+			createBubble(ID, "Examples/orange", _state, _generator, 's');
+			_generator->createPhysicalBubble('s');
+		}
+		else if(input>48&&input<52){
+			if(input>48){
+				createBubble(ID, getMat(ID), _state, _generator, 's');
+				ID++;
+			}
+			if(input>49){
+				createBubble(ID,  getMat(ID), _state, _generator, 's');
+				ID++;
+			}
+			if(input>50){
+				createBubble(ID,  getMat(ID), _state, _generator, 's');
+				ID++;
+			}
+				
+			_generator->createPhysicalBubble(input);
 		}
 		ID++;
 	}
@@ -57,15 +102,11 @@ bool FruitNinja::stop(){
 	return true;
 };
 
+
 void FruitNinja::createBubble(unsigned int ID, char* material, BubbleState* BS, BubbleGenerator* BG, char w){
+	
 	Bubble b;
 	b.ID = ID;
 	b.material = material;
-	if(BG->createPhysicalBubble(w)){
-		BS->addBubble(b);
-		cout<<"Bubble created!\n";
-	}
-	else{ 
-		cerr<<"Bubble not generated";
-	}
+	BS->addBubble(b);
 };

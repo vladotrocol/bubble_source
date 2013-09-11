@@ -142,7 +142,7 @@ void Predictor::test(){
 		}
 		if(((float)(c-s1)/CLOCKS_PER_SEC)>0.612){
 			x =_t*50;
-			y = sin(_t)*50+400;
+			y =  _t*_t+400;
 			correct(Point3f(x, y, 0.0f));
 			circle(*img,Point2f(x,y),1,Scalar( 255, 0, 0 ),-1,8 );
 			s1 = c;

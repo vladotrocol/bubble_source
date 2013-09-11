@@ -8,18 +8,26 @@ int pos;
 
 int led = 13;
 
+//global delays
+int moveDelay=3;
+
+
+//fogger ports in
 int foggerIn1 = A1;
 int foggerIn2 = A0;
 int foggerIn3 = A2;
 
+//fogger ports out
 int foggerOut3 = 10;
 int foggerOut2 = 8;
 int foggerOut1 = 9;
 
+//fogger current value
 int fogger1Val = 0;
 int fogger2Val = 1;
 int fogger3Val = 2;
 
+//fogger low value counter
 int f1Ready = 0;
 int f2Ready = 0;
 int f3Ready = 0;
@@ -36,9 +44,13 @@ void setup() {
   servoPump.attach(3);
   servoSwing.attach(4);
 
+  moveServo('p',65, moveDelay);
+    delay(1000);
+
   //go to initial position
-  servoSwing.write(100);
-  servoPump.write(50); 
+  moveServo('s', 100, moveDelay);
+  //moveServo('s', 45, moveDelay);
+   
 }
 
 void setupFoggers(){
@@ -75,7 +87,7 @@ void triggerFogger(int whichFogger){
   digitalWrite(trigLine, HIGH);
   delay(fogTrigDelay);
   digitalWrite(trigLine,LOW);
-  Serial.println("Fired!!");
+  //Serial.println("Fired!!");
 
 
 }
@@ -87,8 +99,6 @@ void loop() {
   if(Serial.available()&&f2Ready<10&&f2Ready!=0){
     readChar();
   }
-  
-  
 }
 
 void programAnalogRead(){
@@ -138,6 +148,7 @@ void readChar(){
     }
     else{
       SuckAir();
+      //SuckSmoke();
     }
   } 
   
@@ -164,7 +175,7 @@ void readChar(){
         }
       }
     }
-    Serial.print("Firing");
+    //Serial.print("Firing");
     if(fogToTrig!=100)
       triggerFogger(fogToTrig);
     else{
@@ -176,30 +187,30 @@ void readChar(){
   
   case 'b':
   case 'B':
-    Dip(800);
+    Dip();
     Big();
     break;
    
   case 'm':
   case 'M':
-    Dip(800);
+    Dip();
     Medium();
     break;
     
   case 's':
   case 'S':
-    Dip(800);
+    Dip();
     Small();
     break;
   
   case 't':
   case 'T':
-    Dip(800);
+    Dip();
     Tiny();
     break;
   }
   if((int)incomingByte>48&&(int)incomingByte<53){
-    Dip(800);
+    Dip();
     multiBubbles((int)incomingByte-48);
   }
 }
@@ -211,75 +222,99 @@ void mainProgram1(){
     digitalWrite(led, toggle);   // turn the LED on (HIGH is the voltage level)
   }
   int inByte = digitalRead(11);
-  Serial.println(inByte,DEC);
+  //Serial.println(inByte,DEC);
   delay(25);
 }
+// Smoke tank usage (full/empty)
 
+void incrementSmoke(int amount){
+  if(full<40){
+    full+=amount;
+  }
+  else{
+    full=0;
+  }
+}
 
+// ----------------Servo functions----------------------------------------
+
+void moveServo(char s,int nextPos, int Delay){
+  int start;
+  Servo servo;
+  if(s=='s'){
+    servo= servoSwing;
+  }
+  else{
+    servo = servoPump;
+  }
+  start = servo.read();
+  if(start<=nextPos){
+    for(pos = start; pos<=nextPos; pos++){ 
+      servo.write(pos);
+      delay(Delay);
+    }
+  }
+  else{
+   for(pos = start; pos>=nextPos; pos--){ 
+      servo.write(pos);
+      delay(Delay);
+    }
+  }
+}
 
 //-------------------------------Generator actions------------------------
 void SuckSmoke(){
   //move in position for smoke
-  for(pos = servoSwing.Read(); pos<=145; pos++){ 
-    servoSwing.write(pos);
-    delay(10);
-  }
+  moveServo('s', 145, moveDelay);
   delay(600);
    //takle air out
-  for(pos = servoPump.Read(); pos<=130; pos++){ 
-    servoPump.write(pos);
-    delay(10);
-  }
+  moveServo('p', 130, moveDelay);
   delay(550);
+  
+  //trigger the smoke machine
   triggerFogger(foggerOut2);
   delay(100);
   
   //suck smoke
-  for(pos = servoPump.Read(); pos<=50; pos++){ 
-    servoPump.write(pos);
-    delay(10);
-  }
+  moveServo('p', 65, moveDelay);
   delay(1000);
 }
 
 void SuckAir(){
   //suck air
-  for(pos = servoPump.Read(); pos<=50; pos++){ 
-    servoPump.write(pos);
-    delay(10);
-  }
+  moveServo('p', 65, moveDelay);
   delay(500);
 }
 
-void Dip(int d){
-  //dip into solution
-  servoSwing.write(100);
-  delay(1400);
+void clean(){
+  moveServo('s', 45, moveDelay);
+  delay(100);
+  moveServo('s', 55, moveDelay);
+  delay(100);
+}
 
+void Dip(){
+  //dip into solution
+  moveServo('s', 100, moveDelay);
+  delay(1400);
+  //clean();
+  // clean();
   //swing into bubble making position
-  servoSwing.write(20);
+  moveServo('s', 30, moveDelay);
   delay(1200);
 }
 
 void Reset(){
   //return to initial stage
-  servoSwing.write(90);
+  moveServo('s',90, moveDelay);
   delay(600);
 }
 //--------------------------------Bubble creation-------------------------
 void Big(){
-  for(pos = 50; pos<=130; pos++){ 
-    servoPump.write(pos);
-    delay(55); 
-  }
+  moveServo('p', 130, 55);
   servoPump.write(175);
   delay(500);
-  if(full<40){
-    full+=10;
-  }
-  else{
-    full=0;
-  }
+  incrementSmoke(10);
 }
 
 void Medium(){
@@ -287,85 +322,48 @@ void Medium(){
     servoPump.write(pos);
     delay(45); 
   }
-  servoPump.write(150);
+  moveServo('p', 150, moveDelay);
   delay(500);
-  if(full<40){
-    full+=7;
-  }
-  else{
-    full=0;
-  }
+  incrementSmoke(7);
 }
 
 void Small(){
-  for(pos = 50; pos<=70; pos++){ 
-    servoPump.write(pos);
-    delay(45); 
-  }
-  servoPump.write(79);
+moveServo('p', 80, 45);
+moveServo('p', 87, 0);
   delay(500);
 
-  if(full<40){
-    full+=15;
-  }
-  else{
-    full=0;
-  }
+  incrementSmoke(15);
 }
 
 void Tiny(){
   servoPump.write(40);
   delay(100);
-  if(full<40){
-    full+=2;
-  }
-  else{
-    full=0;
-  }
+  incrementSmoke(2);
 }
 
 void multiBubbles(int n){
   if(n>0){
-    for(pos = 38; pos<=44; pos++){ 
-      servoPump.write(pos);
-      delay(40); 
-    }
-    servoPump.write(48);
-    delay(700);
+    moveServo('p',75,40);
+    moveServo('p', 81, moveDelay);
+    delay(500);
   }
-
   if(n>1){
-    for(pos = 49; pos<=56; pos++){ 
-      servoPump.write(pos);
-      delay(40); 
-    }
-    servoPump.write(59);
-    delay(700);
+    moveServo('p',91,45);
+    moveServo('p', 97, moveDelay);
+    delay(500);
   }
 
   if(n>2){
-    for(pos = 60; pos<=67; pos++){ 
-      servoPump.write(pos);
-      delay(40); 
-    }
-    servoPump.write(70);
-    delay(700);
+    moveServo('p',107,40);
+    moveServo('p', 122, moveDelay);
+    delay(500);
   }
 
   if(n>3){
-    for(pos = 71; pos<=78; pos++){ 
-      servoPump.write(pos);
-      delay(40); 
-    }
-    servoPump.write(81);
-    delay(700);
+    moveServo('p',122,40);
+    moveServo('p', 129, moveDelay);
+    delay(500);
   }
-
-  if(full<40){
-    full+=5*n;
-  }
-  else{
-    full=0;
-  }
+  incrementSmoke(5*n);
 }
 
