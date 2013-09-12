@@ -52,25 +52,29 @@ void FruitNinja::run(){
 	cout<<"Press w for watermelon, o for orange:\n";
 	while(status==ST_PLAYING){
 		input = _getch();
-		if(input == 'w'){
-			createBubble(ID, "Examples/blue", _state, _generator, 's');
+		if(input == 'q'){
+			createBubble(ID, "Examples/text1", _state, _generator, 'm');
+			_generator->createPhysicalBubble('b');
+		}
+		else if(input == 'w'){
+			createBubble(ID, "Examples/text2", _state, _generator, 'm');
+			_generator->createPhysicalBubble('m');
+		}
+		else if(input == 'e'){
+			createBubble(ID, "Examples/number1", _state, _generator, 'm');
 			_generator->createPhysicalBubble('s');
 		}
-		else if(input == 'o'){
-			createBubble(ID, "Examples/green", _state, _generator, 's');
-			_generator->createPhysicalBubble('s');
+		else if(input == 'r'){
+			createBubble(ID, "Examples/number2", _state, _generator, 'm');
+			_generator->createPhysicalBubble('t');
 		}
-		else if(input == 'b'){
-			createBubble(ID, "Examples/purple", _state, _generator, 's');
-			_generator->createPhysicalBubble('s');
+		else if(input == 't'){
+			createBubble(ID, "Examples/test", _state, _generator, 'm');
+			_generator->createPhysicalBubble('m');
 		}
-		else if(input == 'n'){
-			createBubble(ID, "Examples/red", _state, _generator, 's');
-			_generator->createPhysicalBubble('s');
-		}
-		else if(input == 'm'){
-			createBubble(ID, "Examples/orange", _state, _generator, 's');
-			_generator->createPhysicalBubble('s');
+		else if(input == 'y'){
+			createBubble(ID, "Examples/red", _state, _generator, 'm');
+			_generator->createPhysicalBubble('m');
 		}
 		else if(input>48&&input<52){
 			if(input>48){
@@ -109,4 +113,5 @@ void FruitNinja::createBubble(unsigned int ID, char* material, BubbleState* BS, 
 	b.ID = ID;
 	b.material = material;
 	BS->addBubble(b);
+	printf("bubbles created\n");
 };

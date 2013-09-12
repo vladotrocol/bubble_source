@@ -50,7 +50,7 @@ void BubbleTracker::insertUntracked(map<unsigned int, Bubble>* trackedBubbles){
 				untrID = _state->getUnknownBubble();
 				if(untrID){
 					_state->updateBubble(untrID, _detector->bubbles.back().center, _detector->bubbles.back().radius, true);
-					lastSeen[untrID] = 10;
+					lastSeen[untrID] = 5;
 					_detector->bubbles.pop_back();
 				}
 			}
@@ -112,7 +112,7 @@ bool BubbleTracker::assignID(map<unsigned int, Bubble>::iterator iter,
 		}
 
 		if(detected){
-			if(lastSeen[tempID]<20){
+			if(lastSeen[tempID]<9){
 				lastSeen[tempID]+=2;
 			}
 			_state->updateBubble(tempID, _detector->bubbles[tempI].center, _detector->bubbles[tempI].radius, true);

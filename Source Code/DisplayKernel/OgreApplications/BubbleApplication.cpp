@@ -147,7 +147,7 @@ void BubbleApplication::updateNodesPositions(){
 		float beta = atan(newCenter.x/newCenter.z);
 		Ogre::Quaternion q1( (Ogre::Radian)alpha, Ogre::Vector3(-1,0,0) );
 		Ogre::Quaternion q2((Ogre::Radian) (beta+3.1415f), Ogre::Vector3(0,1,0) );
-		static float size=50;
+		static float size=40;
 		//1.1. Try and get a handler of the graphical representation of this bubble
 		std::map<unsigned int, _GraphicalBubble>::iterator it=graphicBubbles.find(itBubbles->first);
 		//1.2. Check if it already existed...

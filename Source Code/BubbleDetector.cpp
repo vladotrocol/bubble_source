@@ -163,7 +163,7 @@ vector<Bubble> BubbleDetector::detectBubbles(){
 	
 	for (unsigned int i = 0; i < bubbles.size(); i++){
 		//Remove bubbles that do not fit min and max sizes
-		if (bubbles[i].radius < _capture->minBubbleSize || bubbles[i].radius > _capture->maxBubbleSize){
+		if (bubbles[i].radius < _capture->minBubbleSize || bubbles[i].radius > _capture->maxBubbleSize||bubbles[i].center.x<50||bubbles[i].center.x>540||bubbles[i].center.y>350){
 			bubbles.erase(bubbles.begin() + i);
 			i--;
 		}

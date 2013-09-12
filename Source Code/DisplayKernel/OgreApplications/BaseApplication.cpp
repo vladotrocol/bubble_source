@@ -55,7 +55,7 @@ bool BaseApplication::configure(void)
     {
         // If returned true, user clicked OK so initialise
         Ogre::NameValuePairList misc;
-		misc["monitorIndex"] = "1";  //I use two monitors, so I tell Ogre to draw on my main (#1) monitor
+		misc["monitorIndex"] = "2";  //I use two monitors, so I tell Ogre to draw on my main (#1) monitor
 		misc["FullScreen"] = "Yes";  
 		misc["FullScreen"] = "Yes";  
 		misc["Colour Depth"]="32";

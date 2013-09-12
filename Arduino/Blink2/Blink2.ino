@@ -18,9 +18,9 @@ int foggerIn2 = A0;
 int foggerIn3 = A2;
 
 //fogger ports out
-int foggerOut3 = 10;
-int foggerOut2 = 8;
-int foggerOut1 = 9;
+int foggerOut3 = 10; //coffe
+int foggerOut2 = 8; //lemon
+int foggerOut1 = 9; //coconut
 
 //fogger current value
 int fogger1Val = 0;
@@ -32,7 +32,7 @@ int f1Ready = 0;
 int f2Ready = 0;
 int f3Ready = 0;
 
-int fogTrigDelay = 150;
+int fogTrigDelay = 300;
 
 int toggle=LOW;
 
@@ -96,7 +96,8 @@ void triggerFogger(int whichFogger){
 // the loop routine runs over and over again forever:
 void loop() {
   programAnalogRead();
-  if(Serial.available()&&f2Ready<10&&f2Ready!=0){
+  
+  if(Serial.available()&&f3Ready<10&&f3Ready!=0){
     readChar();
   }
 }
@@ -107,7 +108,7 @@ void programAnalogRead(){
   if(fogger1Val<200&&f1Ready<100){
     f1Ready++;  
   }
-  else{
+  else if(fogger1Val>=200){
     f1Ready = 0;
   }
  
@@ -115,7 +116,7 @@ void programAnalogRead(){
   if(fogger2Val<200&&f2Ready<100){
     f2Ready++;
   }
-  else{
+  else if(fogger2Val>=200){
     f2Ready = 0;
   }
   
@@ -123,19 +124,22 @@ void programAnalogRead(){
   if(fogger3Val<200&&f3Ready<100){  
     f3Ready++;
   }
-  else{
+  else if(fogger1Val>=200){
     f3Ready = 0;
   }
   
-  
-//  Serial.print("F1: ");
+//Serial.print("F2: ");
+//Serial.print(fogger2Val,DEC);
+//Serial.print(" ");
+//  Serial.println(f2Ready);
+////  Serial.print("F1: ");
 //  Serial.print(fogger1Val,DEC);
 //  Serial.print(" F2: ");
 //  Serial.print(fogger2Val,DEC);
 //  Serial.print(" F3: ");
 //  Serial.println(fogger3Val,DEC);
 //  
-//  delay(300);
+  delay(500);
 }
 
 void readChar(){
@@ -272,7 +276,7 @@ void SuckSmoke(){
   delay(550);
   
   //trigger the smoke machine
-  triggerFogger(foggerOut2);
+  triggerFogger(foggerOut3);
   delay(100);
   
   //suck smoke
@@ -311,20 +315,17 @@ void Reset(){
 }
 //--------------------------------Bubble creation-------------------------
 void Big(){
-  moveServo('p', 130, 55);
-  servoPump.write(175);
+  moveServo('p', 100, 45);
+  moveServo('p', 130, 0);
   delay(500);
   incrementSmoke(10);
 }
 
 void Medium(){
-  for(pos = 50; pos<=90; pos++){ 
-    servoPump.write(pos);
-    delay(45); 
-  }
-  moveServo('p', 150, moveDelay);
+  moveServo('p', 95, 45);
+  moveServo('p', 110, 0);
   delay(500);
-  incrementSmoke(7);
+  incrementSmoke(20);
 }
 
 void Small(){
@@ -336,7 +337,7 @@ moveServo('p', 87, 0);
 }
 
 void Tiny(){
-  servoPump.write(40);
+  moveServo('p', 70, 0);
   delay(100);
   incrementSmoke(2);
 }
