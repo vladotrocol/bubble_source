@@ -6,6 +6,7 @@
 #include "BubbleState.h"
 #include "BubbleGenerator.h"
 
+using namespace std;
 class FruitNinja{
 	protected:
 		static const int ST_INIT=0;
@@ -24,6 +25,7 @@ class FruitNinja{
 		bool start();
 		void run();
 		bool stop();
-		void createBubble(unsigned int ID, char* material, BubbleState* state, BubbleGenerator* gen, char w);
+		void startStudy();
+		void createBubble(unsigned int ID, float radius, string material, BubbleState* state, BubbleGenerator* gen, char w);
 };
 #endif

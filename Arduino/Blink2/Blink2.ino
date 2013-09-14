@@ -1,13 +1,20 @@
 #include <Servo.h>
+//------------------------------------Important!-------------------
+//Wait about 20-30 seconds before starting the experiment
+
+//Make SURE you have the correct PORT (usually COM6 for the bubble arduino)
+
+//Make sure you reset or turn off the machine before leaving it unattended 
+//or else it might just start making bubbles on it's own and fill the room with smoke
 
 Servo servoPump;
 Servo servoSwing;
 char incomingByte;
-int full;
+int full=-1;
 int pos;
 
 int led = 13;
-
+int scentStudy = 0;
 //global delays
 int moveDelay=3;
 
@@ -32,9 +39,12 @@ int f1Ready = 0;
 int f2Ready = 0;
 int f3Ready = 0;
 
-int fogTrigDelay = 300;
+int fogTrigDelay = 200;
 
+int currentFogger = foggerOut1;
 int toggle=LOW;
+
+int startAnglePump = 55;
 
 void setup() {
   // initialize the LED pin as an output:
@@ -44,7 +54,7 @@ void setup() {
   servoPump.attach(3);
   servoSwing.attach(4);
 
-  moveServo('p',65, moveDelay);
+  moveServo('p',startAnglePump, moveDelay);
     delay(1000);
 
   //go to initial position
@@ -92,14 +102,43 @@ void triggerFogger(int whichFogger){
 
 }
 
+int getReadyFogger(){
+  if(currentFogger==foggerOut1){
+    return f1Ready;
+  }
+  else if(currentFogger == foggerOut2){
+    return f2Ready;
+  }
+  else if(currentFogger == foggerOut3){
+    return f3Ready;
+  }
+  return -1;
+}
+
 
 // the loop routine runs over and over again forever:
 void loop() {
   programAnalogRead();
-  
-  if(Serial.available()&&f3Ready<10&&f3Ready!=0){
-    readChar();
+  if(scentStudy==0){
+        if(full==0){
+          if(Serial.available()&&(getReadyFogger()<10&&getReadyFogger()>0)){   //change fogger (ready xcondition)
+            readChar();
+          }
+            
+        }
+        else
+        {
+          if(Serial.available()){
+            readChar();
+          }
+        }
+        }
+  else{
+        if(Serial.available()&&(getReadyFogger()<10&&getReadyFogger()>0)){   //change fogger (ready xcondition)
+          readChar();
+        }
   }
+
 }
 
 void programAnalogRead(){
@@ -147,12 +186,16 @@ void readChar(){
   int fogToTrig;
   
   if(incomingByte!=-1){
-    if(full==0){
+    if(full==0||full==-1){
       SuckSmoke();
     }
     else{
+      if(scentStudy==0){
       SuckAir();
-      //SuckSmoke();
+      }
+      else{
+      SuckSmoke();//for scent study
+      }
     }
   } 
   
@@ -267,26 +310,41 @@ void moveServo(char s,int nextPos, int Delay){
 }
 
 //-------------------------------Generator actions------------------------
+void clearSmoke(){
+//takle air out
+  moveServo('p', 130, moveDelay);
+  delay(250);
+  //takle air out
+  moveServo('p', 30, moveDelay);
+  delay(250);
+  //takle air out
+  moveServo('p', 130, moveDelay);
+  delay(250);
+}
+
 void SuckSmoke(){
   //move in position for smoke
+  
   moveServo('s', 145, moveDelay);
   delay(600);
-   //takle air out
+  if(scentStudy==1){
+  clearSmoke(); 
+  }     //takle air out
   moveServo('p', 130, moveDelay);
   delay(550);
   
   //trigger the smoke machine
-  triggerFogger(foggerOut3);
+  triggerFogger(currentFogger);                    //Set fogger
   delay(100);
   
   //suck smoke
-  moveServo('p', 65, moveDelay);
+  moveServo('p', startAnglePump, moveDelay);
   delay(1000);
 }
 
 void SuckAir(){
   //suck air
-  moveServo('p', 65, moveDelay);
+  moveServo('p', startAnglePump, moveDelay);
   delay(500);
 }
 
@@ -315,25 +373,26 @@ void Reset(){
 }
 //--------------------------------Bubble creation-------------------------
 void Big(){
-  moveServo('p', 100, 45);
-  moveServo('p', 130, 0);
+  moveServo('p', 85, 45);
+  moveServo('p', 100, 50);
+  moveServo('p', 125, 0);
   delay(500);
-  incrementSmoke(10);
+  incrementSmoke(20);
 }
 
 void Medium(){
-  moveServo('p', 95, 45);
-  moveServo('p', 110, 0);
+  moveServo('p', 83, 45);
+  moveServo('p', 93, 0);
   delay(500);
   incrementSmoke(20);
 }
 
 void Small(){
-moveServo('p', 80, 45);
-moveServo('p', 87, 0);
+  moveServo('p', 68, 45);
+  moveServo('p', 75, 0);
   delay(500);
 
-  incrementSmoke(15);
+  incrementSmoke(10);
 }
 
 void Tiny(){

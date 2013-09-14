@@ -17,11 +17,12 @@ public:
 	bool state;
 	unsigned int closeID;
 	double minD;
-	char* material;
+	string material;
 	bool updated;
 	void pixelsToMilimiters();
 	void write(Point3f center);
 	Point3f read();
+	float setRadius;
 private :
 	inline cv::Point3f _getKinectCoordinates(float x,float y, float depth);
 	inline cv::Point3f _fromKinectToWorldCoordinates(cv::Point3f p);

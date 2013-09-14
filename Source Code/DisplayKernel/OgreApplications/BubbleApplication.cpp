@@ -143,11 +143,15 @@ void BubbleApplication::updateNodesPositions(){
 		//get filter prediction
 		Point3f newCenter = itBubbles->second.predict.predict();
 		//compute new orientation
-		float alpha = atan(newCenter.y/newCenter.z);
-		float beta = atan(newCenter.x/newCenter.z);
+		float alpha=0; 
+		float beta=0;
+		if(newCenter.z!=0){
+			alpha= atan(newCenter.y/newCenter.z);
+			beta= atan(newCenter.x/newCenter.z);
+		}
 		Ogre::Quaternion q1( (Ogre::Radian)alpha, Ogre::Vector3(-1,0,0) );
 		Ogre::Quaternion q2((Ogre::Radian) (beta+3.1415f), Ogre::Vector3(0,1,0) );
-		static float size=40;
+		static float size=30;
 		//1.1. Try and get a handler of the graphical representation of this bubble
 		std::map<unsigned int, _GraphicalBubble>::iterator it=graphicBubbles.find(itBubbles->first);
 		//1.2. Check if it already existed...
@@ -155,7 +159,7 @@ void BubbleApplication::updateNodesPositions(){
 		{//This bubble already existed... we simply update its position
 			
 			
-			it->second.node->setScale(size,-size,size);	
+			it->second.node->setScale(itBubbles->second.setRadius,-itBubbles->second.setRadius,itBubbles->second.setRadius);	
 			it->second.node->setPosition(newCenter.x,newCenter.y, newCenter.z);
 			it->second.node->setOrientation(q1*q2);
 			//printf("%f %f\n", predictor[itBubbles->first].prediction.x,predictor[itBubbles->first].prediction.y);
@@ -170,9 +174,9 @@ void BubbleApplication::updateNodesPositions(){
 			aux->attachObject(auxEnt);
 			//Set its size and position
 			//aux->scale(itBubbles->second.radius,itBubbles->second.radius,-itBubbles->second.radius);	
-			//aux->rotate(Ogre::Vector3(0,1,0), Ogre::Radian(3.1415f));
+		//aux->rotate(Ogre::Vector3(0,1,0), Ogre::Radian(3.1415f));
 			//aux->scale(40,-40,40);	
-			aux->setScale(size,-size,size);	
+			aux->setScale(itBubbles->second.setRadius,-itBubbles->second.setRadius,itBubbles->second.setRadius);	
 			aux->setPosition(newCenter.x,newCenter.y, newCenter.z);
 			aux->setOrientation(q1*q2);
 			//Store it

@@ -159,7 +159,7 @@ void COMToolkit::sendByte(unsigned char byte){
 	}
 	else{
 		//printf("Sent %d\n", byte);
-		cout << "Sent: " << buffer << endl ;
+		//cout << "Sent: " << buffer << endl ;
 	}
 	SetFilePointer(hSerial,0,0,FILE_BEGIN);
 }
